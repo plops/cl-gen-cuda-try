@@ -41,14 +41,14 @@
 				    `(,(format nil "d_~a" e) :type int*))
 			       )
 			 ,@(loop for e in '(a b c) collect
-				`(funcall cudaMalloc (,(format nil "&d_~a" e) (* N (funcall sizeof int)))))
+				`(funcall cudaMalloc ,(format nil "&d_~a" e) (* N (funcall sizeof int))))
 			 (dotimes (i N)
 			   (setf (aref a i) i
 				 (aref b i) i
 				 (aref c i) 0))
 			 ,@(loop for e in '(a b c) collect
-				`(funcall cudaMemcpy (,(format nil "d_~a" e) ,e (* N (funcall sizeof int))
-						       cudaMemcpyHostToDevice)))
+				`(funcall cudaMemcpy ,(format nil "d_~a" e) ,e (* N (funcall sizeof int))
+					  cudaMemcpyHostToDevice))
 			 (funcall "vector_add<<<1,N>>>" d_a d_b d_c N)
 			 (funcall cudaMemcpy c d_c (* N (funcall sizeof int))
 				  cudaMemcpyDeviceToHost)
@@ -57,4 +57,7 @@
 				  (funcall free ,e)
 				  (funcall cudaFree ,(format nil "d_~a" e))))
 			 (return 0))))))
-    (write-source *main-cpp-filename* "cpp" code)))
+    (write-source *main-cpp-filename* "cu" code)
+    (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "serv3:./"))))
+
+

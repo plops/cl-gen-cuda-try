@@ -20,20 +20,17 @@ int main() {
     int *d_a;
     int *d_b;
     int *d_c;
-    cudaMalloc(not processable : (&d_a(*N(funcall sizeof int))));
-    cudaMalloc(not processable : (&d_b(*N(funcall sizeof int))));
-    cudaMalloc(not processable : (&d_c(*N(funcall sizeof int))));
+    cudaMalloc(&d_a, (N * sizeof(int)));
+    cudaMalloc(&d_b, (N * sizeof(int)));
+    cudaMalloc(&d_c, (N * sizeof(int)));
     for (unsigned int i = 0; (i < N); i += 1) {
       a[i] = i;
       b[i] = i;
       c[i] = 0;
     }
-    cudaMemcpy(not processable
-               : (d_a a(*N(funcall sizeof int)) cudaMemcpyHostToDevice));
-    cudaMemcpy(not processable
-               : (d_b b(*N(funcall sizeof int)) cudaMemcpyHostToDevice));
-    cudaMemcpy(not processable
-               : (d_c c(*N(funcall sizeof int)) cudaMemcpyHostToDevice));
+    cudaMemcpy(d_a, a, (N * sizeof(int)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b, (N * sizeof(int)), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_c, c, (N * sizeof(int)), cudaMemcpyHostToDevice);
     vector_add<<<1, N>>>(d_a, d_b, d_c, N);
     cudaMemcpy(c, d_c, (N * sizeof(int)), cudaMemcpyDeviceToHost);
     free(a);
