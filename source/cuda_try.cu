@@ -14,9 +14,9 @@ enum { N = 1024 };
 
 int main() {
   {
-    int *a = malloc((N * sizeof(int)));
-    int *b = malloc((N * sizeof(int)));
-    int *c = malloc((N * sizeof(int)));
+    int *a = static_cast<int *>(malloc((N * sizeof(int))));
+    int *b = static_cast<int *>(malloc((N * sizeof(int))));
+    int *c = static_cast<int *>(malloc((N * sizeof(int))));
     int *d_a;
     int *d_b;
     int *d_c;

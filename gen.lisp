@@ -36,7 +36,8 @@
 			       "int")
 		       
 		       (let (,@(loop for e in '(a b c) collect
-				    `(,e :type int* :init (funcall malloc (* N (funcall sizeof int)))))
+				    `(,e :type int* :init (funcall "static_cast<int*>"
+								   (funcall malloc (* N (funcall sizeof int))))))
 			     ,@(loop for e in '(a b c) collect
 				    `(,(format nil "d_~a" e) :type int*))
 			       )
