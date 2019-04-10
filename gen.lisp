@@ -59,6 +59,6 @@
 				  (funcall cudaFree ,(format nil "d_~a" e))))
 			 (return 0))))))
     (write-source *main-cpp-filename* "cu" code)
-    (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "serv3:./"))))
+    (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "serv3:./"))))
 
 
