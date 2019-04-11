@@ -19,113 +19,121 @@
 
 
 (code `(with-compilation-unit
-		 (include <iostream>)
-	        (include <iomanip>)		 
-	       (include <cmath>)
-	       (include <algorithm>)
-	       (include <array>)
-	       (include <complex>)
-	       (include <sys/time.h>) ;; gettimeofday
+	   (include <iostream>)
+	 (include <iomanip>)		 
+	 (include <cmath>)
+	 (include <algorithm>)
+	 (include <array>)
+	 (include <complex>)
+	 (include <sys/time.h>) ;; gettimeofday
 
-	       (with-compilation-unit
-		     (enum Constants (M_MAG_N ,n))
+	 (with-compilation-unit
+	     (enum Constants (M_MAG_N ,n))
 		 
-		   (decl (
+	   (decl (
 			  
-			  (m_fft_in :type "std::array<std::complex<float>,M_MAG_N>"  :init (list (list ,@ (loop for i below n collect 0.0))))
-			  (m_fft_out :type "std::array<std::complex<float>,M_MAG_N>"  :init (list (list ,@ (loop for i below n collect 0.0))))
-			  (m_fft_out2 :type "std::array<std::complex<float>,M_MAG_N>"  :init (list (list ,@ (loop for i below n collect 0.0))))
-			  (m_fft_out_mag :type "std::array<float,M_MAG_N>" :init (list (list ,@ (loop for i below n collect 0.0))))
-			  )))
-	       (function (current_time () "static inline uint64_t")
+		  (m_fft_in :type "std::array<std::complex<float>,M_MAG_N>"  :init (list (list ,@ (loop for i below n collect 0.0))))
+		  (m_fft_out :type "std::array<std::complex<float>,M_MAG_N>"  :init (list (list ,@ (loop for i below n collect 0.0))))
+		  (m_fft_out2 :type "std::array<std::complex<float>,M_MAG_N>"  :init (list (list ,@ (loop for i below n collect 0.0))))
+		  (m_fft_out_mag :type "std::array<float,M_MAG_N>" :init (list (list ,@ (loop for i below n collect 0.0))))
+		  )))
+	 (function (current_time () "static inline uint64_t")
                                          
-                                         (let ((tv :type "struct timeval"))
-                                           (funcall gettimeofday &tv nullptr)
-                                           (return (+ (* tv.tv_sec 1000000)
-                                                      tv.tv_usec))))
+                   (let ((tv :type "struct timeval"))
+                     (funcall gettimeofday &tv nullptr)
+                     (return (+ (* tv.tv_sec 1000000)
+                                tv.tv_usec))))
 
-	       (function (ft ((in :type "const std::array<std::complex<float>, N > &" )
-			      (out :type "std::array<std::complex<float>, N > &" ))
-			     "template<std::size_t N> void"
-			     )
-			 (dotimes (k N)
-			   (setf (aref out k) 0))
-			 (dotimes (k N)
-			   (dotimes (n N)
-			     (+= (aref out k) (* (funcall "std::exp"
-							  (funcall "std::complex<float>"
-								   0s0
-								   (/ (* M_PI -2 k n)
-								      N)))
-						 (aref in n))))))
-	       ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
-	       ;; https://www.nvidia.com/content/dam/en-zz/Solutions/design-visualization/technologies/turing-architecture/NVIDIA-Turing-Architecture-Whitepaper.pdf
-	       ;; L2 cache/gpu      =  5.6MB
-	       ;; register file/gpu = 17.4MB = 72 (68?) * 256kB
-	       ;; L1 6.9MB = 72*96kB (64l1,32shm) or (32l1,64shm) (shared between 4 processing blocks)
-	       ;; Compute workloads can divide the 96 KB into 32 KB
-	       ;; shared memory and 64 KB L1 cache, or 64 KB shared
-	       ;; memory and 32 KB L1 cache.
+	 (function (ft ((in :type "const std::array<std::complex<float>, N > &" )
+			(out :type "std::array<std::complex<float>, N > &" ))
+		       "template<std::size_t N> void"
+		       )
+		   (dotimes (k N)
+		     (setf (aref out k) 0))
+		   (dotimes (k N)
+		     (dotimes (n N)
+		       (+= (aref out k) (* (funcall "std::exp"
+						    (funcall "std::complex<float>"
+							     0s0
+							     (/ (* M_PI -2 k n)
+								N)))
+					   (aref in n))))))
+	 ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
+	 ;; https://www.nvidia.com/content/dam/en-zz/Solutions/design-visualization/technologies/turing-architecture/NVIDIA-Turing-Architecture-Whitepaper.pdf
+	 ;; L2 cache/gpu      =  5.6MB
+	 ;; register file/gpu = 17.4MB = 72 (68?) * 256kB
+	 ;; L1 6.9MB = 72*96kB (64l1,32shm) or (32l1,64shm) (shared between 4 processing blocks)
+	 ;; Compute workloads can divide the 96 KB into 32 KB
+	 ;; shared memory and 64 KB L1 cache, or 64 KB shared
+	 ;; memory and 32 KB L1 cache.
 
-	       ;; https://images.nvidia.com/content/volta-architecture/pdf/volta-architecture-whitepaper.pdf
-	       ;; tensor core
-	       ;; mixed precision fp32/fp16 2d fft https://sc18.supercomputing.org/proceedings/src_poster/poster_files/spost111s2-file2.pdf
-	       ;; https://arxiv.org/pdf/1803.04014
-	       
-	       (function  (bit_reverse_copy ((in :type "const std::array<std::complex<float>, N > &")
-					     (out :type "std::array<std::complex<float>, N > &"))
-					    "template<std::size_t N > void")
-			  (setf ,@(loop for i below n appending
-				  `((aref out ,(rev i n)) (aref in ,i)))))
-	       (function
-		(fft ((in :type "const std::array<std::complex<float>, N > &")
-				(out :type "std::array<std::complex<float>, N > &"))
-			       "template<std::size_t N > void")
-		(funcall bit_reverse_copy in out)
-		,@(loop for s from 1 upto (floor (log n 2)) appending
-		       (let ((m (expt 2 s)))
-			 `((let ((w_m :type "const auto" :init (funcall "std::complex<float>"
-									,(coerce (cos (/ (* pi -2) m)) 'single-float)
-									,(coerce (sin (/ (* pi -2) m)) 'single-float))))
-			     (for ((k 0) (< k N) (+= k ,m))
-				  (let ((w :type "std::complex<float>" :ctor 1))
-				    (dotimes (j ,(/ m 2))
-				      (let ((t :ctor (* w (aref out (+ k j ,(/ m 2)))))
-					    (u :ctor (aref out (+ k j)))
-					    )
-					(setf (aref out (+ k j)) (+ u t)
-					      (aref out (+ k j ,(/ m 2))) (- u t)
-					      w (* w w_m)))))))))
-		       ))
+	 ;; https://images.nvidia.com/content/volta-architecture/pdf/volta-architecture-whitepaper.pdf
+	 ;; tensor core
+	 ;; mixed precision fp32/fp16 2d fft https://sc18.supercomputing.org/proceedings/src_poster/poster_files/spost111s2-file2.pdf
+	 ;; https://arxiv.org/pdf/1803.04014
+	 
+	 ;; W. Linderman, J. Corner, and S. Tucker. 2006. Real-time wide swath synthetic aperture radar image formation using embedded HPC. InHPCMP Users GroupConferences, 2006. IEEE, 244–251. 10.1109/hpcmp-ugc.2006.68
+	 
+	 ;; real-time formation of 37 km wide strips of imagery with
+	 ;; <1m resolution.  Twenty-four dual Xeon nodes costing less
+	 ;; than $100K are capable of sustaining the real-time
+	 ;; throughput of 100 GFLOPS and continuously produce imagery
+	 ;; at a rate of 3.43 km^2/second.
+	 
+	 (function  (bit_reverse_copy ((in :type "const std::array<std::complex<float>, N > &")
+				       (out :type "std::array<std::complex<float>, N > &"))
+				      "template<std::size_t N > void")
+		    (setf ,@(loop for i below n appending
+				 `((aref out ,(rev i n)) (aref in ,i)))))
+	 (function
+	  (fft ((in :type "const std::array<std::complex<float>, N > &")
+		(out :type "std::array<std::complex<float>, N > &"))
+	       "template<std::size_t N > void")
+	  (funcall bit_reverse_copy in out)
+	  ,@(loop for s from 1 upto (floor (log n 2)) appending
+		 (let ((m (expt 2 s)))
+		   `((let ((w_m :type "const auto" :init (funcall "std::complex<float>"
+								  ,(coerce (cos (/ (* pi -2) m)) 'single-float)
+								  ,(coerce (sin (/ (* pi -2) m)) 'single-float))))
+		       (for ((k 0) (< k N) (+= k ,m))
+			    (let ((w :type "std::complex<float>" :ctor 1))
+			      (dotimes (j ,(/ m 2))
+				(let ((t :ctor (* w (aref out (+ k j ,(/ m 2)))))
+				      (u :ctor (aref out (+ k j)))
+				      )
+				  (setf (aref out (+ k j)) (+ u t)
+					(aref out (+ k j ,(/ m 2))) (- u t)
+					w (* w w_m)))))))))
+		 ))
 	      
 	       
-	       (function (main () int)
+	 (function (main () int)
 
-			 (statements
-			  (dotimes (i M_MAG_N)
-			    (setf (aref m_fft_in i) 0.0
-				  (aref m_fft_out i) 0.0
-				  (aref m_fft_out_mag i) 0.0))
-			  (setf (aref m_fft_in 1) 1.0)
-			  (macroexpand (benchmark
-					(dotimes (i 10)
-					  (funcall ft m_fft_in m_fft_out)))))
+		   (statements
+		    (dotimes (i M_MAG_N)
+		      (setf (aref m_fft_in i) 0.0
+			    (aref m_fft_out i) 0.0
+			    (aref m_fft_out_mag i) 0.0))
+		    (setf (aref m_fft_in 1) 1.0)
+		    (macroexpand (benchmark
+				  (dotimes (i 10)
+				    (funcall ft m_fft_in m_fft_out)))))
 
-			 (statements
-			  (dotimes (i M_MAG_N)
-			    (setf (aref m_fft_in i) 0.0
-				  (aref m_fft_out2 i) 0.0
-				  (aref m_fft_out_mag i) 0.0))
-			  (setf (aref m_fft_in 1) 1.0)
-			  (macroexpand (benchmark
-			     (dotimes (i 10)
-			       (funcall fft m_fft_in m_fft_out2)))))
+		   (statements
+		    (dotimes (i M_MAG_N)
+		      (setf (aref m_fft_in i) 0.0
+			    (aref m_fft_out2 i) 0.0
+			    (aref m_fft_out_mag i) 0.0))
+		    (setf (aref m_fft_in 1) 1.0)
+		    (macroexpand (benchmark
+				  (dotimes (i 10)
+				    (funcall fft m_fft_in m_fft_out2)))))
 			 
-			 #+nil (dotimes  (i M_MAG_N)
-				 (setf (aref m_fft_out_mag i) (funcall "std::abs" (aref m_fft_out i))))
+		   #+nil (dotimes  (i M_MAG_N)
+			   (setf (aref m_fft_out_mag i) (funcall "std::abs" (aref m_fft_out i))))
 			 
-			 (dotimes (i M_MAG_N)
-			   (macroexpand (e (funcall "std::setw" 6) i (funcall "std::setw" 30) (aref m_fft_out i) (funcall "std::setw" 30) (aref m_fft_out2 i)))))))
+		   (dotimes (i M_MAG_N)
+		     (macroexpand (e (funcall "std::setw" 6) i (funcall "std::setw" 30) (aref m_fft_out i) (funcall "std::setw" 30) (aref m_fft_out2 i)))))))
 
 (progn
   (defparameter *main-cpp-filename*
