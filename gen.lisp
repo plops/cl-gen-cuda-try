@@ -70,7 +70,7 @@
 	 ;; https://images.nvidia.com/content/volta-architecture/pdf/volta-architecture-whitepaper.pdf
 	 ;; tensor core
 	 ;; mixed precision fp32/fp16 2d fft https://sc18.supercomputing.org/proceedings/src_poster/poster_files/spost111s2-file2.pdf
-	 ;; https://arxiv.org/pdf/1803.04014
+	 ;; tensor Core Programmability,Performance & Precision (2018) https://arxiv.org/pdf/1803.04014
 	 
 	 ;; W. Linderman, J. Corner, and S. Tucker. 2006. Real-time wide swath synthetic aperture radar image formation using embedded HPC. InHPCMP Users GroupConferences, 2006. IEEE, 244–251. 10.1109/hpcmp-ugc.2006.68
 	 
