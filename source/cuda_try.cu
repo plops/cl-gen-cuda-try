@@ -424,6 +424,34 @@ int main() {
              "into when usingcudaFuncSetAttribute)\n",
              val);
     }
+    {
+      size_t val;
+      cudaDeviceGetLimit(&val, cudaLimitStackSize);
+      printf(
+          "cudaLimitStackSize=%lu (stack size in bytes of each GPU thread)\n",
+          val);
+      cudaDeviceGetLimit(&val, cudaLimitPrintfFifoSize);
+      printf("cudaLimitPrintfFifoSize=%lu (size in bytes of the shared FIFO "
+             "used by the printf() devicesystem call)\n",
+             val);
+      cudaDeviceGetLimit(&val, cudaLimitMallocHeapSize);
+      printf("cudaLimitMallocHeapSize=%lu (size in bytes of the heap used by "
+             "the malloc() and free()device system calls)\n",
+             val);
+      cudaDeviceGetLimit(&val, cudaLimitDevRuntimeSyncDepth);
+      printf("cudaLimitDevRuntimeSyncDepth=%lu (maximum grid depth at which a "
+             "thread canisssue the device runtime call cudaDeviceSynchronize() "
+             "to wait on child gridlaunches to complete.)\n",
+             val);
+      cudaDeviceGetLimit(&val, cudaLimitDevRuntimePendingLaunchCount);
+      printf("cudaLimitDevRuntimePendingLaunchCount=%lu (maximum number of "
+             "outstandingdevice runtime launches.)\n",
+             val);
+      cudaDeviceGetLimit(&val, cudaLimitMaxL2FetchGranularity);
+      printf(
+          "cudaLimitMaxL2FetchGranularity=%lu (L2 cache fetch granularity.)\n",
+          val);
+    }
   }
   {
     int *a = static_cast<int *>(malloc((N * sizeof(int))));

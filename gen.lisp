@@ -233,6 +233,15 @@
     (cudaDevAttrMaxSharedMemoryPerBlockOptin "Maximum per blockshared memory size on the device. This value can be opted into when usingcudaFuncSetAttribute")) )
 
 
+(defparameter  *device-limit* 
+ `((cudaLimitStackSize "stack size in bytes of each GPU thread")
+  (cudaLimitPrintfFifoSize "size in bytes of the shared FIFO used by the printf() devicesystem call")
+  (cudaLimitMallocHeapSize "size in bytes of the heap used by the malloc() and free()device system calls")
+  (cudaLimitDevRuntimeSyncDepth "maximum grid depth at which a thread canisssue the device runtime call cudaDeviceSynchronize() to wait on child gridlaunches to complete.")
+  (cudaLimitDevRuntimePendingLaunchCount "maximum number of outstandingdevice runtime launches.")
+  (cudaLimitMaxL2FetchGranularity "L2 cache fetch granularity.")))
+
+
 (progn
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cuda_try"
@@ -265,10 +274,18 @@
 			   ,@(loop for (attr text) in *device-attribute* collect
 				  `(statements
 				    (funcall cudaDeviceGetAttribute &val ,attr cuda_dev)
-				    (funcall printf (string ,(format nil "~a=%d (~a)\\n" attr text)) val)))))
+				    (funcall printf (string ,(format nil "~a=%d (~a)\\n" attr text)) val))))
+			 (let ((val :type size_t))
+			   ,@(loop for (name text) in *device-limit* collect
+				  `(statements
+				    (funcall cudaDeviceGetLimit &val ,name)
+				    (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val)))))
 		       #+nil(let ((device_prop :type cudaDeviceProp))
 			 (funcall cudaGetDeviceProperties &device_prop cuda_dev)
 			 )
+
+		       #+nil
+		       (funcall cudaDeviceGetCacheConfig cudaFuncCachePreferShared)
 		       
 		       (let (,@(loop for e in '(a b c) collect
 				    `(,e :type int* :init (funcall "static_cast<int*>"
