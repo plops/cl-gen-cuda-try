@@ -21,11 +21,11 @@ __global__ void vector_add(int *a, int *b, int *c, int n) {
     }
   }
 }
-enum { N = 1024, NX = 256, NY = 256 };
+enum { N = 1024, NX = 256, NY = 32 };
 
 __global__ void fft(cuFloatComplex *__restrict__ in) {
   {
-    __shared__ cuFloatComplex tmp[NY];
+    __shared__ cuFloatComplex tmp[NX];
     tmp[0] = in[0];
     tmp[128] = in[1];
     tmp[64] = in[2];

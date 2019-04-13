@@ -33,6 +33,7 @@
 
 ;; enable gdb by adding this to docker (can't figure out how to do this on vast.ai, though):
 ;; --cap-add=SYS_PTRACE
+;; Do not grant this capability to containers unless you know what you are doing. Seriously.
 
 ;; apt install cuda-cupti-10-1
 ;; https://people.maths.ox.ac.uk/gilesm/cuda/lecs/NV_Profiling_lowres.pdf
@@ -46,6 +47,11 @@
 ;; strided
 ;; bank conflicts can slow down access of shared memory but in general it is fast for random access
 
+;; The texture cache is optimized for 2D spatial locality, so threads
+;; of the same warp that read texture addresses that are close
+;; together will achieve best performance.      -> this is useless for 1d ffts
+
+;; https://people.eecs.berkeley.edu/~kubitron/courses/cs258-S08/projects/reports/project6_report.pdf
 
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
@@ -410,11 +416,11 @@
 			      (statements
 			       (setf (aref c i) (+ (aref a i)
 						   (aref b i)))))))
-	      (enum () (N 1024) (NX 256) (NY 256))
+	      (enum () (N 1024) (NX 256) (NY 32))
 
 	      (function ("fft" ((in :type "cuFloatComplex* __restrict__"))
 			       "__global__ void")
-			(let (((aref tmp NY) :type "__shared__ cuFloatComplex"))
+			(let (((aref tmp NX) :type "__shared__  cuFloatComplex"))
 			  (setf ,@(loop for i below 256 appending
 				       `((aref tmp ,(rev i 256)) (aref in ,i))))
 			  #+nil(setf (aref tmp threadIdx.y)
