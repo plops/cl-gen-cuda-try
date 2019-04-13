@@ -31,7 +31,8 @@
 ;; throughput of 100 GFLOPS and continuously produce imagery
 ;; at a rate of 3.43 km^2/second.
 
-
+;; enable gdb by adding this to docker:
+;; --cap-add=SYS_PTRACE
 
 #+nil
 (defun rev (x nn)
@@ -295,10 +296,10 @@
 			    ,@(loop for (name text) in *device-limit* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetLimit &val ,name))
-				     (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val)))))
-			#+nil(let ((device_prop :type cudaDeviceProp))
-			       (funcall cudaGetDeviceProperties &device_prop cuda_dev)
-			       )
+				     (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val))))
+			  (let ((device_prop :type cudaDeviceProp))
+			    ,(cuda `(funcall cudaGetDeviceProperties &device_prop cuda_dev))
+			    ))
 
 		       
 			,(cuda `(funcall cudaDeviceSetCacheConfig cudaFuncCachePreferShared))
@@ -328,4 +329,4 @@
 			  (return 0))))))
      (write-source *main-cpp-filename* "cu" code)
      (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))
-     (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc cuda_try.cu; ./a.out")))))
+     (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -g cuda_try.cu; ./a.out")))))

@@ -521,6 +521,10 @@ int main() {
           "cudaLimitMaxL2FetchGranularity=%lu (L2 cache fetch granularity.)\n",
           val);
     }
+    {
+      cudaDeviceProp device_prop;
+      check_cuda_errors(cudaGetDeviceProperties(&device_prop, cuda_dev));
+    }
   }
   check_cuda_errors(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
   {
