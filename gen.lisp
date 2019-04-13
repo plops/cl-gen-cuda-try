@@ -35,7 +35,7 @@
 ;; --cap-add=SYS_PTRACE
 
 ;; apt install cuda-cupti-10-1
-;; 
+;; https://developer.download.nvidia.com/compute/DevZone/docs/html/C/doc/CUPTI_Users_Guide.pdf
 
 #+nil
 (defun rev (x nn)
