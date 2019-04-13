@@ -246,7 +246,7 @@
 (defparameter *device-property*
   `((char name 256 )
     ;;(cudaUUID_t uuid) ;; char bytes[16]
-    ;(uint8_t uuid 16) 
+    (uint8_t uuid.bytes 16) 
     (size_t totalGlobalMem)
     (size_t sharedMemPerBlock)
     (int regsPerBlock)
@@ -382,12 +382,14 @@
 								     (int "%d")
 								     (size_t "%zu")
 								     (char "%c")
-								     (uint8_t "%x"))))
+								     (uint8_t "0x%02hhX"))))
 					      (full-fmt (format nil "~a = ~a\\n" name el-fmt)))
 					 (when number
 					   (setf full-fmt (format nil "~a = [~{~a~^,~}]\\n" name (loop for i below number collect el-fmt))))
 					 (if number
-					     `(funcall printf (string ,full-fmt) ,@(loop for i below number collect `(aref (slot-value device_prop ,name) ,i)))
+					     `(funcall printf (string ,full-fmt)
+						       ,@(loop for i below number collect
+							      `(aref (slot-value device_prop ,name) ,i)))
 					     `(funcall printf (string ,full-fmt) (slot-value device_prop ,name))))))
 			    ))
 

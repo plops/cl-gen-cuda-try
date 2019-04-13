@@ -624,6 +624,18 @@ int main() {
           device_prop.name[249], device_prop.name[250], device_prop.name[251],
           device_prop.name[252], device_prop.name[253], device_prop.name[254],
           device_prop.name[255]);
+      printf("uuid.bytes = "
+             "[0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,"
+             "0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,0x%02hhX,"
+             "0x%02hhX,0x%02hhX]\n",
+             device_prop.uuid.bytes[0], device_prop.uuid.bytes[1],
+             device_prop.uuid.bytes[2], device_prop.uuid.bytes[3],
+             device_prop.uuid.bytes[4], device_prop.uuid.bytes[5],
+             device_prop.uuid.bytes[6], device_prop.uuid.bytes[7],
+             device_prop.uuid.bytes[8], device_prop.uuid.bytes[9],
+             device_prop.uuid.bytes[10], device_prop.uuid.bytes[11],
+             device_prop.uuid.bytes[12], device_prop.uuid.bytes[13],
+             device_prop.uuid.bytes[14], device_prop.uuid.bytes[15]);
       printf("totalGlobalMem = %zu\n", device_prop.totalGlobalMem);
       printf("sharedMemPerBlock = %zu\n", device_prop.sharedMemPerBlock);
       printf("regsPerBlock = %d\n", device_prop.regsPerBlock);
