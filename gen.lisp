@@ -446,14 +446,23 @@
 					      (full-fmt (format nil "~v,,,'.a = ~a\\n"
 								max-name-len
 								name el-fmt)))
-					 (when number
-					   (setf full-fmt (format nil "~v,,,'.a = [~{~a~^,~}]\\n"
-								  max-name-len
-								  name (loop for i below number collect el-fmt))))
-					 (if number
-					     `(funcall printf (string ,full-fmt)
-						       ,@(loop for i below number collect
-							      `(aref (slot-value device_prop ,name) ,i)))
+				       (cond
+					 ((eq type 'char)
+					  (setf full-fmt (format nil "~v,,,'.a = '%s'\\n"
+								     max-name-len
+								     name)))
+					 (number
+					      (setf full-fmt (format nil "~v,,,'.a = [~{~a~^,~}]\\n"
+								     max-name-len
+								     name (loop for i below number collect el-fmt)))))
+				       (if number
+					   (cond ((eq type 'char)
+						  `(funcall printf (string ,full-fmt)
+							    (slot-value device_prop ,name)))
+						 (t
+						  `(funcall printf (string ,full-fmt)
+							    ,@(loop for i below number collect
+								   `(aref (slot-value device_prop ,name) ,i)))))
 					     `(funcall printf (string ,full-fmt) (slot-value device_prop ,name))))))))
 	      
 	      (function ("main" ()
