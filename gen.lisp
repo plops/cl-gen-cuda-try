@@ -49,10 +49,10 @@
 
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
-      (res 0))
-  (dotimes (i n)
-    (setf (ldb (byte 1 i) res) (ldb (byte 1 (- n 1 i)) x)))
-  res))
+	(res 0))
+    (dotimes (i n)
+      (setf (ldb (byte 1 i) res) (ldb (byte 1 (- n 1 i)) x)))
+    res))
 
 #+nil
 (code `(with-compilation-unit
@@ -415,7 +415,9 @@
 	      (function ("fft" ((in :type "cuFloatComplex* __restrict__"))
 			       "__global__ void")
 			(let (((aref tmp NY) :type "__shared__ cuFloatComplex"))
-			  (setf (aref tmp threadIdx.y)
+			  (setf ,@(loop for i below 256 appending
+				       `((aref tmp ,(rev i 256)) (aref in ,i))))
+			  #+nil(setf (aref tmp threadIdx.y)
 				(aref in threadIdx.y)))
 			)
 	      
