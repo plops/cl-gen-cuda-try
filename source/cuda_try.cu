@@ -760,7 +760,25 @@ int main() {
     cudaMemcpy(d_a, a, (N * sizeof(int)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b, (N * sizeof(int)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_c, c, (N * sizeof(int)), cudaMemcpyHostToDevice);
-    vector_add<<<1, N>>>(d_a, d_b, d_c, N);
+    {
+      cudaEvent_t start;
+      cudaEvent_t stop;
+      check_cuda_errors(cudaEventCreate(&start));
+      check_cuda_errors(cudaEventCreate(&stop));
+      check_cuda_errors(cudaEventRecord(start, 0));
+      vector_add<<<1, N>>>(d_a, d_b, d_c, N);
+      check_cuda_errors(cudaEventRecord(stop, 0));
+      check_cuda_errors(cudaEventSynchronize(stop));
+      {
+        float time;
+        check_cuda_errors(cudaEventElapsedTime(&time, start, stop));
+        printf("executing kernel '(funcall vector_add<<<1,N>>> d_a d_b d_c N)' "
+               "took %f ms.\n",
+               time);
+        check_cuda_errors(cudaEventDestroy(start));
+        check_cuda_errors(cudaEventDestroy(stop));
+      }
+    }
     cudaMemcpy(c, d_c, (N * sizeof(int)), cudaMemcpyDeviceToHost);
     free(a);
     cudaFree(d_a);

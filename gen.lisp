@@ -38,6 +38,8 @@
 ;; https://people.maths.ox.ac.uk/gilesm/cuda/lecs/NV_Profiling_lowres.pdf
 ;; https://developer.download.nvidia.com/compute/DevZone/docs/html/C/doc/CUPTI_Users_Guide.pdf
 
+;; https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/
+
 #+nil
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
@@ -324,13 +326,47 @@
 
 
 
+(defun cuda (cmd)
+  `(funcall check_cuda_errors ,cmd))
+
+;; https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/
+;; cudaEvent_t start, stop;
+;; float time;
+
+;; cudaEventCreate(&start);
+;; cudaEventCreate(&stop);
+
+;; cudaEventRecord( start, 0 );
+;; kernel<<<grid,threads>>> ( d_odata, d_idata, size_x, size_y, 
+;;                            NUM_REPS);
+;; cudaEventRecord( stop, 0 );
+;; cudaEventSynchronize( stop );
+
+;; cudaEventElapsedTime( &time, start, stop );
+;; cudaEventDestroy( start );
+;; cudaEventDestroy( stop );
+
+
+(defun with-cuda-timer (kernel-instantiation)
+  `(let ((start :type cudaEvent_t)
+	 (stop :type cudaEvent_t))
+     ,(cuda `(funcall cudaEventCreate &start))
+     ,(cuda `(funcall cudaEventCreate &stop))
+     ,(cuda `(funcall cudaEventRecord start 0))
+     ,kernel-instantiation
+     ,(cuda `(funcall cudaEventRecord stop 0))
+     ,(cuda `(funcall cudaEventSynchronize stop))
+     (let ((time :type float))
+       ,(cuda `(funcall cudaEventElapsedTime &time start stop))
+       (funcall printf (string ,(format nil "executing kernel '~a' took %f ms.\\n" kernel-instantiation)) time)
+       ,(cuda `(funcall cudaEventDestroy start))
+       ,(cuda `(funcall cudaEventDestroy stop)))))
 
 (progn
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cuda_try"
 		     (user-homedir-pathname)))
-  (flet ((cuda (cmd)
-	       `(funcall check_cuda_errors ,cmd)))
+  (flet ()
     (let* (				;(n 32)
 	  (code
 	   `(with-compilation-unit
@@ -430,7 +466,7 @@
 			  ,@(loop for e in '(a b c) collect
 				 `(funcall cudaMemcpy ,(format nil "d_~a" e) ,e (* N (funcall sizeof int))
 					   cudaMemcpyHostToDevice))
-			  (funcall "vector_add<<<1,N>>>" d_a d_b d_c N)
+			  ,(with-cuda-timer `(funcall "vector_add<<<1,N>>>" d_a d_b d_c N))
 			  (funcall cudaMemcpy c d_c (* N (funcall sizeof int))
 				   cudaMemcpyDeviceToHost)
 			  ,@(loop for e in '(a b c) collect
@@ -440,4 +476,5 @@
 			  (return 0))))))
      (write-source *main-cpp-filename* "cu" code)
      (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))
-     (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -g cuda_try.cu; ./a.out")))))
+     ;; -g
+     (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu 2>compile_msg.out;  ./a.out")))))
