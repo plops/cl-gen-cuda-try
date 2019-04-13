@@ -743,12 +743,18 @@ int main() {
   }
   check_cuda_errors(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
   {
-    int *a = static_cast<int *>(malloc((N * sizeof(int))));
-    int *b = static_cast<int *>(malloc((N * sizeof(int))));
-    int *c = static_cast<int *>(malloc((N * sizeof(int))));
+    int *a = static_cast<int *>(0);
+    int *b = static_cast<int *>(0);
+    int *c = static_cast<int *>(0);
     int *d_a;
     int *d_b;
     int *d_c;
+    check_cuda_errors(cudaHostAlloc(static_cast<void **>((&(a))),
+                                    (N * sizeof(int)), cudaHostAllocDefault));
+    check_cuda_errors(cudaHostAlloc(static_cast<void **>((&(b))),
+                                    (N * sizeof(int)), cudaHostAllocDefault));
+    check_cuda_errors(cudaHostAlloc(static_cast<void **>((&(c))),
+                                    (N * sizeof(int)), cudaHostAllocDefault));
     cudaMalloc(&d_a, (N * sizeof(int)));
     cudaMalloc(&d_b, (N * sizeof(int)));
     cudaMalloc(&d_c, (N * sizeof(int)));
@@ -757,9 +763,9 @@ int main() {
       b[i] = i;
       c[i] = 0;
     }
-    cudaMemcpy(d_a, a, (N * sizeof(int)), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, b, (N * sizeof(int)), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_c, c, (N * sizeof(int)), cudaMemcpyHostToDevice);
+    cudaMemcpyAsync(d_a, a, (N * sizeof(int)), cudaMemcpyHostToDevice, 0);
+    cudaMemcpyAsync(d_b, b, (N * sizeof(int)), cudaMemcpyHostToDevice, 0);
+    cudaMemcpyAsync(d_c, c, (N * sizeof(int)), cudaMemcpyHostToDevice, 0);
     {
       cudaEvent_t start;
       cudaEvent_t stop;
@@ -779,12 +785,12 @@ int main() {
         check_cuda_errors(cudaEventDestroy(stop));
       }
     }
-    cudaMemcpy(c, d_c, (N * sizeof(int)), cudaMemcpyDeviceToHost);
-    free(a);
+    cudaMemcpyAync(c, d_c, (N * sizeof(int)), cudaMemcpyDeviceToHost, 0);
+    cudaFreeHost(a);
     cudaFree(d_a);
-    free(b);
+    cudaFreeHost(b);
     cudaFree(d_b);
-    free(c);
+    cudaFreeHost(c);
     cudaFree(d_c);
     return 0;
   }

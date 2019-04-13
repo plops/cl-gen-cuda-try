@@ -453,10 +453,17 @@
 		       
 			(let (,@(loop for e in '(a b c) collect
 				     `(,e :type int* :init (funcall "static_cast<int*>"
-								    (funcall malloc (* N (funcall sizeof int))))))
+								    #+sync (funcall malloc (* N (funcall sizeof int)))
+								    #-sync 0)))
 			      ,@(loop for e in '(a b c) collect
 				     `(,(format nil "d_~a" e) :type int*))
 				)
+			  #-sync
+			  ,@(loop for e in '(a b c) collect
+				 (cuda `(funcall cudaHostAlloc
+						 (funcall static_cast<void**> (ref ,e))
+						 (* N (funcall sizeof int))
+						 cudaHostAllocDefault)))
 			  ,@(loop for e in '(a b c) collect
 				 `(funcall cudaMalloc ,(format nil "&d_~a" e) (* N (funcall sizeof int))))
 			  (dotimes (i N)
@@ -464,14 +471,19 @@
 				  (aref b i) i
 				  (aref c i) 0))
 			  ,@(loop for e in '(a b c) collect
-				 `(funcall cudaMemcpy ,(format nil "d_~a" e) ,e (* N (funcall sizeof int))
-					   cudaMemcpyHostToDevice))
+				 `(funcall #+sync cudaMemcpy
+					   #-sync cudaMemcpyAsync
+					   ,(format nil "d_~a" e) ,e (* N (funcall sizeof int))
+					   cudaMemcpyHostToDevice
+					   0))
 			  ,(with-cuda-timer `(funcall "vector_add<<<1,N>>>" d_a d_b d_c N))
-			  (funcall cudaMemcpy c d_c (* N (funcall sizeof int))
-				   cudaMemcpyDeviceToHost)
+			  (funcall cudaMemcpyAync c d_c (* N (funcall sizeof int))
+				   cudaMemcpyDeviceToHost 0)
 			  ,@(loop for e in '(a b c) collect
 				 `(statements
-				   (funcall free ,e)
+				   (funcall #-sync cudaFreeHost
+					    #+sync free
+					    ,e)
 				   (funcall cudaFree ,(format nil "d_~a" e))))
 			  (return 0))))))
      (write-source *main-cpp-filename* "cu" code)
