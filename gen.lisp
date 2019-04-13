@@ -35,6 +35,7 @@
 ;; --cap-add=SYS_PTRACE
 
 ;; apt install cuda-cupti-10-1
+;; https://people.maths.ox.ac.uk/gilesm/cuda/lecs/NV_Profiling_lowres.pdf
 ;; https://developer.download.nvidia.com/compute/DevZone/docs/html/C/doc/CUPTI_Users_Guide.pdf
 
 #+nil
@@ -361,23 +362,27 @@
 			      (statements
 			       (setf (aref c i) (+ (aref a i)
 						   (aref b i)))))))
-	      (enum () (N 1024))
-	      (function ("main" ()
-				"int")
-			(let ((cuda_dev :type int))
-			  ,(cuda `(funcall cudaGetDevice &cuda_dev))
-			  (raw "// read device attributes")
-			  (let ((val :type int))
+	      (enum () (N 1024) (NX 256) (NY 256))
+
+	      (function ("fft" ((in :type "cuFloatComplex* __restrict__"))
+			       "__global__ void")
+			)
+	      
+
+	      (function (cuda_list_attributes ((cuda_dev :type int)) void)
+			(let ((val :type int))
 			    ,@(loop for (attr text) in *device-attribute* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetAttribute &val ,attr cuda_dev))
-				     (funcall printf (string ,(format nil "~a=%d (~a)\\n" attr text)) val))))
-			  (let ((val :type size_t))
+				     (funcall printf (string ,(format nil "~a=%d (~a)\\n" attr text)) val)))))
+	      (function (cuda_list_limits ((cuda_dev :type int)) void)
+			(let ((val :type size_t))
 			    ,@(loop for (name text) in *device-limit* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetLimit &val ,name))
-				     (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val))))
-			  (let ((device_prop :type cudaDeviceProp))
+				     (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val)))))
+	      (function (cuda_list_properties ((cuda_dev :type int)) void)
+			(let ((device_prop :type cudaDeviceProp))
 			    ,(cuda `(funcall cudaGetDeviceProperties &device_prop cuda_dev))
 			    ,@(loop for e in *device-property* collect
 				   (destructuring-bind (type name &optional number) e
@@ -393,8 +398,15 @@
 					     `(funcall printf (string ,full-fmt)
 						       ,@(loop for i below number collect
 							      `(aref (slot-value device_prop ,name) ,i)))
-					     `(funcall printf (string ,full-fmt) (slot-value device_prop ,name))))))
-			    ))
+					     `(funcall printf (string ,full-fmt) (slot-value device_prop ,name))))))))
+	      
+	      (function ("main" ()
+				"int")
+			(let ((cuda_dev :type int))
+			  ,(cuda `(funcall cudaGetDevice &cuda_dev))
+			  (funcall cuda_list_attributes cuda_dev)
+			  (funcall cuda_list_limits cuda_dev)
+			  (funcall cuda_list_properties cuda_dev))
 
 		       
 			,(cuda `(funcall cudaDeviceSetCacheConfig cudaFuncCachePreferShared))
