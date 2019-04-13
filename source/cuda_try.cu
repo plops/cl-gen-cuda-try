@@ -23,7 +23,12 @@ __global__ void vector_add(int *a, int *b, int *c, int n) {
 }
 enum { N = 1024, NX = 256, NY = 256 };
 
-__global__ void fft(cuFloatComplex *__restrict__ in);
+__global__ void fft(cuFloatComplex *__restrict__ in) {
+  {
+    __shared__ cuFloatComplex tmp[NY];
+    tmp[threadIdx.y] = in[threadIdx.y];
+  }
+}
 void cuda_list_attributes(int cuda_dev) {
   {
     int val;
@@ -788,12 +793,43 @@ int main() {
       }
     }
     cudaMemcpyAsync(c, d_c, (N * sizeof(int)), cudaMemcpyDeviceToHost, 0);
-    cudaFreeHost(a);
-    cudaFree(d_a);
-    cudaFreeHost(b);
-    cudaFree(d_b);
-    cudaFreeHost(c);
-    cudaFree(d_c);
+    check_cuda_errors(cudaFreeHost(a));
+    check_cuda_errors(cudaFree(d_a));
+    check_cuda_errors(cudaFreeHost(b));
+    check_cuda_errors(cudaFree(d_b));
+    check_cuda_errors(cudaFreeHost(c));
+    check_cuda_errors(cudaFree(d_c));
+    {
+      cuFloatComplex *fft_in_host = NULL;
+      cuFloatComplex *fft_in_dev = NULL;
+      auto fft_in_bytes = (NX * NY * sizeof(cuFloatComplex));
+      check_cuda_errors(
+          cudaHostAlloc((&(fft_in_host)), fft_in_bytes, cudaHostAllocDefault));
+      check_cuda_errors(cudaMalloc((&(fft_in_dev)), fft_in_bytes));
+      check_cuda_errors(cudaMemcpyAsync(fft_in_dev, fft_in_host, fft_in_bytes,
+                                        cudaMemcpyHostToDevice, 0));
+      {
+        cudaEvent_t start;
+        cudaEvent_t stop;
+        check_cuda_errors(cudaEventCreate(&start));
+        check_cuda_errors(cudaEventCreate(&stop));
+        check_cuda_errors(cudaEventRecord(start, 0));
+        fft<<<NX, NY>>>(fft_in_dev);
+        check_cuda_errors(cudaEventRecord(stop, 0));
+        check_cuda_errors(cudaEventSynchronize(stop));
+        {
+          float time;
+          check_cuda_errors(cudaEventElapsedTime(&time, start, stop));
+          printf("executing kernel '(funcall fft<<<NX,NY>>> fft_in_dev)' took "
+                 "%f ms.\n",
+                 time);
+          check_cuda_errors(cudaEventDestroy(start));
+          check_cuda_errors(cudaEventDestroy(stop));
+        }
+      }
+      check_cuda_errors(cudaFreeHost(fft_in_host));
+      check_cuda_errors(cudaFree(fft_in_dev));
+    }
     return 0;
   }
 }

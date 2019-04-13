@@ -44,8 +44,9 @@
 ;; i target compute cap > 6.1
 ;; coalesce global mem, don't scatter
 ;; strided
+;; bank conflicts can slow down access of shared memory but in general it is fast for random access
 
-#+nil
+
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
       (res 0))
@@ -413,6 +414,9 @@
 
 	      (function ("fft" ((in :type "cuFloatComplex* __restrict__"))
 			       "__global__ void")
+			(let (((aref tmp NY) :type "__shared__ cuFloatComplex"))
+			  (setf (aref tmp threadIdx.y)
+				(aref in threadIdx.y)))
 			)
 	      
 
@@ -505,14 +509,37 @@
 					   cudaMemcpyHostToDevice
 					   0))
 			  ,(with-cuda-timer `(funcall "vector_add<<<1,N>>>" d_a d_b d_c N))
+
+
+			  
 			  (funcall cudaMemcpyAsync c d_c (* N (funcall sizeof int))
 				   cudaMemcpyDeviceToHost 0)
 			  ,@(loop for e in '(a b c) collect
 				 `(statements
-				   (funcall #-sync cudaFreeHost
-					    #+sync free
-					    ,e)
-				   (funcall cudaFree ,(format nil "d_~a" e))))
+				   ,(cuda `(funcall #-sync cudaFreeHost
+						    #+sync free
+						    ,e))
+				   ,(cuda `(funcall cudaFree ,(format nil "d_~a" e)))))
+
+			  (let ((fft_in_host :type cuFloatComplex* :init NULL)
+				(fft_in_dev :type cuFloatComplex* :init NULL)
+				(fft_in_bytes :init (* NX NY (funcall sizeof cuFloatComplex))))
+			    ,(cuda `(funcall cudaHostAlloc
+					    (ref fft_in_host)
+					    fft_in_bytes
+					    cudaHostAllocDefault))
+			    ,(cuda `(funcall cudaMalloc
+					    (ref fft_in_dev)
+					    fft_in_bytes))
+			    ,(cuda `(funcall cudaMemcpyAsync
+					     fft_in_dev
+					     fft_in_host
+					     fft_in_bytes
+					     cudaMemcpyHostToDevice
+					     0))
+			    ,(with-cuda-timer `(funcall "fft<<<NX,NY>>>" fft_in_dev))
+			    ,(cuda `(funcall cudaFreeHost fft_in_host))
+			    ,(cuda `(funcall cudaFree fft_in_dev)))
 			  (return 0))))))
      (write-source *main-cpp-filename* "cu" code)
      (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))
