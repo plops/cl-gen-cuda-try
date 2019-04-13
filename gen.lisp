@@ -39,6 +39,11 @@
 ;; https://developer.download.nvidia.com/compute/DevZone/docs/html/C/doc/CUPTI_Users_Guide.pdf
 
 ;; https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/
+;; compute cap > 2.0, with tcc can use uva (unified virtual addressing) (i think not consumer geforce)
+;; latency: global > local > texture > constant > shared > register
+;; i target compute cap > 6.1
+;; coalesce global mem, don't scatter
+;; strided
 
 #+nil
 (defun rev (x nn)
