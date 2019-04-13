@@ -454,14 +454,14 @@
 			(let (,@(loop for e in '(a b c) collect
 				     `(,e :type int* :init (funcall "static_cast<int*>"
 								    #+sync (funcall malloc (* N (funcall sizeof int)))
-								    #-sync 0)))
+								    #-sync NULL)))
 			      ,@(loop for e in '(a b c) collect
-				     `(,(format nil "d_~a" e) :type int*))
+				     `(,(format nil "d_~a" e) :type int* :init NULL))
 				)
 			  #-sync
 			  ,@(loop for e in '(a b c) collect
 				 (cuda `(funcall cudaHostAlloc
-						 (funcall static_cast<void**> (ref ,e))
+						 (ref ,e)
 						 (* N (funcall sizeof int))
 						 cudaHostAllocDefault)))
 			  ,@(loop for e in '(a b c) collect
@@ -477,7 +477,7 @@
 					   cudaMemcpyHostToDevice
 					   0))
 			  ,(with-cuda-timer `(funcall "vector_add<<<1,N>>>" d_a d_b d_c N))
-			  (funcall cudaMemcpyAync c d_c (* N (funcall sizeof int))
+			  (funcall cudaMemcpyAsync c d_c (* N (funcall sizeof int))
 				   cudaMemcpyDeviceToHost 0)
 			  ,@(loop for e in '(a b c) collect
 				 `(statements
