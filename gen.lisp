@@ -421,7 +421,7 @@
 			    ,@(loop for (attr text) in *device-attribute* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetAttribute &val ,attr cuda_dev))
-				     (funcall printf (string ,(format nil "~v,,,'.a = %d (~a)\\n"
+				     (funcall printf (string ,(format nil "~v,,,'.a = %12d (~a)\\n"
 								      (reduce #'max (mapcar #'(lambda (x) (length (format nil "~a" x))) (mapcar #'first *device-attribute*)))
 								      attr text)) val)))))
 	      (function (cuda_list_limits ((cuda_dev :type int)) void)
@@ -429,7 +429,7 @@
 			    ,@(loop for (name text) in *device-limit* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetLimit &val ,name))
-				     (funcall printf (string ,(format nil "~v,,,'.a = %lu (~a)\\n"
+				     (funcall printf (string ,(format nil "~v,,,'.a = %12lu (~a)\\n"
 								      (reduce #'max (mapcar #'(lambda (x) (length (format nil "~a" x))) (mapcar #'first *device-limit*)))
 								      name text)) val)))))
 	      (function (cuda_list_properties ((cuda_dev :type int)) void)
