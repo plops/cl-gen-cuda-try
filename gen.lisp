@@ -31,8 +31,11 @@
 ;; throughput of 100 GFLOPS and continuously produce imagery
 ;; at a rate of 3.43 km^2/second.
 
-;; enable gdb by adding this to docker:
+;; enable gdb by adding this to docker (can't figure out how to do this on vast.ai, though):
 ;; --cap-add=SYS_PTRACE
+
+;; apt install cuda-cupti-10-1
+;; 
 
 #+nil
 (defun rev (x nn)
