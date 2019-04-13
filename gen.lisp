@@ -421,7 +421,7 @@
 			    ,@(loop for (attr text) in *device-attribute* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetAttribute &val ,attr cuda_dev))
-				     (funcall printf (string ,(format nil "~va = %d (~a)\\n"
+				     (funcall printf (string ,(format nil "~v,,,'.a = %d (~a)\\n"
 								      (reduce #'max (mapcar #'(lambda (x) (length (format nil "~a" x))) (mapcar #'first *device-attribute*)))
 								      attr text)) val)))))
 	      (function (cuda_list_limits ((cuda_dev :type int)) void)
@@ -429,7 +429,7 @@
 			    ,@(loop for (name text) in *device-limit* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetLimit &val ,name))
-				     (funcall printf (string ,(format nil "~va = %lu (~a)\\n"
+				     (funcall printf (string ,(format nil "~v,,,'.a = %lu (~a)\\n"
 								      (reduce #'max (mapcar #'(lambda (x) (length (format nil "~a" x))) (mapcar #'first *device-limit*)))
 								      name text)) val)))))
 	      (function (cuda_list_properties ((cuda_dev :type int)) void)
@@ -443,11 +443,11 @@
 								     (size_t "%zu")
 								     (char "%c")
 								     (uint8_t "0x%02hhX"))))
-					      (full-fmt (format nil "~va = ~a\\n"
+					      (full-fmt (format nil "~v,,,'.a = ~a\\n"
 								max-name-len
 								name el-fmt)))
 					 (when number
-					   (setf full-fmt (format nil "~va = [~{~a~^,~}]\\n"
+					   (setf full-fmt (format nil "~v,,,'.a = [~{~a~^,~}]\\n"
 								  max-name-len
 								  name (loop for i below number collect el-fmt))))
 					 (if number
