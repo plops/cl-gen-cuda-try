@@ -367,6 +367,11 @@
        ,(cuda `(funcall cudaEventDestroy start))
        ,(cuda `(funcall cudaEventDestroy stop)))))
 
+
+
+
+
+
 (progn
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cuda_try"
@@ -416,26 +421,35 @@
 			    ,@(loop for (attr text) in *device-attribute* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetAttribute &val ,attr cuda_dev))
-				     (funcall printf (string ,(format nil "~a=%d (~a)\\n" attr text)) val)))))
+				     (funcall printf (string ,(format nil "~va = %d (~a)\\n"
+								      (reduce #'max (mapcar #'(lambda (x) (length (format nil "~a" x))) (mapcar #'first *device-attribute*)))
+								      attr text)) val)))))
 	      (function (cuda_list_limits ((cuda_dev :type int)) void)
 			(let ((val :type size_t))
 			    ,@(loop for (name text) in *device-limit* collect
 				   `(statements
 				     ,(cuda `(funcall cudaDeviceGetLimit &val ,name))
-				     (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val)))))
+				     (funcall printf (string ,(format nil "~va = %lu (~a)\\n"
+								      (reduce #'max (mapcar #'(lambda (x) (length (format nil "~a" x))) (mapcar #'first *device-limit*)))
+								      name text)) val)))))
 	      (function (cuda_list_properties ((cuda_dev :type int)) void)
 			(let ((device_prop :type cudaDeviceProp))
 			    ,(cuda `(funcall cudaGetDeviceProperties &device_prop cuda_dev))
 			    ,@(loop for e in *device-property* collect
 				   (destructuring-bind (type name &optional number) e
-				       (let* ((el-fmt (format nil "~a" (ecase type
+				     (let* ((max-name-len 45)
+					    (el-fmt (format nil "~a" (ecase type
 								     (int "%d")
 								     (size_t "%zu")
 								     (char "%c")
 								     (uint8_t "0x%02hhX"))))
-					      (full-fmt (format nil "~a = ~a\\n" name el-fmt)))
+					      (full-fmt (format nil "~va = ~a\\n"
+								max-name-len
+								name el-fmt)))
 					 (when number
-					   (setf full-fmt (format nil "~a = [~{~a~^,~}]\\n" name (loop for i below number collect el-fmt))))
+					   (setf full-fmt (format nil "~va = [~{~a~^,~}]\\n"
+								  max-name-len
+								  name (loop for i below number collect el-fmt))))
 					 (if number
 					     `(funcall printf (string ,full-fmt)
 						       ,@(loop for i below number collect
@@ -446,7 +460,7 @@
 				"int")
 			(let ((cuda_dev_number :type int))
 			  ,(cuda `(funcall cudaGetDeviceCount &cuda_dev_number))
-			  (funcall printf (string "cuda_dev_number=%d\\n") cuda_dev_number)
+			  (funcall printf (string "cuda_dev_number = %d\\n") cuda_dev_number)
 			 (let ((cuda_dev :type int))
 			   ,(cuda `(funcall cudaGetDevice &cuda_dev))
 			   (funcall cuda_list_attributes cuda_dev)
