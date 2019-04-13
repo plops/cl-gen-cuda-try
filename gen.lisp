@@ -284,7 +284,7 @@
 	      (function ("main" ()
 				"int")
 			(let ((cuda_dev :type int))
-			  ,(cuda `(funcall cudaChooseDevice &cuda_dev NULL))
+			  ,(cuda `(funcall cudaGetDevice &cuda_dev))
 			  (raw "// read device attributes")
 			  (let ((val :type int))
 			    ,@(loop for (attr text) in *device-attribute* collect

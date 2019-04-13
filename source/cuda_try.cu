@@ -25,7 +25,7 @@ enum { N = 1024 };
 int main() {
   {
     int cuda_dev;
-    check_cuda_errors(cudaChooseDevice(&cuda_dev, NULL));
+    check_cuda_errors(cudaGetDevice(&cuda_dev));
     // read device attributes;
     {
       int val;
