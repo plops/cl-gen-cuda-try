@@ -1,3 +1,4 @@
+#include <cuComplex.h>
 #include <stdio.h>
 #ifndef check_cuda_errors
 #define check_cuda_errors(err) __check_cuda_errors(err, __FILE__, __LINE__)
@@ -20,8 +21,9 @@ __global__ void vector_add(int *a, int *b, int *c, int n) {
     }
   }
 }
-enum { N = 1024 };
+enum { N = 1024, NX = 256, NY = 256 };
 
+__global__ void fft(cuFloatComplex *__restrict__ in);
 void cuda_list_attributes(int cuda_dev) {
   {
     int val;
@@ -728,11 +730,16 @@ void cuda_list_properties(int cuda_dev) {
 }
 int main() {
   {
-    int cuda_dev;
-    check_cuda_errors(cudaGetDevice(&cuda_dev));
-    cuda_list_attributes(cuda_dev);
-    cuda_list_limits(cuda_dev);
-    cuda_list_properties(cuda_dev);
+    int cuda_dev_number;
+    check_cuda_errors(cudaGetDeviceCount(&cuda_dev_number));
+    printf("cuda_dev_number=%d\n", cuda_dev_number);
+    {
+      int cuda_dev;
+      check_cuda_errors(cudaGetDevice(&cuda_dev));
+      cuda_list_attributes(cuda_dev);
+      cuda_list_limits(cuda_dev);
+      cuda_list_properties(cuda_dev);
+    }
   }
   check_cuda_errors(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
   {
