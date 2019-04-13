@@ -524,6 +524,217 @@ int main() {
     {
       cudaDeviceProp device_prop;
       check_cuda_errors(cudaGetDeviceProperties(&device_prop, cuda_dev));
+      printf(
+          "name = "
+          "[%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%"
+          "c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,"
+          "%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%"
+          "c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,"
+          "%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%"
+          "c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,"
+          "%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%"
+          "c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,"
+          "%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%"
+          "c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,"
+          "%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%c,%"
+          "c,%c,%c,%c,%c,%c,%c,%c,%c]\n",
+          device_prop.name[0], device_prop.name[1], device_prop.name[2],
+          device_prop.name[3], device_prop.name[4], device_prop.name[5],
+          device_prop.name[6], device_prop.name[7], device_prop.name[8],
+          device_prop.name[9], device_prop.name[10], device_prop.name[11],
+          device_prop.name[12], device_prop.name[13], device_prop.name[14],
+          device_prop.name[15], device_prop.name[16], device_prop.name[17],
+          device_prop.name[18], device_prop.name[19], device_prop.name[20],
+          device_prop.name[21], device_prop.name[22], device_prop.name[23],
+          device_prop.name[24], device_prop.name[25], device_prop.name[26],
+          device_prop.name[27], device_prop.name[28], device_prop.name[29],
+          device_prop.name[30], device_prop.name[31], device_prop.name[32],
+          device_prop.name[33], device_prop.name[34], device_prop.name[35],
+          device_prop.name[36], device_prop.name[37], device_prop.name[38],
+          device_prop.name[39], device_prop.name[40], device_prop.name[41],
+          device_prop.name[42], device_prop.name[43], device_prop.name[44],
+          device_prop.name[45], device_prop.name[46], device_prop.name[47],
+          device_prop.name[48], device_prop.name[49], device_prop.name[50],
+          device_prop.name[51], device_prop.name[52], device_prop.name[53],
+          device_prop.name[54], device_prop.name[55], device_prop.name[56],
+          device_prop.name[57], device_prop.name[58], device_prop.name[59],
+          device_prop.name[60], device_prop.name[61], device_prop.name[62],
+          device_prop.name[63], device_prop.name[64], device_prop.name[65],
+          device_prop.name[66], device_prop.name[67], device_prop.name[68],
+          device_prop.name[69], device_prop.name[70], device_prop.name[71],
+          device_prop.name[72], device_prop.name[73], device_prop.name[74],
+          device_prop.name[75], device_prop.name[76], device_prop.name[77],
+          device_prop.name[78], device_prop.name[79], device_prop.name[80],
+          device_prop.name[81], device_prop.name[82], device_prop.name[83],
+          device_prop.name[84], device_prop.name[85], device_prop.name[86],
+          device_prop.name[87], device_prop.name[88], device_prop.name[89],
+          device_prop.name[90], device_prop.name[91], device_prop.name[92],
+          device_prop.name[93], device_prop.name[94], device_prop.name[95],
+          device_prop.name[96], device_prop.name[97], device_prop.name[98],
+          device_prop.name[99], device_prop.name[100], device_prop.name[101],
+          device_prop.name[102], device_prop.name[103], device_prop.name[104],
+          device_prop.name[105], device_prop.name[106], device_prop.name[107],
+          device_prop.name[108], device_prop.name[109], device_prop.name[110],
+          device_prop.name[111], device_prop.name[112], device_prop.name[113],
+          device_prop.name[114], device_prop.name[115], device_prop.name[116],
+          device_prop.name[117], device_prop.name[118], device_prop.name[119],
+          device_prop.name[120], device_prop.name[121], device_prop.name[122],
+          device_prop.name[123], device_prop.name[124], device_prop.name[125],
+          device_prop.name[126], device_prop.name[127], device_prop.name[128],
+          device_prop.name[129], device_prop.name[130], device_prop.name[131],
+          device_prop.name[132], device_prop.name[133], device_prop.name[134],
+          device_prop.name[135], device_prop.name[136], device_prop.name[137],
+          device_prop.name[138], device_prop.name[139], device_prop.name[140],
+          device_prop.name[141], device_prop.name[142], device_prop.name[143],
+          device_prop.name[144], device_prop.name[145], device_prop.name[146],
+          device_prop.name[147], device_prop.name[148], device_prop.name[149],
+          device_prop.name[150], device_prop.name[151], device_prop.name[152],
+          device_prop.name[153], device_prop.name[154], device_prop.name[155],
+          device_prop.name[156], device_prop.name[157], device_prop.name[158],
+          device_prop.name[159], device_prop.name[160], device_prop.name[161],
+          device_prop.name[162], device_prop.name[163], device_prop.name[164],
+          device_prop.name[165], device_prop.name[166], device_prop.name[167],
+          device_prop.name[168], device_prop.name[169], device_prop.name[170],
+          device_prop.name[171], device_prop.name[172], device_prop.name[173],
+          device_prop.name[174], device_prop.name[175], device_prop.name[176],
+          device_prop.name[177], device_prop.name[178], device_prop.name[179],
+          device_prop.name[180], device_prop.name[181], device_prop.name[182],
+          device_prop.name[183], device_prop.name[184], device_prop.name[185],
+          device_prop.name[186], device_prop.name[187], device_prop.name[188],
+          device_prop.name[189], device_prop.name[190], device_prop.name[191],
+          device_prop.name[192], device_prop.name[193], device_prop.name[194],
+          device_prop.name[195], device_prop.name[196], device_prop.name[197],
+          device_prop.name[198], device_prop.name[199], device_prop.name[200],
+          device_prop.name[201], device_prop.name[202], device_prop.name[203],
+          device_prop.name[204], device_prop.name[205], device_prop.name[206],
+          device_prop.name[207], device_prop.name[208], device_prop.name[209],
+          device_prop.name[210], device_prop.name[211], device_prop.name[212],
+          device_prop.name[213], device_prop.name[214], device_prop.name[215],
+          device_prop.name[216], device_prop.name[217], device_prop.name[218],
+          device_prop.name[219], device_prop.name[220], device_prop.name[221],
+          device_prop.name[222], device_prop.name[223], device_prop.name[224],
+          device_prop.name[225], device_prop.name[226], device_prop.name[227],
+          device_prop.name[228], device_prop.name[229], device_prop.name[230],
+          device_prop.name[231], device_prop.name[232], device_prop.name[233],
+          device_prop.name[234], device_prop.name[235], device_prop.name[236],
+          device_prop.name[237], device_prop.name[238], device_prop.name[239],
+          device_prop.name[240], device_prop.name[241], device_prop.name[242],
+          device_prop.name[243], device_prop.name[244], device_prop.name[245],
+          device_prop.name[246], device_prop.name[247], device_prop.name[248],
+          device_prop.name[249], device_prop.name[250], device_prop.name[251],
+          device_prop.name[252], device_prop.name[253], device_prop.name[254],
+          device_prop.name[255]);
+      printf("totalGlobalMem = %zu\n", device_prop.totalGlobalMem);
+      printf("sharedMemPerBlock = %zu\n", device_prop.sharedMemPerBlock);
+      printf("regsPerBlock = %d\n", device_prop.regsPerBlock);
+      printf("warpSize = %d\n", device_prop.warpSize);
+      printf("memPitch = %zu\n", device_prop.memPitch);
+      printf("maxThreadsPerBlock = %d\n", device_prop.maxThreadsPerBlock);
+      printf("maxThreadsDim = [%d,%d,%d]\n", device_prop.maxThreadsDim[0],
+             device_prop.maxThreadsDim[1], device_prop.maxThreadsDim[2]);
+      printf("maxGridSize = [%d,%d,%d]\n", device_prop.maxGridSize[0],
+             device_prop.maxGridSize[1], device_prop.maxGridSize[2]);
+      printf("clockRate = %d\n", device_prop.clockRate);
+      printf("totalConstMem = %zu\n", device_prop.totalConstMem);
+      printf("major = %d\n", device_prop.major);
+      printf("minor = %d\n", device_prop.minor);
+      printf("textureAlignment = %zu\n", device_prop.textureAlignment);
+      printf("texturePitchAlignment = %zu\n",
+             device_prop.texturePitchAlignment);
+      printf("deviceOverlap = %d\n", device_prop.deviceOverlap);
+      printf("multiProcessorCount = %d\n", device_prop.multiProcessorCount);
+      printf("kernelExecTimeoutEnabled = %d\n",
+             device_prop.kernelExecTimeoutEnabled);
+      printf("integrated = %d\n", device_prop.integrated);
+      printf("canMapHostMemory = %d\n", device_prop.canMapHostMemory);
+      printf("computeMode = %d\n", device_prop.computeMode);
+      printf("maxTexture1D = %d\n", device_prop.maxTexture1D);
+      printf("maxTexture1DMipmap = %d\n", device_prop.maxTexture1DMipmap);
+      printf("maxTexture1DLinear = %d\n", device_prop.maxTexture1DLinear);
+      printf("maxTexture2D = [%d,%d]\n", device_prop.maxTexture2D[0],
+             device_prop.maxTexture2D[1]);
+      printf("maxTexture2DMipmap = [%d,%d]\n",
+             device_prop.maxTexture2DMipmap[0],
+             device_prop.maxTexture2DMipmap[1]);
+      printf("maxTexture2DLinear = [%d,%d,%d]\n",
+             device_prop.maxTexture2DLinear[0],
+             device_prop.maxTexture2DLinear[1],
+             device_prop.maxTexture2DLinear[2]);
+      printf("maxTexture2DGather = [%d,%d]\n",
+             device_prop.maxTexture2DGather[0],
+             device_prop.maxTexture2DGather[1]);
+      printf("maxTexture3D = [%d,%d,%d]\n", device_prop.maxTexture3D[0],
+             device_prop.maxTexture3D[1], device_prop.maxTexture3D[2]);
+      printf("maxTexture3DAlt = [%d,%d,%d]\n", device_prop.maxTexture3DAlt[0],
+             device_prop.maxTexture3DAlt[1], device_prop.maxTexture3DAlt[2]);
+      printf("maxTextureCubemap = %d\n", device_prop.maxTextureCubemap);
+      printf("maxTexture1DLayered = [%d,%d]\n",
+             device_prop.maxTexture1DLayered[0],
+             device_prop.maxTexture1DLayered[1]);
+      printf("maxTexture2DLayered = [%d,%d,%d]\n",
+             device_prop.maxTexture2DLayered[0],
+             device_prop.maxTexture2DLayered[1],
+             device_prop.maxTexture2DLayered[2]);
+      printf("maxTextureCubemapLayered = [%d,%d]\n",
+             device_prop.maxTextureCubemapLayered[0],
+             device_prop.maxTextureCubemapLayered[1]);
+      printf("maxSurface1D = %d\n", device_prop.maxSurface1D);
+      printf("maxSurface2D = [%d,%d]\n", device_prop.maxSurface2D[0],
+             device_prop.maxSurface2D[1]);
+      printf("maxSurface3D = [%d,%d,%d]\n", device_prop.maxSurface3D[0],
+             device_prop.maxSurface3D[1], device_prop.maxSurface3D[2]);
+      printf("maxSurface1DLayered = [%d,%d]\n",
+             device_prop.maxSurface1DLayered[0],
+             device_prop.maxSurface1DLayered[1]);
+      printf("maxSurface2DLayered = [%d,%d,%d]\n",
+             device_prop.maxSurface2DLayered[0],
+             device_prop.maxSurface2DLayered[1],
+             device_prop.maxSurface2DLayered[2]);
+      printf("maxSurfaceCubemap = %d\n", device_prop.maxSurfaceCubemap);
+      printf("maxSurfaceCubemapLayered = [%d,%d]\n",
+             device_prop.maxSurfaceCubemapLayered[0],
+             device_prop.maxSurfaceCubemapLayered[1]);
+      printf("surfaceAlignment = %zu\n", device_prop.surfaceAlignment);
+      printf("concurrentKernels = %d\n", device_prop.concurrentKernels);
+      printf("ECCEnabled = %d\n", device_prop.ECCEnabled);
+      printf("pciBusID = %d\n", device_prop.pciBusID);
+      printf("pciDeviceID = %d\n", device_prop.pciDeviceID);
+      printf("pciDomainID = %d\n", device_prop.pciDomainID);
+      printf("tccDriver = %d\n", device_prop.tccDriver);
+      printf("asyncEngineCount = %d\n", device_prop.asyncEngineCount);
+      printf("unifiedAddressing = %d\n", device_prop.unifiedAddressing);
+      printf("memoryClockRate = %d\n", device_prop.memoryClockRate);
+      printf("memoryBusWidth = %d\n", device_prop.memoryBusWidth);
+      printf("l2CacheSize = %d\n", device_prop.l2CacheSize);
+      printf("maxThreadsPerMultiProcessor = %d\n",
+             device_prop.maxThreadsPerMultiProcessor);
+      printf("streamPrioritiesSupported = %d\n",
+             device_prop.streamPrioritiesSupported);
+      printf("globalL1CacheSupported = %d\n",
+             device_prop.globalL1CacheSupported);
+      printf("localL1CacheSupported = %d\n", device_prop.localL1CacheSupported);
+      printf("sharedMemPerMultiprocessor = %zu\n",
+             device_prop.sharedMemPerMultiprocessor);
+      printf("regsPerMultiprocessor = %d\n", device_prop.regsPerMultiprocessor);
+      printf("managedMemory = %d\n", device_prop.managedMemory);
+      printf("isMultiGpuBoard = %d\n", device_prop.isMultiGpuBoard);
+      printf("multiGpuBoardGroupID = %d\n", device_prop.multiGpuBoardGroupID);
+      printf("singleToDoublePrecisionPerfRatio = %d\n",
+             device_prop.singleToDoublePrecisionPerfRatio);
+      printf("pageableMemoryAccess = %d\n", device_prop.pageableMemoryAccess);
+      printf("concurrentManagedAccess = %d\n",
+             device_prop.concurrentManagedAccess);
+      printf("computePreemptionSupported = %d\n",
+             device_prop.computePreemptionSupported);
+      printf("canUseHostPointerForRegisteredMem = %d\n",
+             device_prop.canUseHostPointerForRegisteredMem);
+      printf("cooperativeLaunch = %d\n", device_prop.cooperativeLaunch);
+      printf("cooperativeMultiDeviceLaunch = %d\n",
+             device_prop.cooperativeMultiDeviceLaunch);
+      printf("pageableMemoryAccessUsesHostPageTables = %d\n",
+             device_prop.pageableMemoryAccessUsesHostPageTables);
+      printf("directManagedMemAccessFromHost = %d\n",
+             device_prop.directManagedMemAccessFromHost);
     }
   }
   check_cuda_errors(cudaDeviceSetCacheConfig(cudaFuncCachePreferShared));
