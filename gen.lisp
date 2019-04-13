@@ -241,76 +241,92 @@
   (cudaLimitDevRuntimePendingLaunchCount "maximum number of outstandingdevice runtime launches.")
   (cudaLimitMaxL2FetchGranularity "L2 cache fetch granularity.")))
 
+#ifndef checkCudaErrors #define checkCudaErrors(err) __checkCudaErrors(err, __FILE__, __LINE__) void __checkCudaErrors(cudaError_t err,constchar*file,constint line){if(cudaSuccess != err){  fprintf(stderr,"checkCudaErrors() Driver API error = %04d \"%s\" from file <%s>, line %i.\n", err, cudaGetErrorString(err), file, line); exit(EXIT_FAILURE);}}#endif/* other code */int n =10000000000000;checkCudaErrors(cudaMalloc((void**)&dev_a, n *sizeof(int)));
 
 (progn
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cuda_try"
 		     (user-homedir-pathname)))
-  (let* (;(n 32)
-	 (code
-	  `(with-compilation-unit
-	       (include <stdio.h>)
-	     
-	     (raw "// https://www.youtube.com/watch?v=Ed_h2km0liI CUDACast #2 - Your First CUDA C Program")
-	     (raw "// https://github.com/NVIDIA-developer-blog/cudacasts/blob/master/ep2-first-cuda-c-program/kernel.cu")
-	     (function ("vector_add" ((a :type "int*")
-				      (b :type "int*")
-				      (c :type "int*")
-				      (n :type "int"))
-				     "__global__ void")
+  (flet ((cuda (cmd)
+	       `(funcall check_cuda_errors ,cmd)))
+    (let* (				;(n 32)
+	  (code
+	   `(with-compilation-unit
+		(include <stdio.h>)
+	      (raw "#ifndef check_cuda_errors")
+	      (raw "#define check_cuda_errors(err) __check_cuda_errors(err,__FILE__,__LINE__)")
+	      (function (__check_cuda_errors ((err :type cudaError_t)
+					      (file :type "const char*")
+					      (line :type "const int"))
+					     void)
+			(if (!= cudaSuccess err)
+			    (statements
+			     (funcall fprintf stderr (string "cuda driver api errror: %04d '%s' from file <%s>, line %i.\\n")
+				      err
+				      (funcall cudaGetErrorString err)
+				      file
+				      line))))
+	      (raw "#endif")
+	      (raw "// https://www.youtube.com/watch?v=Ed_h2km0liI CUDACast #2 - Your First CUDA C Program")
+	      (raw "// https://github.com/NVIDIA-developer-blog/cudacasts/blob/master/ep2-first-cuda-c-program/kernel.cu")
+	      (function ("vector_add" ((a :type "int*")
+				       (b :type "int*")
+				       (c :type "int*")
+				       (n :type "int"))
+				      "__global__ void")
 		       
-		       (let ((i :type int :init threadIdx.x))
-			 (if (< i n)
-			     (statements
-			      (setf (aref c i) (+ (aref a i)
-						  (aref b i)))))))
-	     (enum () (N 1024))
-	     (function ("main" ()
-			       "int")
-		       (let ((cuda_dev :type int))
-			 (funcall cudaChooseDevice &cuda_dev NULL)
-			 (raw "// read device attributes")
-			 (let ((val :type int))
-			   ,@(loop for (attr text) in *device-attribute* collect
-				  `(statements
-				    (funcall cudaDeviceGetAttribute &val ,attr cuda_dev)
-				    (funcall printf (string ,(format nil "~a=%d (~a)\\n" attr text)) val))))
-			 (let ((val :type size_t))
-			   ,@(loop for (name text) in *device-limit* collect
-				  `(statements
-				    (funcall cudaDeviceGetLimit &val ,name)
-				    (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val)))))
-		       #+nil(let ((device_prop :type cudaDeviceProp))
-			 (funcall cudaGetDeviceProperties &device_prop cuda_dev)
-			 )
-
-		       #+nil
-		       (funcall cudaDeviceGetCacheConfig cudaFuncCachePreferShared)
-		       
-		       (let (,@(loop for e in '(a b c) collect
-				    `(,e :type int* :init (funcall "static_cast<int*>"
-								   (funcall malloc (* N (funcall sizeof int))))))
-			     ,@(loop for e in '(a b c) collect
-				    `(,(format nil "d_~a" e) :type int*))
+			(let ((i :type int :init threadIdx.x))
+			  (if (< i n)
+			      (statements
+			       (setf (aref c i) (+ (aref a i)
+						   (aref b i)))))))
+	      (enum () (N 1024))
+	      (function ("main" ()
+				"int")
+			(let ((cuda_dev :type int))
+			  ,(cuda `(funcall cudaChooseDevice &cuda_dev NULL))
+			  (raw "// read device attributes")
+			  (let ((val :type int))
+			    ,@(loop for (attr text) in *device-attribute* collect
+				   `(statements
+				     ,(cuda `(funcall cudaDeviceGetAttribute &val ,attr cuda_dev))
+				     (funcall printf (string ,(format nil "~a=%d (~a)\\n" attr text)) val))))
+			  (let ((val :type size_t))
+			    ,@(loop for (name text) in *device-limit* collect
+				   `(statements
+				     ,(cuda `(funcall cudaDeviceGetLimit &val ,name))
+				     (funcall printf (string ,(format nil "~a=%lu (~a)\\n" name text)) val)))))
+			#+nil(let ((device_prop :type cudaDeviceProp))
+			       (funcall cudaGetDeviceProperties &device_prop cuda_dev)
 			       )
-			 ,@(loop for e in '(a b c) collect
-				`(funcall cudaMalloc ,(format nil "&d_~a" e) (* N (funcall sizeof int))))
-			 (dotimes (i N)
-			   (setf (aref a i) i
-				 (aref b i) i
-				 (aref c i) 0))
-			 ,@(loop for e in '(a b c) collect
-				`(funcall cudaMemcpy ,(format nil "d_~a" e) ,e (* N (funcall sizeof int))
-					  cudaMemcpyHostToDevice))
-			 (funcall "vector_add<<<1,N>>>" d_a d_b d_c N)
-			 (funcall cudaMemcpy c d_c (* N (funcall sizeof int))
-				  cudaMemcpyDeviceToHost)
-			 ,@(loop for e in '(a b c) collect
-				`(statements
-				  (funcall free ,e)
-				  (funcall cudaFree ,(format nil "d_~a" e))))
-			 (return 0))))))
-    (write-source *main-cpp-filename* "cu" code)
-    (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))))
+
+		       
+			,(cuda `(funcall cudaDeviceSetCacheConfig cudaFuncCachePreferShared))
+		       
+			(let (,@(loop for e in '(a b c) collect
+				     `(,e :type int* :init (funcall "static_cast<int*>"
+								    (funcall malloc (* N (funcall sizeof int))))))
+			      ,@(loop for e in '(a b c) collect
+				     `(,(format nil "d_~a" e) :type int*))
+				)
+			  ,@(loop for e in '(a b c) collect
+				 `(funcall cudaMalloc ,(format nil "&d_~a" e) (* N (funcall sizeof int))))
+			  (dotimes (i N)
+			    (setf (aref a i) i
+				  (aref b i) i
+				  (aref c i) 0))
+			  ,@(loop for e in '(a b c) collect
+				 `(funcall cudaMemcpy ,(format nil "d_~a" e) ,e (* N (funcall sizeof int))
+					   cudaMemcpyHostToDevice))
+			  (funcall "vector_add<<<1,N>>>" d_a d_b d_c N)
+			  (funcall cudaMemcpy c d_c (* N (funcall sizeof int))
+				   cudaMemcpyDeviceToHost)
+			  ,@(loop for e in '(a b c) collect
+				 `(statements
+				   (funcall free ,e)
+				   (funcall cudaFree ,(format nil "d_~a" e))))
+			  (return 0))))))
+     (write-source *main-cpp-filename* "cu" code)
+     (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./")))))
 
 
