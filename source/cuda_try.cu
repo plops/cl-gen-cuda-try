@@ -1061,8 +1061,26 @@ int main() {
       check_cuda_errors(
           cudaHostAlloc((&(fft_in_host)), fft_in_bytes, cudaHostAllocDefault));
       check_cuda_errors(cudaMalloc((&(fft_in_dev)), fft_in_bytes));
-      check_cuda_errors(cudaMemcpyAsync(fft_in_dev, fft_in_host, fft_in_bytes,
-                                        cudaMemcpyHostToDevice, 0));
+      printf("transfer %d bytes to gpu.\n", fft_in_bytes);
+      {
+        cudaEvent_t start;
+        cudaEvent_t stop;
+        check_cuda_errors(cudaEventCreate(&start));
+        check_cuda_errors(cudaEventCreate(&stop));
+        check_cuda_errors(cudaEventRecord(start, 0));
+        cudaMemcpyAsync(fft_in_dev, fft_in_host, fft_in_bytes,
+                        cudaMemcpyHostToDevice, 0);
+        check_cuda_errors(cudaEventRecord(stop, 0));
+        check_cuda_errors(cudaEventSynchronize(stop));
+        {
+          float time;
+          check_cuda_errors(cudaEventElapsedTime(&time, start, stop));
+          printf(
+              "executing kernel '(funcall cudaMemcpyAsync fft_in_dev fft_in_host fft_in_bytes
+              cudaMemcpyHostToDevice 0)' took %f ms.\n",time); check_cuda_errors(cudaEventDestroy(start));
+          check_cuda_errors(cudaEventDestroy(stop));
+        }
+      }
       {
         cudaEvent_t start;
         cudaEvent_t stop;

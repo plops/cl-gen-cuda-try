@@ -536,15 +536,18 @@
 					    (ref fft_in_host)
 					    fft_in_bytes
 					    cudaHostAllocDefault))
+			    
 			    ,(cuda `(funcall cudaMalloc
 					    (ref fft_in_dev)
 					    fft_in_bytes))
-			    ,(cuda `(funcall cudaMemcpyAsync
-					     fft_in_dev
-					     fft_in_host
-					     fft_in_bytes
-					     cudaMemcpyHostToDevice
-					     0))
+			    (funcall printf (string "transfer %d bytes to gpu.\\n")
+				     fft_in_bytes)
+			    ,(with-cuda-timer `(funcall cudaMemcpyAsync
+							fft_in_dev
+							fft_in_host
+							fft_in_bytes
+							cudaMemcpyHostToDevice
+							0))
 			    ,(with-cuda-timer `(funcall "fft<<<NX,NY>>>" fft_in_dev))
 			    ,(cuda `(funcall cudaFreeHost fft_in_host))
 			    ,(cuda `(funcall cudaFree fft_in_dev)))
@@ -552,4 +555,5 @@
      (write-source *main-cpp-filename* "cu" code)
      (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))
      ;; -g
-     (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu 2>compile_msg.out;  ./a.out")))))
+     (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu 2>compile_msg.out;  ./a.out"))
+     )))
