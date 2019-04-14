@@ -52,6 +52,7 @@
 ;; together will achieve best performance.      -> this is useless for 1d ffts
 
 ;; https://people.eecs.berkeley.edu/~kubitron/courses/cs258-S08/projects/reports/project6_report.pdf
+;; nvidia-smi topo -m
 
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
@@ -245,10 +246,10 @@
      (cudaDevAttrCanUseHostPointerForRegisteredMem "1 if the device can access hostregistered memory at the same virtual address as the CPU, and 0 otherwise.")
      (cudaDevAttrCooperativeLaunch "1 if the device supports launching cooperativekernels via cudaLaunchCooperativeKernel, and 0 otherwise.")
      (cudaDevAttrCooperativeMultiDeviceLaunch "1 if the device supports launchingcooperative kernels via cudaLaunchCooperativeKernelMultiDevice, and 0otherwise.")
-     (cudaDevAttrCanFlushRemoteWrites "1 if the device supports flushing ofoutstanding remote writes, and 0 otherwise.")
-     (cudaDevAttrHostRegisterSupported  "1 if the device supports host memoryregistration via cudaHostRegister, and 0 otherwise.")
-     (cudaDevAttrPageableMemoryAccessUsesHostPageTables "1 if the device accessespageable memory via the host's page tables, and 0 otherwise.")
-     (cudaDevAttrDirectManagedMemAccessFromHost "1 if the host can directly accessmanaged memory on the device without migration, and 0 otherwise.")
+     #+cuda10 (cudaDevAttrCanFlushRemoteWrites "1 if the device supports flushing ofoutstanding remote writes, and 0 otherwise.")
+     #+cuda10 (cudaDevAttrHostRegisterSupported  "1 if the device supports host memoryregistration via cudaHostRegister, and 0 otherwise.")
+     #+cuda10 (cudaDevAttrPageableMemoryAccessUsesHostPageTables "1 if the device accessespageable memory via the host's page tables, and 0 otherwise.")
+     #+cuda10 (cudaDevAttrDirectManagedMemAccessFromHost "1 if the host can directly accessmanaged memory on the device without migration, and 0 otherwise.")
      (cudaDevAttrMaxSharedMemoryPerBlockOptin "Maximum per blockshared memory size on the device. This value can be opted into when usingcudaFuncSetAttribute")) )
 
 
@@ -258,13 +259,13 @@
      (cudaLimitMallocHeapSize "size in bytes of the heap used by the malloc() and free()device system calls")
      (cudaLimitDevRuntimeSyncDepth "maximum grid depth at which a thread canisssue the device runtime call cudaDeviceSynchronize() to wait on child gridlaunches to complete.")
      (cudaLimitDevRuntimePendingLaunchCount "maximum number of outstandingdevice runtime launches.")
-     (cudaLimitMaxL2FetchGranularity "L2 cache fetch granularity.")))
+     #+cuda10 (cudaLimitMaxL2FetchGranularity "L2 cache fetch granularity.")))
 
 
  (defparameter *device-property*
    `((char name 256 )
      ;;(cudaUUID_t uuid) ;; char bytes[16]
-     (uint8_t uuid.bytes 16) 
+     #+cuda10 (uint8_t uuid.bytes 16) 
      (size_t totalGlobalMem)
      (size_t sharedMemPerBlock)
      (int regsPerBlock)
@@ -333,8 +334,8 @@
      (int canUseHostPointerForRegisteredMem)
      (int cooperativeLaunch)
      (int cooperativeMultiDeviceLaunch)
-     (int pageableMemoryAccessUsesHostPageTables)
-     (int directManagedMemAccessFromHost))))
+     #+cuda10 (int pageableMemoryAccessUsesHostPageTables)
+     #+cuda10 (int directManagedMemAccessFromHost))))
 
 
 
@@ -370,7 +371,8 @@
      ,(cuda `(funcall cudaEventSynchronize stop))
      (let ((time :type float))
        ,(cuda `(funcall cudaEventElapsedTime &time start stop))
-       (funcall printf (string ,(format nil "executing kernel '~a' took %f ms.\\n" kernel-instantiation)) time)
+       #+nil (funcall printf (string ,(format nil "executing kernel '~a' took %f ms.\\n" kernel-instantiation)) time)
+       (funcall printf (string ,(format nil "executing some code took %f ms.\\n")) time)
        ,(cuda `(funcall cudaEventDestroy start))
        ,(cuda `(funcall cudaEventDestroy stop)))))
 
@@ -553,9 +555,13 @@
 			    ,(cuda `(funcall cudaFree fft_in_dev)))
 			  (return 0))))))
      (write-source *main-cpp-filename* "cu" code)
-     #+nil (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))
-     ;; -g
-     #+nil (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu 2>compile_msg.out;  ./a.out"))
-     (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "cheap:./"))
-     (sb-ext:run-program "/usr/bin/ssh" `("-C" "cheap" "/opt/cuda/bin/nvcc -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu"))
+     (progn
+       (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))
+       (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu 2>compile_msg.out;  ./a.out")))
+
+     #+nil (progn
+       (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "cheap:./"))
+       (sb-ext:run-program "/usr/bin/ssh" `("-C" "cheap" "/opt/cuda/bin/nvcc --cudart=static  -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu"))
+       (sb-ext:run-program "/usr/bin/scp" `("-C" "cheap:./a.out" "/dev/shm"))
+       (sb-ext:run-program "/usr/bin/scp" `("-C" "/dev/shm/a.out" "vast:./")))
      )))
