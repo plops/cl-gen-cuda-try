@@ -533,7 +533,7 @@
 
 			  (let ((fft_in_host :type cuFloatComplex* :init NULL)
 				(fft_in_dev :type cuFloatComplex* :init NULL)
-				(fft_in_bytes :init (* NX NY (funcall sizeof cuFloatComplex))))
+				(fft_in_bytes :type size_t :init (* NX NY (funcall sizeof cuFloatComplex))))
 			    ,(cuda `(funcall cudaHostAlloc
 					    (ref fft_in_host)
 					    fft_in_bytes
@@ -557,7 +557,7 @@
      (write-source *main-cpp-filename* "cu" code)
      (progn
        (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "-l" "root" "vast:./"))
-       (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -O2 --ptxas-options --verbose -Xptxas -O3 cuda_try.cu 2>compile_msg.out;  ./a.out")))
+       (sb-ext:run-program "/usr/bin/ssh" `("-C" "-l" "root" "vast" "/usr/local/cuda/bin/nvcc -O2 --keep -ptx --ptxas-options --verbose -Xptxas -O3 cuda_try.cu 2>compile_msg.out;  ./a.out")))
 
      #+nil (progn
        (sb-ext:run-program "/usr/bin/scp" `("-C" ,(format nil "~a.cu" *main-cpp-filename*) "cheap:./"))

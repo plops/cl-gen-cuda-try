@@ -1009,7 +1009,7 @@ int main() {
     {
       cuFloatComplex *fft_in_host = NULL;
       cuFloatComplex *fft_in_dev = NULL;
-      auto fft_in_bytes = (NX * NY * sizeof(cuFloatComplex));
+      size_t fft_in_bytes = (NX * NY * sizeof(cuFloatComplex));
       check_cuda_errors(
           cudaHostAlloc((&(fft_in_host)), fft_in_bytes, cudaHostAllocDefault));
       check_cuda_errors(cudaMalloc((&(fft_in_dev)), fft_in_bytes));
