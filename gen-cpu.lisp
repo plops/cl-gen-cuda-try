@@ -128,9 +128,29 @@
 		       ,(let ((n1 8)
 			      (n2 8))
 			  `(let (((aref local_a (* ,n1 ,n2)) :type "static complex"))
-			     (setf ,@(loop for i below (* n1 n2) appending
-					  `((aref local_a ,(rev i (* n1 n2))) (aref a ,i)))))))	     
-	     
+			     ,@(loop for j below n2 collect
+				    `(setf ,@(loop for i below n1 appending
+						  `((aref local_a ,(+ (rev i n1)
+								      (* j n1)))
+						    (aref a ,(+ i (* j n1)))))))
+			     (let (((aref line ,n1) :type "static complex"))
+			      ,@(loop for j below n2 collect
+				     `(statements 
+					(dotimes (i ,n1)
+					  (setf (aref line i) (aref local_a (+ i ,(* j n1)))))
+					(dotimes (k ,n1)
+					  (setf (aref local_a (+ k ,(* j n1)))
+						(* (aref line k)
+						   (funcall cexpf (* k ,(/ (* 2 j pi)
+									   n1) "1.0fi"
+									   )))))))))))	     
+
+
+	     (decl (((aref global_a 256) :type complex)))
 	     (function ("main" ()
-			       "int")))))
-    (write-source *main-cpp-filename* "c" code)))
+			       int)
+		       (funcall fun global_a 256)
+		       (return 0)))))
+    (write-source *main-cpp-filename* "c" code)
+    (uiop:run-program "gcc -O3 -march=native source/cpu_try.c -o source/cpu_try")
+    (uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")))
