@@ -69,60 +69,53 @@ void fun(complex *__restrict__ a, int n) {
     local_a[63] = a[63];
     {
       static complex line[8];
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 0)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 0)] = (line[k] * cexpf((k * (0.0e+0) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 0)] = (line[k] * cexpf((k * (0.0e+0f) * 1.0fi)));
       }
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 8)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 8)] =
-            (line[k] * cexpf((k * (7.853981633974483e-1) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 8)] = (line[k] * cexpf((k * (7.853982e-1f) * 1.0fi)));
       }
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 16)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 16)] =
-            (line[k] * cexpf((k * (1.5707963267948966e+0) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 16)] = (line[k] * cexpf((k * (1.5707964e+0f) * 1.0fi)));
       }
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 24)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 24)] =
-            (line[k] * cexpf((k * (2.3561944901923448e+0) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 24)] = (line[k] * cexpf((k * (2.3561946e+0f) * 1.0fi)));
       }
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 32)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 32)] =
-            (line[k] * cexpf((k * (3.141592653589793e+0) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 32)] = (line[k] * cexpf((k * (3.1415927e+0f) * 1.0fi)));
       }
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 40)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 40)] =
-            (line[k] * cexpf((k * (3.9269908169872414e+0) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 40)] = (line[k] * cexpf((k * (3.9269906e+0f) * 1.0fi)));
       }
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 48)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 48)] =
-            (line[k] * cexpf((k * (4.7123889803846897e+0) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 48)] = (line[k] * cexpf((k * (4.712389e+0f) * 1.0fi)));
       }
-      for (unsigned int i = 0; (i < 8); i += 1) {
+      for (int i = 0; (i < 8); i += 1) {
         line[i] = local_a[(i + 56)];
       }
-      for (unsigned int k = 0; (k < 8); k += 1) {
-        local_a[(k + 56)] =
-            (line[k] * cexpf((k * (5.497787143782138e+0) * 1.0fi)));
+      for (int k = 0; (k < 8); k += 1) {
+        local_a[(k + 56)] = (line[k] * cexpf((k * (5.497787e+0f) * 1.0fi)));
       }
     }
   }

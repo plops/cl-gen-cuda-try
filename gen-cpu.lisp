@@ -141,8 +141,9 @@
 					(dotimes (k ,n1)
 					  (setf (aref local_a (+ k ,(* j n1)))
 						(* (aref line k)
-						   (funcall cexpf (* k ,(/ (* 2 j pi)
-									   n1) "1.0fi"
+						   (funcall cexpf (* k ,(coerce (/ (* 2 j pi)
+										   n1)
+										'single-float) "1.0fi"
 									   )))))))))))	     
 
 
