@@ -154,3 +154,53 @@
     (write-source *main-cpp-filename* "c" code)
     (uiop:run-program "gcc -O3 -march=native source/cpu_try.c -o source/cpu_try")
     (uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")))
+
+
+
+(progn
+  (defparameter *main-cpp-filename*
+    (merge-pathnames "stage/cl-gen-cuda-try/source/cpu_try"
+		     (user-homedir-pathname)))
+  (let* (
+	 (code
+	  `(with-compilation-unit
+	       (include <stdio.h>)
+	     (include <complex.h>)
+
+	     (function (fun ((a :type "complex* __restrict__")
+			     )
+			    void)
+		       ,(let ((n1 4)
+			      (n2 4))
+			  `(let (((aref x (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi)))
+			     (raw "// split 1d into col major n1 x n2 matrix, n1 columns, n2 rows")
+			     ;; read columns
+			     (dotimes (j1 ,n1)
+			      (dotimes (j2 ,n2)
+				(setf (aref x (+ j1 (* ,n1 j2)))
+				      (aref a (+ j2 (* ,n2 j1))))))
+
+
+			     (raw "// dft on each row")
+			     (let (((aref s (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
+				   )
+			       ,@(loop for j2 below n2 appending
+				      (loop for j1 below n1 collect
+					   `(setf (aref s ,(+ j1 (* n1 j2)))
+						  (+ ,@(loop for k below n2 collect
+							    (if (eq 0 (* j2 k))
+								  `(aref x ,(+ j1 (* k n1)))
+								  `(* (aref x ,(+ j1 (* k n1))) ,(exp (complex 0s0 (* j2 k)))))
+							    )))))
+			       )
+			     )))	     
+
+
+	     (decl (((aref global_a (* 4 4)) :type complex)))
+	     (function ("main" ()
+			       int)
+		       (funcall fun global_a 256)
+		       (return 0)))))
+    (write-source *main-cpp-filename* "c" code)
+    (uiop:run-program "gcc -O3 -march=native source/cpu_try.c -o source/cpu_try")
+    (uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")))

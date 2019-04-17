@@ -1013,7 +1013,7 @@ int main() {
       check_cuda_errors(
           cudaHostAlloc((&(fft_in_host)), fft_in_bytes, cudaHostAllocDefault));
       check_cuda_errors(cudaMalloc((&(fft_in_dev)), fft_in_bytes));
-      printf("transfer %d bytes to gpu.\n", fft_in_bytes);
+      printf("transfer %zu bytes to gpu.\n", fft_in_bytes);
       {
         cudaEvent_t start;
         cudaEvent_t stop;

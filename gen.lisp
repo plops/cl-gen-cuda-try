@@ -52,6 +52,7 @@
 ;; together will achieve best performance.      -> this is useless for 1d ffts
 
 ;; https://people.eecs.berkeley.edu/~kubitron/courses/cs258-S08/projects/reports/project6_report.pdf
+;; https://devtalk.nvidia.com/default/topic/392645/my-speedy-fft-3x-faster-than-cufft/?offset=1#2782382
 ;; nvidia-smi topo -m
 
 (defun rev (x nn)
@@ -542,7 +543,7 @@
 			    ,(cuda `(funcall cudaMalloc
 					    (ref fft_in_dev)
 					    fft_in_bytes))
-			    (funcall printf (string "transfer %d bytes to gpu.\\n")
+			    (funcall printf (string "transfer %zu bytes to gpu.\\n")
 				     fft_in_bytes)
 			    ,(with-cuda-timer `(funcall cudaMemcpyAsync
 							fft_in_dev
