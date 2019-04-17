@@ -188,7 +188,15 @@
 					  (loop for k below n2 when (and (/= 0 (* k j2))
 									 (<= j2 k)) collect
 					       `(,(format nil "w_~a_~a_~a" j2 k n2) :type "const complex"
-						  :init ,(exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))
+						  :init ,(labels ((flush (a)
+								  (if (< (abs a) 1e-15)
+								      0s0
+								      a))
+								(flush-z (z)
+								  (let ((a (realpart z))
+									(b (imagpart z)))
+								    (complex (flush a) (flush b)))))
+							   (flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))
 				   )
 			       ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect

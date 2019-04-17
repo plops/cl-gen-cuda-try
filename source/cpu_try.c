@@ -23,12 +23,12 @@ void fun(complex *__restrict__ a) {
     // dft on each row;
     {
       static complex s[(4 * 4)] = {0.0fi};
-      const complex w_1_1_4 = ((6.123233995736767e-17) + (-1.e+0i));
-      const complex w_1_2_4 = ((-1.e+0) + (-1.2246467991473534e-16i));
-      const complex w_1_3_4 = ((-1.8369701987210296e-16) + (1.e+0i));
-      const complex w_2_2_4 = ((1.e+0) + (2.4492935982947064e-16i));
-      const complex w_2_3_4 = ((-1.e+0) + (-3.673940397442059e-16i));
-      const complex w_3_3_4 = ((5.51091059616309e-16) + (-1.e+0i));
+      const complex w_1_1_4 = ((0.0e+0) + (-1.e+0i));
+      const complex w_1_2_4 = ((-1.e+0) + (0.0e+0i));
+      const complex w_1_3_4 = ((0.0e+0) + (1.e+0i));
+      const complex w_2_2_4 = ((1.e+0) + (0.0e+0i));
+      const complex w_2_3_4 = ((-1.e+0) + (0.0e+0i));
+      const complex w_3_3_4 = ((0.0e+0) + (-1.e+0i));
       s[(0 + (4 * 0))] = (x[0] + x[4] + x[8] + x[12]);
       s[(1 + (4 * 0))] = (x[1] + x[5] + x[9] + x[13]);
       s[(2 + (4 * 0))] = (x[2] + x[6] + x[10] + x[14]);
