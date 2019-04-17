@@ -175,10 +175,10 @@
 			  `(let (((aref x (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi)))
 			     (raw "// split 1d into col major n1 x n2 matrix, n1 columns, n2 rows")
 			     ;; read columns
-			     (dotimes (j1 ,n1)
-			      (dotimes (j2 ,n2)
-				(setf (aref x (+ j1 (* ,n1 j2)))
-				      (aref a (+ j2 (* ,n2 j1))))))
+			     ,@(loop for j1 below n1 appending
+				    (loop for j2 below n2 collect
+					 `(setf (aref x (+ ,j1 (* ,n1 ,j2)))
+					       (aref a ,(+ j2 (* n2 j1))))))
 
 
 			     (raw "// dft on each row")
@@ -186,11 +186,11 @@
 				   )
 			       ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
-					   `(setf (aref s ,(+ j1 (* n1 j2)))
+					   `(setf (aref s (+ ,j1 (* ,n1 ,j2)))
 						  (+ ,@(loop for k below n2 collect
 							    (if (eq 0 (* j2 k))
 								  `(aref x ,(+ j1 (* k n1)))
-								  `(* (aref x ,(+ j1 (* k n1))) ,(exp (complex 0s0 (* j2 k)))))
+								  `(* (aref x ,(+ j1 (* k n1))) ,(exp (complex 0s0 (* -2 (/ pi n2) j2 k)))))
 							    )))))
 			       )
 			     )))	     
