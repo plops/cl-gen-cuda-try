@@ -184,6 +184,11 @@
 
 			     (raw "// dft on each row")
 			     (let (((aref s (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
+				   ,@(loop for j2 below n2 appending
+					  (loop for k below n2 when (and (/= 0 (* k j2))
+									 (<= j2 k)) collect
+					       `(,(format nil "w_~a_~a_~a" j2 k n2) :type "const complex"
+						  :init ,(exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))
 				   )
 			       ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
@@ -191,7 +196,7 @@
 						  (+ ,@(loop for k below n2 collect
 							    (if (eq 0 (* j2 k))
 								  `(aref x ,(+ j1 (* k n1)))
-								  `(* (aref x ,(+ j1 (* k n1))) ,(exp (complex 0s0 (* -2 (/ pi n2) j2 k)))))
+								  `(* (aref x ,(+ j1 (* k n1))) ,(format nil "w~{_~a~}_~a" (sort (list j2 k) #'<) n2)))
 							    )))))
 			       )
 			     )))	     
@@ -200,9 +205,9 @@
 	     (decl (((aref global_a (* 4 4)) :type complex)))
 	     (function ("main" ()
 			       int)
-		       (funcall fun global_a 256)
+		       (funcall fun global_a)
 		       (return 0)))))
     (write-source *main-cpp-filename* "c" code)
-    ;(uiop:run-program "gcc -O3 -march=native source/cpu_try.c -o source/cpu_try")
-    ;(uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")
+    (uiop:run-program "gcc -O3 -march=native source/cpu_try.c -o source/cpu_try")
+    (uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")
     ))
