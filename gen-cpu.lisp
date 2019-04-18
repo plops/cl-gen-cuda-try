@@ -176,13 +176,13 @@
 	  `(with-compilation-unit
 	       (include <stdio.h>)
 	     (include <complex.h>)
-
-	     (function (fun ((a :type "complex* __restrict__")
+	     ;(raw "#typedef scomplex float complex")
+	     (function (fun ((a :type "float complex* __restrict__")
 			     )
-			    "complex*")
+			    "float complex*")
 		       ,(let ((n1 4)
 			      (n2 4))
-			  `(let (((aref x (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi)))
+			  `(let (((aref x (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi)))
 			     (raw "// split 1d into col major n1 x n2 matrix, n1 columns, n2 rows")
 			     ;; read columns
 			     ,@(loop for j1 below n1 appending
@@ -192,7 +192,7 @@
 
 
 			     (raw "// dft on each row")
-			     (let (((aref s (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
+			     (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
 				   ,@(let ((args-seen nil))
 				       (loop for j2 below n2 appending
 					    (loop for k below n2 when (not (member
@@ -211,7 +211,7 @@
 								     1)))
 						       (format nil "wn2_~a_~a"
 							       (numerator arg)
-							       (denominator arg))) :type "const complex"
+							       (denominator arg))) :type "const float complex"
 						     :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))))
 			       ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
@@ -227,7 +227,7 @@
 										 (denominator arg))))))))))
 
 			       (raw "// transpose and elementwise multiplication")
-			       (let (((aref z (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
+			       (let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
 				     ,@(let ((w-seen ()))
 					 (loop for j1 below n1 appending
 					      (loop for j2 below n2 when (and (/= 0 (* j1 j2))
@@ -244,7 +244,7 @@
 								(let ((val (round (* 180000 (/ pi)
 										    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))
 								 (list (if (< val 0) "m" "p") (abs val))))
-						       :type "const complex"
+						       :type "const float complex"
 						       :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
 				 ,@(loop for j1 below n1 appending
 					(loop for j2 below n2 collect
@@ -259,7 +259,7 @@
 					;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
 							      )))))
 				 (raw "// dft on each row")
-				 (let (((aref y (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
+				 (let (((aref y (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
 				       ,@(let ((seen ()))
 					   (loop for j1 below n1 appending
 						(loop for j2 below n2 when (and (/= 0 (* j1 j2))
@@ -274,7 +274,7 @@
 								 (let ((val (round (* 180000 (/ pi)
 										      (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))))
 								   (list (if (< val 0) "m" "p") (abs val))))
-							 :type "const complex"
+							 :type "const float complex"
 							 :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1))))))))))))
 				   
 				   ,@(loop for j1 below n1 appending
@@ -293,7 +293,7 @@
 				   (return y)))))))	     
 
 
-	     (decl (((aref global_a (* 4 4)) :type complex)))
+	     (decl (((aref global_a (* 4 4)) :type "float complex")))
 	     (function ("main" ()
 			       int)
 		       (funcall fun global_a)

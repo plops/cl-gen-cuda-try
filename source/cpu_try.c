@@ -1,8 +1,8 @@
 #include <complex.h>
 #include <stdio.h>
-complex *fun(complex *__restrict__ a) {
+float complex *fun(float complex *__restrict__ a) {
   {
-    static complex x[(4 * 4)] = {0.0fi};
+    static float complex x[(4 * 4)] = {0.0fi};
     // split 1d into col major n1 x n2 matrix, n1 columns, n2 rows;
     x[(0 + (4 * 0))] = a[0];
     x[(0 + (4 * 1))] = a[1];
@@ -22,11 +22,11 @@ complex *fun(complex *__restrict__ a) {
     x[(3 + (4 * 3))] = a[15];
     // dft on each row;
     {
-      static complex s[(4 * 4)] = {0.0fi};
-      const complex wn2_1_4 = ((1.e+0) + (0.0e+0i));
-      const complex wn2_0_1 = ((0.0e+0) + (-1.e+0i));
-      const complex wn2_3_4 = ((-1.e+0) + (0.0e+0i));
-      const complex wn2_1_2 = ((0.0e+0) + (1.e+0i));
+      static float complex s[(4 * 4)] = {0.0fi};
+      const float complex wn2_1_4 = ((1.e+0) + (0.0e+0i));
+      const float complex wn2_0_1 = ((0.0e+0) + (-1.e+0i));
+      const float complex wn2_3_4 = ((-1.e+0) + (0.0e+0i));
+      const float complex wn2_1_2 = ((0.0e+0) + (1.e+0i));
       s[0] = (x[0] + x[4] + x[8] + x[12]);
       s[1] = (x[1] + x[5] + x[9] + x[13]);
       s[2] = (x[2] + x[6] + x[10] + x[14]);
@@ -45,17 +45,17 @@ complex *fun(complex *__restrict__ a) {
       s[15] = (x[3] + (x[7] * wn2_1_2) + (x[11] * wn2_3_4) + (x[15] * wn2_0_1));
       // transpose and elementwise multiplication;
       {
-        static complex z[(4 * 4)] = {0.0fi};
-        const complex wn_m22500 =
+        static float complex z[(4 * 4)] = {0.0fi};
+        const float complex wn_m22500 =
             ((9.238795325112866e-1) + (-3.826834323650897e-1i));
-        const complex wn_m45000 =
+        const float complex wn_m45000 =
             ((7.071067811865475e-1) + (-7.071067811865475e-1i));
-        const complex wn_m67500 =
+        const float complex wn_m67500 =
             ((3.826834323650898e-1) + (-9.238795325112866e-1i));
-        const complex wn_m90000 = ((0.0e+0) + (-1.e+0i));
-        const complex wn_m135000 =
+        const float complex wn_m90000 = ((0.0e+0) + (-1.e+0i));
+        const float complex wn_m135000 =
             ((-7.071067811865475e-1) + (-7.071067811865475e-1i));
-        const complex wn_p157500 =
+        const float complex wn_p157500 =
             ((-9.238795325112867e-1) + (3.8268343236508967e-1i));
         z[0] = s[0];
         z[1] = s[4];
@@ -75,11 +75,11 @@ complex *fun(complex *__restrict__ a) {
         z[15] = (s[15] * wn_p157500);
         // dft on each row;
         {
-          static complex y[(4 * 4)] = {0.0fi};
-          const complex wn1_m90000 = ((0.0e+0) + (-1.e+0i));
-          const complex wn1_m180000 = ((-1.e+0) + (0.0e+0i));
-          const complex wn1_p90000 = ((0.0e+0) + (1.e+0i));
-          const complex wn1_p0 = ((1.e+0) + (0.0e+0i));
+          static float complex y[(4 * 4)] = {0.0fi};
+          const float complex wn1_m90000 = ((0.0e+0) + (-1.e+0i));
+          const float complex wn1_m180000 = ((-1.e+0) + (0.0e+0i));
+          const float complex wn1_p90000 = ((0.0e+0) + (1.e+0i));
+          const float complex wn1_p0 = ((1.e+0) + (0.0e+0i));
           y[0] = (z[0] + z[4] + z[8] + z[12]);
           y[1] = (z[1] + z[5] + z[9] + z[13]);
           y[2] = (z[2] + z[6] + z[10] + z[14]);
@@ -114,7 +114,7 @@ complex *fun(complex *__restrict__ a) {
     }
   }
 }
-complex global_a[(4 * 4)];
+float complex global_a[(4 * 4)];
 
 int main() {
   fun(global_a);
