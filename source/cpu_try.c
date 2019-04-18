@@ -1,11 +1,17 @@
 // gcc -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize
+// -mfma -mavx2
+
 // clang -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2
 // -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize
-// -Rpass-missed=loop-vectorize icc -std=c99 -O2 -D NOFUNCCALL -qopt-report=1
-// -qopt-report-phase=vec -guide-vec -parallel
+// -Rpass-missed=loop-vectorize
+
+// icc -std=c99 -O2 -D NOFUNCCALL -qopt-report=1 -qopt-report-phase=vec
+// -guide-vec -parallel
+
 #include <complex.h>
 #include <stdio.h>
 float complex *fun(float complex *__restrict__ a) {
+  a = __builtin_assume_aligned(a, 16);
   {
     static float complex x[(4 * 4)] = {0.0fi};
     // split 1d into col major n1 x n2 matrix, n1 columns, n2 rows;
@@ -124,7 +130,7 @@ float complex global_a[(4 * 4)];
 int main() {
   {
     complex float sum = (0.0e+0f);
-    for (unsigned int i = 0; (i < 10000000); i += 1) {
+    for (int i = 0; (i < 10000000); i += 1) {
       {
         float complex *res = fun(global_a);
         sum = (sum + res[0]);
