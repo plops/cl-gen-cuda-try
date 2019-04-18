@@ -46,20 +46,14 @@ complex *fun(complex *__restrict__ a) {
       // transpose and elementwise multiplication;
       {
         static complex z[(4 * 4)] = {0.0fi};
-        const complex wn_p0 = ((1.e+0) + (-0.0e+0i));
+        const complex wn_p0 = ((1.e+0) + (0.0e+0i));
         const complex wn_m22500 =
             ((9.238795325112866e-1) + (-3.826834323650897e-1i));
         const complex wn_m45000 =
             ((7.071067811865475e-1) + (-7.071067811865475e-1i));
         const complex wn_m67500 =
             ((3.826834323650898e-1) + (-9.238795325112866e-1i));
-        const complex wn_m45000 =
-            ((7.071067811865475e-1) + (-7.071067811865475e-1i));
-        const complex wn_m90000 = ((6.123233995736767e-17) + (-1.e+0i));
-        const complex wn_m135000 =
-            ((-7.071067811865475e-1) + (-7.071067811865475e-1i));
-        const complex wn_m67500 =
-            ((3.826834323650898e-1) + (-9.238795325112866e-1i));
+        const complex wn_m90000 = ((0.0e+0) + (-1.e+0i));
         const complex wn_m135000 =
             ((-7.071067811865475e-1) + (-7.071067811865475e-1i));
         const complex wn_p157500 =

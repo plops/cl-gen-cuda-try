@@ -157,7 +157,14 @@
     (uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")))
 
 
-
+(defun flush (a)
+  (if (< (abs a) 1e-15)
+      0s0
+      a))
+(defun flush-z (z)
+    (let ((a (realpart z))
+	  (b (imagpart z)))
+      (complex (flush a) (flush b))))
 
 
 (progn
@@ -205,15 +212,7 @@
 						       (format nil "w_~a_~a"
 							       (numerator arg)
 							       (denominator arg))) :type "const complex"
-						     :init ,(labels ((flush (a)
-								       (if (< (abs a) 1e-15)
-									   0s0
-									   a))
-								     (flush-z (z)
-								       (let ((a (realpart z))
-									     (b (imagpart z)))
-									 (complex (flush a) (flush b)))))
-							      (flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k)))))))))))
+						     :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))))
 			       ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
 					   `(setf (aref s ,(+ j1 (* n1 j2)))
@@ -237,15 +236,15 @@
 										      w-seen))
 						 collect
 						   (progn
-						     (push (round (* 1800 (/ pi)
+						     (push (round (* 180000 (/ pi)
 								     (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))
 							   w-seen)
-						    `(,(format nil "wn_~{~a~}"
-							       (let ((val (round (* 180000 (/ pi)
+						     `(,(format nil "wn_~{~a~}"
+								(let ((val (round (* 180000 (/ pi)
 										    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))
 								 (list (if (< val 0) "m" "p") (abs val))))
 						       :type "const complex"
-						       :init ,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))))))))
+						       :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
 				 ,@(loop for j1 below n1 appending
 					(loop for j2 below n2 collect
 					     `(setf (aref z ,(+ (* j1 n2) j2))
@@ -257,10 +256,8 @@
 										    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))
 								 (list (if (< val 0) "m" "p") (abs val))))
 							      ;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
-							      ))
-						    )))
-				 (return z))
-			       ))))	     
+							      )))))
+				 (return z))))))	     
 
 
 	     (decl (((aref global_a (* 4 4)) :type complex)))
