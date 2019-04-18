@@ -186,25 +186,24 @@
 				   (return y)))))))	     
 
 
-	     ;(decl (((aref global_a (* 4 4)) :type "float complex")))
+	     (decl (((aref global_a (* 4 4)) :type "alignas(16) float complex")))
 	     (function ("main" ()
 			       int)
 		       
-		       (let ((my_a :type "complex float*" :init (cast "complex float*"
+		       (let (#+nil (my_a :type "complex float*" :init (cast "complex float*"
 								      (funcall aligned_alloc (* 16
 											      (funcall sizeof "complex float"))
 									       64)))
 			     (sum :type "complex float" :init 0s0))
 			 
 			 ,@(loop for i below n collect
-				`(setf (aref my_a ,i) ,(exp (complex 0s0 (* -2 pi 2.34 i (/ n))))))
-			 (let ((my_a_k :type "complex float*" :init (funcall fun_slow my_a)))
+				`(setf (aref global_a ,i) ,(exp (complex 0s0 (* -2 pi 2.34 i (/ n))))))
+			 (let ((my_a_k :type "complex float*" :init (funcall fun_slow global_a)))
 			   
 			   (dotimes (i 1)
-			     (let ((res :type "float complex*" :init (funcall fun my_a)))
+			     (let ((res :type "float complex*" :init (funcall fun global_a)))
 			       (setf sum (+ sum (aref res 0))))
 			     )
-			   ;(funcall free my_a_k)
 			   ))
 		       (return 0)))))
     (write-source *main-cpp-filename* "c" code)
