@@ -158,31 +158,7 @@
 
 
 
-(let ((n1 4)
-      (n2 4))
- (loop for j2 below n2 appending
-      (loop for k below n2 when (and (/= 0 (* k j2))
-				     (<= j2 k)) collect
-	   `(,(format nil "w_~a_~a_~a" j2 k n2) :type "const complex"
-	      :init ,(labels ((flush (a)
-				(if (< (abs a) 1e-15)
-				    0s0
-				    a))
-			      (flush-z (z)
-				(let ((a (realpart z))
-				      (b (imagpart z)))
-				  (complex (flush a) (flush b)))))
-		       (let ((z (flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))
-			 (list
-			  z
-			  (* 180 (/ pi) (phase z))
-			  (mod (+ (/ 1 4) (/ (* -1 j2 k)
-					     n2))
-			       1)
-			  #+nil
-			  (mod (/ (* -1 j2 k)
-				  n2)
-			       1))))))))
+
 
 (progn
   (defparameter *main-cpp-filename*
@@ -240,7 +216,7 @@
 							      (flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k)))))))))))
 			       ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
-					   `(setf (aref s (+ ,j1 (* ,n1 ,j2)))
+					   `(setf (aref s ,(+ j1 (* n1 j2)))
 						  (+ ,@(loop for k below n2 collect
 							    (if (eq 0 (* j2 k))
 								  `(aref x ,(+ j1 (* k n1)))
@@ -250,7 +226,36 @@
 								    `(* (aref x ,(+ j1 (* k n1)))
 									,(format nil "w_~a_~a" (numerator arg)
 										 (denominator arg))))))))))
-			       (return s)))))	     
+
+			       (raw "// transpose and elementwise multiplication")
+			       (let (((aref z (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
+				     ,@(let ((w-seen ()))
+					 (loop for j1 below n1 appending
+					      (loop for j2 below n2 when (not 
+									      (member (round (* 1800 (/ pi)
+												(phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))
+										      w-seen))
+						 collect
+						   (progn
+						     (push (round (* 1800 (/ pi)
+								     (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))
+							   w-seen)
+						    `(,(format nil "wn_~{~a~}"
+							       (let ((val (round (* 1800 (/ pi)
+										    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))
+								 (list (if (< val 0) "m" "p") (abs val))))
+						       :type "const complex"
+						       :init ,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))))))))
+				 ,@(loop for j1 below n1 appending
+					(loop for j2 below n2 collect
+					     `(setf (aref z ,(+ (* j1 n2) j2))
+						    ,(if (eq 0 (* j1 j2))
+							 `(aref s ,(+ j1 (* j2 n1)))
+							 `(*  (aref s ,(+ j1 (* j2 n1)))
+							      ,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))))
+						    )))
+				 (return z))
+			       ))))	     
 
 
 	     (decl (((aref global_a (* 4 4)) :type complex)))
