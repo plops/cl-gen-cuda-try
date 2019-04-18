@@ -9,7 +9,26 @@
 // -guide-vec -parallel
 
 #include <complex.h>
+#include <math.h>
 #include <stdlib.h>
+#include <string.h>
+float complex *fun_slow(float complex *__restrict__ a) {
+  // returned array needs to be freed by caller;
+  a = __builtin_assume_aligned(a, 64);
+  {
+    static float complex *y;
+    y = aligned_alloc((16 * sizeof(complex float)), 64);
+    y = __builtin_assume_aligned(y, 64);
+    memset(y, 0, (16 * sizeof(complex float)));
+    for (unsigned int j = 0; (j < 16); j += 1) {
+      for (unsigned int k = 0; (k < 16); k += 1) {
+        y[j] =
+            (y[j] + a[k] + cexpf((1.0fi * (-3.9269908169872414e-1) * j * k)));
+      }
+    }
+    return y;
+  }
+}
 float complex *fun(float complex *__restrict__ a) {
   a = __builtin_assume_aligned(a, 64);
   {
@@ -125,17 +144,34 @@ float complex *fun(float complex *__restrict__ a) {
     }
   }
 }
-float complex global_a[(4 * 4)];
-
 int main() {
   {
     complex float *my_a =
         ((complex float *)(aligned_alloc((16 * sizeof(complex float)), 64)));
     complex float sum = (0.0e+0f);
-    for (int i = 0; (i < 10000000); i += 1) {
-      {
-        float complex *res = fun(global_a);
-        sum = (sum + res[0]);
+    my_a[0] = ((1.e+0) + (-0.0e+0i));
+    my_a[1] = ((6.066823777961017e-1) + (-7.94944332938897e-1i));
+    my_a[2] = ((-2.638729849433362e-1) + (-9.64557436245812e-1i));
+    my_a[3] = ((-9.268565576792579e-1) + (-3.7541566494614503e-1i));
+    my_a[4] = ((-8.607420956341875e-1) + (5.090412997029484e-1i));
+    my_a[5] = ((-1.175375648178387e-1) + (9.930684371465506e-1i));
+    my_a[6] = ((7.181261570260874e-1) + (6.959129418217075e-1i));
+    my_a[7] = ((9.888865338221661e-1) + (-1.4867220057960334e-1i));
+    my_a[8] = ((4.81753910393466e-1) + (-8.763065501413327e-1i));
+    my_a[9] = ((-4.043433180820094e-1) + (-9.146072824564818e-1i));
+    my_a[10] = ((-9.723698417133847e-1) + (-2.334456915993249e-1i));
+    my_a[11] = ((-7.754959772537804e-1) + (6.313525079250132e-1i));
+    my_a[12] = ((3.1410354810113594e-2) + (9.995065730702838e-1i));
+    my_a[13] = ((8.136081947410193e-1) + (5.814135408212121e-1i));
+    my_a[14] = ((9.557931535496363e-1) + (-2.9403987421375555e-1i));
+    my_a[15] = ((3.4611753141243573e-1) + (-9.381911609309488e-1i));
+    {
+      complex float *my_a_k = fun_slow(my_a);
+      for (unsigned int i = 0; (i < 1); i += 1) {
+        {
+          float complex *res = fun(my_a);
+          sum = (sum + res[0]);
+        }
       }
     }
   }
