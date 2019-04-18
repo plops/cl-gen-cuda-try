@@ -174,6 +174,7 @@
   (let* (
 	 (code
 	  `(with-compilation-unit
+	       (raw "// -O3 -ffast-math -march=skylake -msse2  -ftree-vectorize")
 	       (include <stdio.h>)
 	     (include <complex.h>)
 	     ;(raw "#typedef scomplex float complex")
