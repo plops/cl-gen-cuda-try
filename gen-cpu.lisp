@@ -49,6 +49,7 @@
 	     (include <stdlib.h>)
 	     (include <string.h>)
 	     (include <complex.h>)
+	     (include <stdalign.h>)
 	     (include <math.h>)
 					;(raw "#typedef scomplex float complex")
 
@@ -56,13 +57,12 @@
 	     
 	     (function (fun_slow ((a :type "float complex* __restrict__"))
 				 "float complex*")
-		       (raw "// returned array needs to be freed by caller")
 		       (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 16byte aligned
-		       (let ((y :type "static float complex*"))
-			 (setf y (funcall aligned_alloc (* 16
+		       (let (((aref y 16) :type "static alignas(16) float complex"))
+			 #+nil (setf y (funcall aligned_alloc (* 16
 							   (funcall sizeof "complex float"))
-					  64))
-			 (setf y (funcall __builtin_assume_aligned y 64))
+						64))
+			 ;(setf y (funcall __builtin_assume_aligned y 64))
 			 (funcall memset y 0 (* 16 (funcall sizeof "complex float")))
 			 (dotimes (j 16)
 			   (dotimes (k ,n)

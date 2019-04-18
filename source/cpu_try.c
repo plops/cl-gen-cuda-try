@@ -10,15 +10,13 @@
 
 #include <complex.h>
 #include <math.h>
+#include <stdalign.h>
 #include <stdlib.h>
 #include <string.h>
 float complex *fun_slow(float complex *__restrict__ a) {
-  // returned array needs to be freed by caller;
   a = __builtin_assume_aligned(a, 64);
   {
-    static float complex *y;
-    y = aligned_alloc((16 * sizeof(complex float)), 64);
-    y = __builtin_assume_aligned(y, 64);
+    static alignas(16) float complex y[16];
     memset(y, 0, (16 * sizeof(complex float)));
     for (unsigned int j = 0; (j < 16); j += 1) {
       for (unsigned int k = 0; (k < 16); k += 1) {
