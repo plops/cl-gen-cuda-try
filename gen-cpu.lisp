@@ -209,7 +209,7 @@
 						   `(,(let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
 										    n2))
 								     1)))
-						       (format nil "w_~a_~a"
+						       (format nil "wn2_~a_~a"
 							       (numerator arg)
 							       (denominator arg))) :type "const complex"
 						     :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))))
@@ -223,7 +223,7 @@
 												 n2))
 										  1)))
 								    `(* (aref x ,(+ j1 (* k n1)))
-									,(format nil "w_~a_~a" (numerator arg)
+									,(format nil "wn2_~a_~a" (numerator arg)
 										 (denominator arg))))))))))
 
 			       (raw "// transpose and elementwise multiplication")
@@ -255,9 +255,20 @@
 							       (let ((val (round (* 180000 (/ pi)
 										    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))
 								 (list (if (< val 0) "m" "p") (abs val))))
-							      ;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
+					;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
 							      )))))
-				 (return z))))))	     
+				 (raw "// dft on each row")
+				 (let (((aref y (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi)))
+				   ,@(loop for j1 below n1 appending
+					  (loop for j2 below n2 collect
+					       `(setf (aref y ,(+ (* j1 n2) j2))
+						      (+ ,@(loop for k below n1 collect
+								(if (eq 0 (* j1 k))
+								    `(aref z ,(+ (* k n2) j2))
+								    `(*
+								      ,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
+								      (aref z ,(+ (* k n2) j2)))))))))
+				   (return y)))))))	     
 
 
 	     (decl (((aref global_a (* 4 4)) :type complex)))
