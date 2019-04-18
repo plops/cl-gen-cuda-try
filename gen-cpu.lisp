@@ -158,6 +158,32 @@
 
 
 
+(let ((n1 4)
+      (n2 4))
+ (loop for j2 below n2 appending
+      (loop for k below n2 when (and (/= 0 (* k j2))
+				     (<= j2 k)) collect
+	   `(,(format nil "w_~a_~a_~a" j2 k n2) :type "const complex"
+	      :init ,(labels ((flush (a)
+				(if (< (abs a) 1e-15)
+				    0s0
+				    a))
+			      (flush-z (z)
+				(let ((a (realpart z))
+				      (b (imagpart z)))
+				  (complex (flush a) (flush b)))))
+		       (let ((z (flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))
+			 (list
+			  z
+			  (* 180 (/ pi) (phase z))
+			  (mod (+ (/ 1 4) (/ (* -1 j2 k)
+					     n2))
+			       1)
+			  #+nil
+			  (mod (/ (* -1 j2 k)
+				  n2)
+			       1))))))))
+
 (progn
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cpu_try"
@@ -184,30 +210,46 @@
 
 			     (raw "// dft on each row")
 			     (let (((aref s (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
-				   ,@(loop for j2 below n2 appending
-					  (loop for k below n2 when (and (/= 0 (* k j2))
-									 (<= j2 k)) collect
-					       `(,(format nil "w_~a_~a_~a" j2 k n2) :type "const complex"
-						  :init ,(labels ((flush (a)
-								  (if (< (abs a) 1e-15)
-								      0s0
-								      a))
-								(flush-z (z)
-								  (let ((a (realpart z))
-									(b (imagpart z)))
-								    (complex (flush a) (flush b)))))
-							   (flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))
-				   )
+				   ,@(let ((args-seen nil))
+				       (loop for j2 below n2 appending
+					    (loop for k below n2 when (not (member
+									    (mod (+ (/ 1 n2)
+										    (/ (* -1 j2 k)
+										       n2))
+										 1)
+									    args-seen))					       collect
+						 (progn
+						   (push (mod (+ (/ 1 n2) (/ (* -1 j2 k)
+										    n2))
+							      1)
+							 args-seen)
+						   `(,(let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
+										    n2))
+								     1)))
+						       (format nil "w_~a_~a"
+							       (numerator arg)
+							       (denominator arg))) :type "const complex"
+						     :init ,(labels ((flush (a)
+								       (if (< (abs a) 1e-15)
+									   0s0
+									   a))
+								     (flush-z (z)
+								       (let ((a (realpart z))
+									     (b (imagpart z)))
+									 (complex (flush a) (flush b)))))
+							      (flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k)))))))))))
 			       ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
 					   `(setf (aref s (+ ,j1 (* ,n1 ,j2)))
 						  (+ ,@(loop for k below n2 collect
 							    (if (eq 0 (* j2 k))
 								  `(aref x ,(+ j1 (* k n1)))
-								  `(* (aref x ,(+ j1 (* k n1))) ,(format nil "w~{_~a~}_~a" (sort (list j2 k) #'<) n2)))
-							    )))))
-			       )
-			     )))	     
+								  (let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
+												 n2))
+										  1)))
+								    `(* (aref x ,(+ j1 (* k n1)))
+									,(format nil "w_~a_~a" (numerator arg)
+										 (denominator arg))))))))))))))	     
 
 
 	     (decl (((aref global_a (* 4 4)) :type complex)))
