@@ -180,18 +180,19 @@
 	       (raw "//gcc -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize -mfma -mavx2")
 	     (raw " ")
 	     ;; https://dendibakh.github.io/blog/2017/10/30/Compiler-optimization-report
-	     (raw "//clang -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2 -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize")
+	     (raw "//clang -std=c11 -Ofast -flto -ffast-math -march=skylake -msse2 -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize")
 	     (raw " ")
-	     (raw "//icc -std=c99 -O2 -D NOFUNCCALL -qopt-report=1 -qopt-report-phase=vec -guide-vec -parallel")
+	     (raw "//icc -std=c11 -O2 -D NOFUNCCALL -qopt-report=1 -qopt-report-phase=vec -guide-vec -parallel")
 	     (raw " ")
 	     
-	     (include <stdio.h>)
+					;(include <stdio.h>)
+	     (include <stdlib.h>)
 	     (include <complex.h>)
 	     ;(raw "#typedef scomplex float complex")
 	     (function (fun ((a :type "float complex* __restrict__")
 			     )
 			    "float complex*")
-		       (setf a (funcall __builtin_assume_aligned a 16)) ;; tell compiler that argument ins 16byte aligned
+		       (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 16byte aligned
 		       ,(let ((n1 4)
 			      (n2 4))
 			  `(let (((aref x (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi)))
@@ -308,7 +309,12 @@
 	     (decl (((aref global_a (* 4 4)) :type "float complex")))
 	     (function ("main" ()
 			       int)
-		       (let ((sum :type "complex float" :init 0s0))
+		       
+		       (let ((my_a :type "complex float*" :init (cast "complex float*"
+								      (funcall aligned_alloc (* 16
+											      (funcall sizeof "complex float"))
+									       64)))
+			     (sum :type "complex float" :init 0s0))
 			(dotimes (i 10000000)
 			  (let ((res :type "float complex*" :init (funcall fun global_a)))
 			    (setf sum (+ sum (aref res 0))))
