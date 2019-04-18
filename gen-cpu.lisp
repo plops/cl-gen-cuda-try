@@ -157,17 +157,18 @@
     (uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")))
 
 
-(defun flush (a)
+
+
+(progn
+  (defun flush (a)
   (if (< (abs a) 1e-15)
       0s0
       a))
-(defun flush-z (z)
+  (defun flush-z (z)
     (let ((a (realpart z))
 	  (b (imagpart z)))
       (complex (flush a) (flush b))))
 
-
-(progn
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cpu_try"
 		     (user-homedir-pathname)))
@@ -301,10 +302,14 @@
 	     (decl (((aref global_a (* 4 4)) :type "float complex")))
 	     (function ("main" ()
 			       int)
-		       (funcall fun global_a)
+		       (let ((sum :type "complex float" :init 0s0))
+			(dotimes (i 10000000)
+			  (let ((res :type "float complex*" :init (funcall fun global_a)))
+			    (setf sum (+ sum (aref res 0))))
+			  ))
 		       (return 0)))))
     (write-source *main-cpp-filename* "c" code)
-    (uiop:run-program "gcc -O3 -march=native source/cpu_try.c -o source/cpu_try")
-    (uiop:run-program "gcc -O3 -march=native -S source/cpu_try.c -o source/cpu_try.s")
+    (uiop:run-program "gcc -march=native -std=c99 -Ofast -ffast-math -march=skylake -msse2  -ftree-vectorize source/cpu_try.c -o source/cpu_try")
+    (uiop:run-program "gcc -march=native -std=c99 -Ofast -ffast-math -march=skylake -msse2  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try.s")
     ))
 

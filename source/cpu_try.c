@@ -1,6 +1,8 @@
 // gcc -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize
-// icc -std=c99 -O2 -D NOFUNCCALL -qopt-report=1 -qopt-report-phase=vec
-// -guide-vec
+// clang -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2
+// -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize
+// -Rpass-missed=loop-vectorize icc -std=c99 -O2 -D NOFUNCCALL -qopt-report=1
+// -qopt-report-phase=vec -guide-vec -parallel
 #include <complex.h>
 #include <stdio.h>
 float complex *fun(float complex *__restrict__ a) {
@@ -120,6 +122,14 @@ float complex *fun(float complex *__restrict__ a) {
 float complex global_a[(4 * 4)];
 
 int main() {
-  fun(global_a);
+  {
+    complex float sum = (0.0e+0f);
+    for (unsigned int i = 0; (i < 10000000); i += 1) {
+      {
+        float complex *res = fun(global_a);
+        sum = (sum + res[0]);
+      }
+    }
+  }
   return 0;
 }
