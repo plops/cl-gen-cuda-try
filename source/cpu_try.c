@@ -11,15 +11,16 @@
 #include <complex.h>
 #include <math.h>
 #include <stdalign.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 float complex *fun_slow(float complex *__restrict__ a) {
   a = __builtin_assume_aligned(a, 64);
   {
-    static alignas(16) float complex y[16];
+    static alignas(16) float complex y[16] = {0.0fi};
     memset(y, 0, (16 * sizeof(complex float)));
-    for (unsigned int j = 0; (j < 16); j += 1) {
-      for (unsigned int k = 0; (k < 16); k += 1) {
+    for (int j = 0; (j < 16); j += 1) {
+      for (int k = 0; (k < 16); k += 1) {
         y[j] =
             (y[j] + a[k] + cexpf((1.0fi * (-3.9269908169872414e-1) * j * k)));
       }
@@ -142,7 +143,7 @@ float complex *fun(float complex *__restrict__ a) {
     }
   }
 }
-alignas(16) float complex global_a[(4 * 4)];
+alignas(16) float complex global_a[(4 * 4)] = {0.0fi};
 
 int main() {
   {
@@ -164,11 +165,14 @@ int main() {
     global_a[14] = ((9.557931535496363e-1) + (-2.9403987421375555e-1i));
     global_a[15] = ((3.4611753141243573e-1) + (-9.381911609309488e-1i));
     {
-      complex float *my_a_k = fun_slow(global_a);
-      for (unsigned int i = 0; (i < 1); i += 1) {
+      complex float *k_slow = fun_slow(global_a);
+      float complex *k_fast = fun(global_a);
+      for (int i = 0; (i < 16); i += 1) {
         {
-          float complex *res = fun(global_a);
-          sum = (sum + res[0]);
+
+          printf("%d   %6.3f+%6.3fi %6.3f+%6.3fi %6.3f+%6.3fi \n", i,
+                 crealf(global_a[i]), cimagf(global_a[i]), crealf(k_slow[i]),
+                 cimagf(k_slow[i]), crealf(k_fast[i]), cimagf(k_fast[i]));
         }
       }
     }
