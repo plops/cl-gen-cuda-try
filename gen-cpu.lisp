@@ -196,7 +196,7 @@
 
 	     (function (fun ((a :type "complex* __restrict__")
 			     )
-			    void)
+			    "complex*")
 		       ,(let ((n1 4)
 			      (n2 4))
 			  `(let (((aref x (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi)))
@@ -249,7 +249,8 @@
 										  1)))
 								    `(* (aref x ,(+ j1 (* k n1)))
 									,(format nil "w_~a_~a" (numerator arg)
-										 (denominator arg))))))))))))))	     
+										 (denominator arg))))))))))
+			       (return s)))))	     
 
 
 	     (decl (((aref global_a (* 4 4)) :type complex)))

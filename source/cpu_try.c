@@ -1,6 +1,6 @@
 #include <complex.h>
 #include <stdio.h>
-void fun(complex *__restrict__ a) {
+complex *fun(complex *__restrict__ a) {
   {
     static complex x[(4 * 4)] = {0.0fi};
     // split 1d into col major n1 x n2 matrix, n1 columns, n2 rows;
@@ -55,6 +55,7 @@ void fun(complex *__restrict__ a) {
           (x[2] + (x[6] * w_1_2) + (x[10] * w_3_4) + (x[14] * w_0_1));
       s[(3 + (4 * 3))] =
           (x[3] + (x[7] * w_1_2) + (x[11] * w_3_4) + (x[15] * w_0_1));
+      return s;
     }
   }
 }
