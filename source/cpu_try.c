@@ -1,3 +1,6 @@
+// gcc -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize
+// icc -std=c99 -O2 -D NOFUNCCALL -qopt-report=1 -qopt-report-phase=vec
+// -guide-vec
 #include <complex.h>
 #include <stdio.h>
 float complex *fun(float complex *__restrict__ a) {

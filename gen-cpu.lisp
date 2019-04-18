@@ -174,7 +174,11 @@
   (let* (
 	 (code
 	  `(with-compilation-unit
-	       (raw "// -O3 -ffast-math -march=skylake -msse2  -ftree-vectorize")
+	       ;; https://news.ycombinator.com/item?id=13147890
+	       (raw "//gcc -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize")
+	     ;; https://dendibakh.github.io/blog/2017/10/30/Compiler-optimization-report
+	     (raw "//clang -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2 -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize")
+	     (raw "//icc -std=c99 -O2 -D NOFUNCCALL -qopt-report=1 -qopt-report-phase=vec -guide-vec -parallel")
 	       (include <stdio.h>)
 	     (include <complex.h>)
 	     ;(raw "#typedef scomplex float complex")
