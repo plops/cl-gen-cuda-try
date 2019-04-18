@@ -230,10 +230,11 @@
 			       (let (((aref z (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
 				     ,@(let ((w-seen ()))
 					 (loop for j1 below n1 appending
-					      (loop for j2 below n2 when (not 
-									      (member (round (* 180000 (/ pi)
-												(phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))
-										      w-seen))
+					      (loop for j2 below n2 when (and (/= 0 (* j1 j2))
+									      (not 
+										  (member (round (* 180000 (/ pi)
+												    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))
+											  w-seen)))
 						 collect
 						   (progn
 						     (push (round (* 180000 (/ pi)
@@ -258,7 +259,24 @@
 					;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
 							      )))))
 				 (raw "// dft on each row")
-				 (let (((aref y (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi)))
+				 (let (((aref y (* ,n1 ,n2)) :type "static complex" :init (list 0.0fi))
+				       ,@(let ((seen ()))
+					   (loop for j1 below n1 appending
+						(loop for j2 below n2 when (and (/= 0 (* j1 j2))
+										(not (member (round (* 180000 (/ pi)
+												       (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))
+											     seen)))
+						   collect
+						     (progn
+						       (push (round (* 180000 (/ pi)
+												       (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ n1))))))) seen)
+						      `(,(format nil "wn1_~{~a~}"
+								 (let ((val (round (* 180000 (/ pi)
+										      (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))))
+								   (list (if (< val 0) "m" "p") (abs val))))
+							 :type "const complex"
+							 :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1))))))))))))
+				   
 				   ,@(loop for j1 below n1 appending
 					  (loop for j2 below n2 collect
 					       `(setf (aref y ,(+ (* j1 n2) j2))
@@ -266,7 +284,11 @@
 								(if (eq 0 (* j1 k))
 								    `(aref z ,(+ (* k n2) j2))
 								    `(*
-								      ,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
+								      ,(format nil "wn1_~{~a~}"
+								 (let ((val (round (* 180000 (/ pi)
+										      (phase (exp (complex 0s0 (* -2 pi j1 k (/ n1)))))))))
+								   (list (if (< val 0) "m" "p") (abs val))))
+								      ;,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
 								      (aref z ,(+ (* k n2) j2)))))))))
 				   (return y)))))))	     
 
