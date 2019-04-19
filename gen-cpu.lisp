@@ -63,7 +63,7 @@
 	     
 	     (function (fun_slow ((a :type "float complex* __restrict__"))
 				 "float complex*")
-		       (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 16byte aligned
+		       (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned
 		       (let (((aref y 16) :type "static alignas(64) float complex" :init (list 0.0fi)))
 			 #+nil (setf y (funcall aligned_alloc (* 16
 							   (funcall sizeof "complex float"))
@@ -76,22 +76,12 @@
 						 (* (aref a k)
 						    (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
 			 (return y)))
-	     (function (fun ((a :type "float complex* __restrict__")
-			     )
+	     (function (fun ((x :type "float complex* __restrict__"))
 			    "float complex*")
-		       (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 16byte aligned
+		       (setf x (funcall __builtin_assume_aligned x 64)) ;; tell compiler that argument ins 64byte aligned
 		       ,(let ()
-			  `(let (((aref x (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi)))
-			     (raw "// split 1d into col major n1 x n2 matrix, n1 columns, n2 rows")
-			     ;; read columns
-			     ,@(loop for j1 below n1 appending
-				    (loop for j2 below n2 collect
-					 `(setf (aref x ,(+ j1 (* n1 j2)))
-					       (aref a ,(+ j1 (* n1 j2))    ;(+ (* n2 j1) js)
-						     ))))
-
-
-			     (raw "// dft on each row")
+			  `(statements
+			    (raw "// dft on each row")
 			     (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
 				   ,@(let ((args-seen nil))
 				       (loop for j2 below n2 appending
