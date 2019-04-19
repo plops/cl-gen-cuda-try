@@ -17,12 +17,12 @@
 float complex *fun_slow(float complex *__restrict__ a) {
   a = __builtin_assume_aligned(a, 64);
   {
-    static alignas(16) float complex y[16] = {0.0fi};
+    static alignas(64) float complex y[16] = {0.0fi};
     memset(y, 0, (16 * sizeof(complex float)));
     for (unsigned int j = 0; (j < 16); j += 1) {
       for (unsigned int k = 0; (k < 16); k += 1) {
         y[j] =
-            (y[j] + a[k] + cexpf((1.0fi * (-3.9269908169872414e-1) * j * k)));
+            (y[j] + (a[k] * cexpf((1.0fi * (-3.9269908169872414e-1) * j * k))));
       }
     }
     return y;
@@ -143,7 +143,7 @@ float complex *fun(float complex *__restrict__ a) {
     }
   }
 }
-alignas(16) float complex global_a[(4 * 4)] = {0.0fi};
+alignas(64) float complex global_a[(4 * 4)] = {0.0fi};
 
 int main() {
   global_a[0] = (1.e+0);

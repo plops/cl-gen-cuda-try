@@ -64,7 +64,7 @@
 	     (function (fun_slow ((a :type "float complex* __restrict__"))
 				 "float complex*")
 		       (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 16byte aligned
-		       (let (((aref y 16) :type "static alignas(16) float complex" :init (list 0.0fi)))
+		       (let (((aref y 16) :type "static alignas(64) float complex" :init (list 0.0fi)))
 			 #+nil (setf y (funcall aligned_alloc (* 16
 							   (funcall sizeof "complex float"))
 						64))
@@ -73,8 +73,8 @@
 			 (dotimes (j 16)
 			   (dotimes (k ,n)
 			     (setf (aref y j) (+ (aref y j)
-						 (aref a k)
-						 (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k))))))
+						 (* (aref a k)
+						    (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
 			 (return y)))
 	     (function (fun ((a :type "float complex* __restrict__")
 			     )
@@ -192,7 +192,7 @@
 				   (return y)))))))	     
 
 
-	     (decl (((aref global_a (* 4 4)) :type "alignas(16) float complex"
+	     (decl (((aref global_a (* 4 4)) :type "alignas(64) float complex"
 		     :init (list 0.0fi))))
 	     (function ("main" ()
 			       int)
