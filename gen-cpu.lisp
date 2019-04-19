@@ -86,8 +86,9 @@
 			     ;; read columns
 			     ,@(loop for j1 below n1 appending
 				    (loop for j2 below n2 collect
-					 `(setf (aref x (+ ,j1 (* ,n1 ,j2)))
-					       (aref a ,(+ j2 (* n2 j1))))))
+					 `(setf (aref x ,(+ j1 (* n1 j2)))
+					       (aref a ,(+ j1 (* n1 j2))    ;(+ (* n2 j1) js)
+						     ))))
 
 
 			     (raw "// dft on each row")
