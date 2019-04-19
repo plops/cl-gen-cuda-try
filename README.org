@@ -1,0 +1,4 @@
+
+# References
+
+- cuda complex library https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp
