@@ -15,6 +15,7 @@
     (30 "compute twiddle factors using addition theorem exp(x+y)=exp(x)*exp(y)")
     (40 "only store twiddle factors that are necessary")))
 
+
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
 	(res 0))
