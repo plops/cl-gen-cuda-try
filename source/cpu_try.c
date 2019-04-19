@@ -19,8 +19,8 @@ float complex *fun_slow(float complex *__restrict__ a) {
   {
     static alignas(16) float complex y[16] = {0.0fi};
     memset(y, 0, (16 * sizeof(complex float)));
-    for (int j = 0; (j < 16); j += 1) {
-      for (int k = 0; (k < 16); k += 1) {
+    for (unsigned int j = 0; (j < 16); j += 1) {
+      for (unsigned int k = 0; (k < 16); k += 1) {
         y[j] =
             (y[j] + a[k] + cexpf((1.0fi * (-3.9269908169872414e-1) * j * k)));
       }
@@ -146,34 +146,90 @@ float complex *fun(float complex *__restrict__ a) {
 alignas(16) float complex global_a[(4 * 4)] = {0.0fi};
 
 int main() {
+  global_a[0] = (1.e+0);
+  global_a[1] = (1.e+0);
+  global_a[2] = (1.e+0);
+  global_a[3] = (1.e+0);
+  global_a[4] = (1.e+0);
+  global_a[5] = (1.e+0);
+  global_a[6] = (1.e+0);
+  global_a[7] = (1.e+0);
+  global_a[8] = (1.e+0);
+  global_a[9] = (1.e+0);
+  global_a[10] = (1.e+0);
+  global_a[11] = (1.e+0);
+  global_a[12] = (1.e+0);
+  global_a[13] = (1.e+0);
+  global_a[14] = (1.e+0);
+  global_a[15] = (1.e+0);
   {
-    complex float sum = (0.0e+0f);
-    global_a[0] = ((1.e+0) + (-0.0e+0i));
-    global_a[1] = ((6.066823777961017e-1) + (-7.94944332938897e-1i));
-    global_a[2] = ((-2.638729849433362e-1) + (-9.64557436245812e-1i));
-    global_a[3] = ((-9.268565576792579e-1) + (-3.7541566494614503e-1i));
-    global_a[4] = ((-8.607420956341875e-1) + (5.090412997029484e-1i));
-    global_a[5] = ((-1.175375648178387e-1) + (9.930684371465506e-1i));
-    global_a[6] = ((7.181261570260874e-1) + (6.959129418217075e-1i));
-    global_a[7] = ((9.888865338221661e-1) + (-1.4867220057960334e-1i));
-    global_a[8] = ((4.81753910393466e-1) + (-8.763065501413327e-1i));
-    global_a[9] = ((-4.043433180820094e-1) + (-9.146072824564818e-1i));
-    global_a[10] = ((-9.723698417133847e-1) + (-2.334456915993249e-1i));
-    global_a[11] = ((-7.754959772537804e-1) + (6.313525079250132e-1i));
-    global_a[12] = ((3.1410354810113594e-2) + (9.995065730702838e-1i));
-    global_a[13] = ((8.136081947410193e-1) + (5.814135408212121e-1i));
-    global_a[14] = ((9.557931535496363e-1) + (-2.9403987421375555e-1i));
-    global_a[15] = ((3.4611753141243573e-1) + (-9.381911609309488e-1i));
-    {
-      complex float *k_slow = fun_slow(global_a);
-      float complex *k_fast = fun(global_a);
-      for (int i = 0; (i < 16); i += 1) {
-        {
+    complex float *k_slow = fun_slow(global_a);
+    float complex *k_fast = fun(global_a);
+    printf("idx     global_a          k_slow           k_fast f=0\n");
+    for (unsigned int i = 0; (i < 16); i += 1) {
+      {
 
-          printf("%d   %6.3f+%6.3fi %6.3f+%6.3fi %6.3f+%6.3fi \n", i,
-                 crealf(global_a[i]), cimagf(global_a[i]), crealf(k_slow[i]),
-                 cimagf(k_slow[i]), crealf(k_fast[i]), cimagf(k_fast[i]));
-        }
+        printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
+               crealf(global_a[i]), cimagf(global_a[i]), crealf(k_slow[i]),
+               cimagf(k_slow[i]), crealf(k_fast[i]), cimagf(k_fast[i]));
+      }
+    }
+  }
+  global_a[0] = (1.e+0);
+  global_a[1] = (7.071067811865475e-1);
+  global_a[2] = (6.123233995736767e-17);
+  global_a[3] = (-7.071067811865475e-1);
+  global_a[4] = (-1.e+0);
+  global_a[5] = (-7.071067811865476e-1);
+  global_a[6] = (-1.8369701987210296e-16);
+  global_a[7] = (7.071067811865474e-1);
+  global_a[8] = (1.e+0);
+  global_a[9] = (7.071067811865476e-1);
+  global_a[10] = (3.061616997868383e-16);
+  global_a[11] = (-7.071067811865467e-1);
+  global_a[12] = (-1.e+0);
+  global_a[13] = (-7.07106781186547e-1);
+  global_a[14] = (-4.2862637970157363e-16);
+  global_a[15] = (7.071067811865465e-1);
+  {
+    complex float *k_slow = fun_slow(global_a);
+    float complex *k_fast = fun(global_a);
+    printf("idx     global_a          k_slow           k_fast f=2\n");
+    for (unsigned int i = 0; (i < 16); i += 1) {
+      {
+
+        printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
+               crealf(global_a[i]), cimagf(global_a[i]), crealf(k_slow[i]),
+               cimagf(k_slow[i]), crealf(k_fast[i]), cimagf(k_fast[i]));
+      }
+    }
+  }
+  global_a[0] = (1.e+0);
+  global_a[1] = (5.515475995016242e-1);
+  global_a[2] = (-3.915904909679914e-1);
+  global_a[3] = (-9.835091900637407e-1);
+  global_a[4] = (-6.933137747668947e-1);
+  global_a[5] = (2.18718093715559e-1);
+  global_a[6] = (9.34580653879671e-1);
+  global_a[7] = (8.122133386604224e-1);
+  global_a[8] = (-3.8632019436958975e-2);
+  global_a[9] = (-8.54828133829132e-1);
+  global_a[10] = (-9.043247909628639e-1);
+  global_a[11] = (-1.4272820142161857e-1);
+  global_a[12] = (7.46881997212307e-1);
+  global_a[13] = (9.666101467684727e-1);
+  global_a[14] = (3.1938101499582e-1);
+  global_a[15] = (-6.143024824737984e-1);
+  {
+    complex float *k_slow = fun_slow(global_a);
+    float complex *k_fast = fun(global_a);
+    printf("idx     global_a          k_slow           k_fast f=2.5123\n");
+    for (unsigned int i = 0; (i < 16); i += 1) {
+      {
+
+        printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
+               crealf(global_a[i]), cimagf(global_a[i]), crealf(k_slow[i]),
+               cimagf(k_slow[i]), crealf(k_fast[i]), cimagf(k_fast[i]));
       }
     }
   }

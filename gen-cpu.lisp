@@ -11,8 +11,9 @@
 
 (defparameter *facts*
   `((10 "to make use of cache read sequentially write random (from limited range)")
-    (20 "compute twiddle factors using addition theorem exp(x+y)=exp(x)*exp(y)"))
-  )
+    (20 "is single cycle sinf, cosf good enough? https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html")
+    (30 "compute twiddle factors using addition theorem exp(x+y)=exp(x)*exp(y)")
+    (40 "only store twiddle factors that are necessary")))
 
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
@@ -195,21 +196,22 @@
 		     :init (list 0.0fi))))
 	     (function ("main" ()
 			       int)
-		       
-		       (let (#+nil (my_a :type "complex float*" :init (cast "complex float*"
-								      (funcall aligned_alloc (* 16
-											      (funcall sizeof "complex float"))
-									       64)))
-			     (sum :type "complex float" :init 0s0))
+
+		       ,@(loop for f in '(0 2 2.5123) collect
+			`(statements
+
 			 
 			 ,@(loop for i below n collect
-				`(setf (aref global_a ,i) ,(exp (complex 0s0 (* -2 pi 2.34 i (/ n))))))
+				`(setf (aref global_a ,i) ,(cos (* -2 pi f i (/ n)))
+					;(exp (complex 0s0 (* -2 pi 2.34 i (/ n))))
+				       ))
 			 (let ((k_slow :type "complex float*" :init (funcall fun_slow global_a))
 			       (k_fast :type "float complex*" :init (funcall fun global_a)))
-			   
+
+			   (funcall printf (string ,(format nil "idx     global_a          k_slow           k_fast f=~a\\n" f)))
 			   (dotimes (i 16)
 			     (let ()
-			       (funcall printf (string "%d   %6.3f+%6.3fi %6.3f+%6.3fi %6.3f+%6.3fi \\n")
+			       (funcall printf (string "%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \\n")
 					i
 					(funcall crealf (aref global_a i))
 					(funcall cimagf (aref global_a i))
@@ -218,7 +220,7 @@
 					(funcall crealf (aref k_fast i))
 					(funcall cimagf (aref k_fast i))))
 			     )
-			   ))
+			   )))
 		       (return 0)))))
     (write-source *main-cpp-filename* "c" code)
     (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
