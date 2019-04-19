@@ -9,6 +9,11 @@
 
 
 
+(defparameter *facts*
+  `((10 "to make use of cache read sequentially write random (from limited range)")
+    (20 "compute twiddle factors using addition theorem exp(x+y)=exp(x)*exp(y)"))
+  )
+
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
 	(res 0))
