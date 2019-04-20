@@ -125,10 +125,12 @@
 							    (case (twiddle-arg j2 k n2) ;if (eq 0 (* j2 k))
 							      (0 `(aref x ,(+ j1 (* k n1))))
 							      (1/2 `(* -1 (aref x ,(+ j1 (* k n1)))))
-							      (1/4 `(* (funcall CMPLXF
+							      (1/4 `(* (funcall ;;__builtin_complex ;;
+									CMPLXF
 										(* -1 (funcall cimagf (aref x ,(+ j1 (* k n1)))))
 										(funcall crealf (aref x ,(+ j1 (* k n1)))))))
-							      (-1/4 `(* (funcall CMPLXF
+							      (-1/4 `(* (funcall ;; __builtin_complex ;;
+										 CMPLXF
 										(funcall cimagf (aref x ,(+ j1 (* k n1))))
 										(* -1 (funcall crealf (aref x ,(+ j1 (* k n1))))))))
 							      (t `(* (aref x ,(+ j1 (* k n1)))
