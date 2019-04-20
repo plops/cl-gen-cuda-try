@@ -1,3 +1,26 @@
+# Introduction
+
+In this code I collect experiments with a code generator that emits C
+code.  The code generator (https://github.com/plops/cl-cpp-generator)
+is very simple. A single function consumes a lisp like language and
+emits a string with C code.
+
+Although very plain, this approach gives access to (some) of the power
+of lisp macros. I can easily play around with different code
+structures, try ideas fast, test the performance and throw non-working
+attempts away without regret.
+
+
+Currently I want to understand 2D Fast Fourier Transform. First on the
+CPU and eventually perhaps on the GPU.
+
+How should memory accesses be ordered?
+
+Should twiddle factors be recomputed on the fly or tabulated? Or is a
+mixed approach faster?
+
+ 
+
 
 # References
 
