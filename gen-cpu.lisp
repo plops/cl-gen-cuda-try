@@ -13,8 +13,12 @@
   `((10 "to make use of cache read sequentially write random (from limited range)")
     (20 "is single cycle sinf, cosf good enough? https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html")
     (30 "compute twiddle factors using addition theorem exp(x+y)=exp(x)*exp(y)")
-    (40 "only store twiddle factors that are necessary")))
+    (40 "only store twiddle factors that are necessary")
+    (50 "radix 4 and 2 are preferred as they don't require floating point multiplication in lower stages")))
 
+
+(let ((r 4))
+  (* 2 r (log 16 r)))
 
 (defun rev (x nn)
   (let ((n (floor (log nn 2)))
@@ -208,4 +212,9 @@
     (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
     (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try.s")
     ))
+
+
+
+
+
 
