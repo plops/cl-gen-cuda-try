@@ -119,7 +119,7 @@
 						 (* (aref a k)
 						    (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
 			 (return y)))
-	     (function (fun ((x :type "float complex* __restrict__"))
+	     (function (fft16_radix4 ((x :type "float complex* __restrict__"))
 			    "float complex*")
 		       (setf x (funcall __builtin_assume_aligned x 64)) ;; tell compiler that argument ins 64byte aligned
 		       ,(let ()
@@ -202,7 +202,87 @@
 								      ,(format nil "w~a" (twiddle-arg-name j1 k n1))
 					;,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
 								      (aref z ,(+ (* k n2) j2)))))))))
-				   (return y)))))))	     
+				   (return y)))))))
+	     ,(let* ((n1 16)
+		     (n2 16)
+		     (r1 4)
+		     (r2 4)
+		     (n (* n1 n2)))
+	       `(function (fft256 ((x :type "float complex* __restrict__"))
+				 "float complex*")
+			 (setf x (funcall __builtin_assume_aligned x 64)) ;; tell compiler that argument ins 64byte aligned
+			 ,(let ()
+			    `(statements
+			      (raw "// fft16 on each row")
+			    
+			      (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+				    )
+			      
+			    
+				,@(loop for j2 below n2 by r2 appending
+				       (loop for j1 below n1 collect
+					    `(setf (aref s ,(+ j1 (* n1 j2)))
+						   (+ ,@(loop for k below n2 collect
+							     (twiddle-mul `(aref x ,(+ j1 (* k n1)))
+									  j2 k n2)
+							     )))))
+
+				(raw "// transpose and elementwise multiplication")
+				#+nil
+				(let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+				      ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
+					  (loop for j1 below n1 appending
+					       (loop for j2 below n2 when (and (/= 0 (* j1 j2))
+									       (not 
+										(member (twiddle-arg j1 j2 (* n1 n2))
+											w-seen)))
+						  collect
+						    (let ((arg (twiddle-arg j1 j2 (* n1 n2))))
+						      (push arg
+							    w-seen)
+						      `(,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
+							 :type "const float complex"
+							 :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
+				  ,@(loop for j1 below n1 appending
+					 (loop for j2 below n2 collect
+					      `(setf (aref z ,(+ (* j1 n2) j2))
+						     ,(twiddle-mul `(aref s ,(+ j1 (* j2 n1)))
+								   j1 j2 (* n1 n2))
+						     #+nil ,(if (eq 0 (* j1 j2))
+								`(aref s ,(+ j1 (* j2 n1)))
+								`(*  (aref s ,(+ j1 (* j2 n1)))
+								     ,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
+					;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
+								     )))))
+				  (raw "// dft on each row")
+				  (let (((aref y (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+					,@(let ((seen (list 0 1/4 -1/4 3/4 1/2)))
+					    (loop for j1 below n1 appending
+						 (loop for j2 below n2 when (and (/= 0 (* j1 j2))
+										 (not (member (twiddle-arg j1 j2 n1)
+											      seen)))
+						    collect
+						      (let ((arg (twiddle-arg j1 j2 n1)))
+							(push arg seen)
+							`(,(format nil "w~a" (twiddle-arg-name j1 j2 n1))
+							   :type "const float complex"
+							   :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))))))
+				   
+				    ,@(loop for j1 below n1 appending
+					   (loop for j2 below n2 collect
+						`(setf (aref y ,(+ (* j1 n2) j2))
+						       (+ ,@(loop for k below n1 collect
+								 (twiddle-mul `(aref z ,(+ (* k n2) j2))
+									      j1 k n1)
+								 #+nil
+								 (if (eq 0 (* j1 k))
+								     `(aref z ,(+ (* k n2) j2))
+								     `(*
+								       ,(format nil "w~a" (twiddle-arg-name j1 k n1))
+					;,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
+								       (aref z ,(+ (* k n2) j2)))))))))
+				    (return y))))))))
+	     
 
 
 	     (decl (((aref global_a (* 4 4)) :type "alignas(64) float complex"
@@ -219,7 +299,7 @@
 					;(exp (complex 0s0 (* -2 pi 2.34 i (/ n))))
 				       ))
 			 (let ((k_slow :type "complex float*" :init (funcall fun_slow global_a))
-			       (k_fast :type "float complex*" :init (funcall fun global_a)))
+			       (k_fast :type "float complex*" :init (funcall fft16_radix4 global_a)))
 
 			   (funcall printf (string ,(format nil "idx     global_a          k_slow           k_fast f=~a\\n" f)))
 			   (dotimes (i 16)

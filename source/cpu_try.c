@@ -19,8 +19,8 @@ float complex *fun_slow(float complex *__restrict__ a) {
   {
     static alignas(64) float complex y[16] = {0.0fi};
     memset(y, 0, (16 * sizeof(complex float)));
-    for (int j = 0; (j < 16); j += 1) {
-      for (int k = 0; (k < 16); k += 1) {
+    for (unsigned int j = 0; (j < 16); j += 1) {
+      for (unsigned int k = 0; (k < 16); k += 1) {
         y[j] =
             (y[j] + (a[k] * cexpf((1.0fi * (-3.9269908169872414e-1) * j * k))));
       }
@@ -28,7 +28,7 @@ float complex *fun_slow(float complex *__restrict__ a) {
     return y;
   }
 }
-float complex *fun(float complex *__restrict__ x) {
+float complex *fft16_radix4(float complex *__restrict__ x) {
   x = __builtin_assume_aligned(x, 64);
   // dft on each row;
   {
@@ -142,9 +142,9 @@ int main() {
   global_a[15] = (1.e+0);
   {
     complex float *k_slow = fun_slow(global_a);
-    float complex *k_fast = fun(global_a);
+    float complex *k_fast = fft16_radix4(global_a);
     printf("idx     global_a          k_slow           k_fast f=0\n");
-    for (int i = 0; (i < 16); i += 1) {
+    for (unsigned int i = 0; (i < 16); i += 1) {
       {
 
         printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
@@ -171,9 +171,9 @@ int main() {
   global_a[15] = (7.071067811865465e-1);
   {
     complex float *k_slow = fun_slow(global_a);
-    float complex *k_fast = fun(global_a);
+    float complex *k_fast = fft16_radix4(global_a);
     printf("idx     global_a          k_slow           k_fast f=2\n");
-    for (int i = 0; (i < 16); i += 1) {
+    for (unsigned int i = 0; (i < 16); i += 1) {
       {
 
         printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
@@ -200,9 +200,9 @@ int main() {
   global_a[15] = (-6.143024824737984e-1);
   {
     complex float *k_slow = fun_slow(global_a);
-    float complex *k_fast = fun(global_a);
+    float complex *k_fast = fft16_radix4(global_a);
     printf("idx     global_a          k_slow           k_fast f=2.5123\n");
-    for (int i = 0; (i < 16); i += 1) {
+    for (unsigned int i = 0; (i < 16); i += 1) {
       {
 
         printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
