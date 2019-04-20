@@ -36,30 +36,30 @@ float complex *fun(float complex *__restrict__ x) {
   // number doesn't loose precision.;
   {
     static float complex s[(4 * 4)] = {0.0fi};
-    const float complex wn2_p0_1 = ((1.e+0) + (0.0e+0i));
-    const float complex wn2_m1_4 = ((0.0e+0) + (-1.e+0i));
-    const float complex wn2_p1_2 = ((-1.e+0) + (0.0e+0i));
-    const float complex wn2_p1_4 = ((0.0e+0) + (1.e+0i));
     s[0] = (x[0] + x[4] + x[8] + x[12]);
     s[1] = (x[1] + x[5] + x[9] + x[13]);
     s[2] = (x[2] + x[6] + x[10] + x[14]);
     s[3] = (x[3] + x[7] + x[11] + x[15]);
-    s[4] = (x[0] + (x[4] * wn2_m1_4) + (x[8] * wn2_p1_2) + (x[12] * wn2_p1_4));
-    s[5] = (x[1] + (x[5] * wn2_m1_4) + (x[9] * wn2_p1_2) + (x[13] * wn2_p1_4));
-    s[6] = (x[2] + (x[6] * wn2_m1_4) + (x[10] * wn2_p1_2) + (x[14] * wn2_p1_4));
-    s[7] = (x[3] + (x[7] * wn2_m1_4) + (x[11] * wn2_p1_2) + (x[15] * wn2_p1_4));
-    s[8] = (x[0] + (x[4] * wn2_p1_2) + (x[8] * wn2_p0_1) + (x[12] * wn2_p1_2));
-    s[9] = (x[1] + (x[5] * wn2_p1_2) + (x[9] * wn2_p0_1) + (x[13] * wn2_p1_2));
-    s[10] =
-        (x[2] + (x[6] * wn2_p1_2) + (x[10] * wn2_p0_1) + (x[14] * wn2_p1_2));
-    s[11] =
-        (x[3] + (x[7] * wn2_p1_2) + (x[11] * wn2_p0_1) + (x[15] * wn2_p1_2));
-    s[12] = (x[0] + (x[4] * wn2_p1_4) + (x[8] * wn2_p1_2) + (x[12] * wn2_m1_4));
-    s[13] = (x[1] + (x[5] * wn2_p1_4) + (x[9] * wn2_p1_2) + (x[13] * wn2_m1_4));
-    s[14] =
-        (x[2] + (x[6] * wn2_p1_4) + (x[10] * wn2_p1_2) + (x[14] * wn2_m1_4));
-    s[15] =
-        (x[3] + (x[7] * wn2_p1_4) + (x[11] * wn2_p1_2) + (x[15] * wn2_m1_4));
+    s[4] = (x[0] + (CMPLXF(cimagf(x[4]), (-1 * crealf(x[4])))) + (-1 * x[8]) +
+            (CMPLXF((-1 * cimagf(x[12])), crealf(x[12]))));
+    s[5] = (x[1] + (CMPLXF(cimagf(x[5]), (-1 * crealf(x[5])))) + (-1 * x[9]) +
+            (CMPLXF((-1 * cimagf(x[13])), crealf(x[13]))));
+    s[6] = (x[2] + (CMPLXF(cimagf(x[6]), (-1 * crealf(x[6])))) + (-1 * x[10]) +
+            (CMPLXF((-1 * cimagf(x[14])), crealf(x[14]))));
+    s[7] = (x[3] + (CMPLXF(cimagf(x[7]), (-1 * crealf(x[7])))) + (-1 * x[11]) +
+            (CMPLXF((-1 * cimagf(x[15])), crealf(x[15]))));
+    s[8] = (x[0] + (-1 * x[4]) + x[8] + (-1 * x[12]));
+    s[9] = (x[1] + (-1 * x[5]) + x[9] + (-1 * x[13]));
+    s[10] = (x[2] + (-1 * x[6]) + x[10] + (-1 * x[14]));
+    s[11] = (x[3] + (-1 * x[7]) + x[11] + (-1 * x[15]));
+    s[12] = (x[0] + (CMPLXF((-1 * cimagf(x[4])), crealf(x[4]))) + (-1 * x[8]) +
+             (CMPLXF(cimagf(x[12]), (-1 * crealf(x[12])))));
+    s[13] = (x[1] + (CMPLXF((-1 * cimagf(x[5])), crealf(x[5]))) + (-1 * x[9]) +
+             (CMPLXF(cimagf(x[13]), (-1 * crealf(x[13])))));
+    s[14] = (x[2] + (CMPLXF((-1 * cimagf(x[6])), crealf(x[6]))) + (-1 * x[10]) +
+             (CMPLXF(cimagf(x[14]), (-1 * crealf(x[14])))));
+    s[15] = (x[3] + (CMPLXF((-1 * cimagf(x[7])), crealf(x[7]))) + (-1 * x[11]) +
+             (CMPLXF(cimagf(x[15]), (-1 * crealf(x[15])))));
     // transpose and elementwise multiplication;
     {
       static float complex z[(4 * 4)] = {0.0fi};

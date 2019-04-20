@@ -105,7 +105,7 @@
 			    (raw "// dft on each row")
 			    (raw "// Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision.")
 			    (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
-				  ,@(let ((args-seen nil))
+				  ,@(let ((args-seen (list 0 1/4 -1/4 1/2)))
 				      (loop for j2 below n2 appending
 					   (loop for k below n2 when (not (member
 									   (twiddle-arg j2 k n2)
@@ -122,10 +122,17 @@
 				      (loop for j1 below n1 collect
 					   `(setf (aref s ,(+ j1 (* n1 j2)))
 						  (+ ,@(loop for k below n2 collect
-							    (if (eq 0 (* j2 k))
-								  `(aref x ,(+ j1 (* k n1)))
-								  `(* (aref x ,(+ j1 (* k n1)))
-								      ,(format nil "wn2_~a" (twiddle-arg-name j2 k n2)))))))))
+							    (case (twiddle-arg j2 k n2) ;if (eq 0 (* j2 k))
+							      (0 `(aref x ,(+ j1 (* k n1))))
+							      (1/2 `(* -1 (aref x ,(+ j1 (* k n1)))))
+							      (1/4 `(* (funcall CMPLXF
+										(* -1 (funcall cimagf (aref x ,(+ j1 (* k n1)))))
+										(funcall crealf (aref x ,(+ j1 (* k n1)))))))
+							      (-1/4 `(* (funcall CMPLXF
+										(funcall cimagf (aref x ,(+ j1 (* k n1))))
+										(* -1 (funcall crealf (aref x ,(+ j1 (* k n1))))))))
+							      (t `(* (aref x ,(+ j1 (* k n1)))
+								   ,(format nil "wn2_~a" (twiddle-arg-name j2 k n2))))))))))
 
 			       (raw "// transpose and elementwise multiplication")
 			       (let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
