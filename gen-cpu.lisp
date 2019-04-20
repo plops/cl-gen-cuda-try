@@ -103,7 +103,8 @@
 					;(raw "#typedef scomplex float complex")
 
 	     (raw "#ifndef CMPLXF")
-	     (raw "#define CMPLX(re,im) ((re)+(im)*1.0fi)")
+	     (raw "#define CMPLXF(real, imag) ((real) + _Complex_I * (imag))")
+	     
 	     (raw "#endif")
 	     
 	     (function (dft16_slow ((a :type "float complex* __restrict__")
@@ -336,9 +337,10 @@
 	   
 	   ))
     (write-source *main-cpp-filename* "c" code)
-    ;(uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
-    (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize source/cpu_try.c -o source/cpu_try_gcc -lm")
-    (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try.s")
+    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try_clang -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
+    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -S -o source/cpu_try_clang.s -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm ")
+    ;(uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize source/cpu_try.c -o source/cpu_try_gcc -lm")
+    (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try_gcc.s")
     ))
 
 

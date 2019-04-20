@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifndef CMPLXF
-#define CMPLX(re, im) ((re) + (im)*1.0fi)
+#define CMPLXF(real, imag) ((real) + _Complex_I * (imag))
 #endif
 float complex *dft16_slow(float complex *__restrict__ a) {
   a = __builtin_assume_aligned(a, 64);
