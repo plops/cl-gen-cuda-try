@@ -25,3 +25,5 @@ mixed approach faster?
 # References
 
 - cuda complex library https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp
+
+- Vasily Volkov FFT on GPU (2008) https://people.eecs.berkeley.edu/~kubitron/courses/cs258-S08/projects/reports/project6_report.pdf
