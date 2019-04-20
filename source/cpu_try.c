@@ -63,68 +63,60 @@ float complex *fun(float complex *__restrict__ x) {
     // transpose and elementwise multiplication;
     {
       static float complex z[(4 * 4)] = {0.0fi};
-      const float complex wn_m1_16 =
+      const float complex w16m1_16 =
           ((9.238795325112866e-1) + (-3.826834323650897e-1i));
-      const float complex wn_p7_8 =
+      const float complex w16p7_8 =
           ((7.071067811865475e-1) + (-7.071067811865475e-1i));
-      const float complex wn_p13_16 =
+      const float complex w16p13_16 =
           ((3.826834323650898e-1) + (-9.238795325112866e-1i));
-      const float complex wn_p3_4 = ((0.0e+0) + (-1.e+0i));
-      const float complex wn_p5_8 =
+      const float complex w16p3_4 = ((0.0e+0) + (-1.e+0i));
+      const float complex w16p5_8 =
           ((-7.071067811865475e-1) + (-7.071067811865475e-1i));
-      const float complex wn_p7_16 =
+      const float complex w16p7_16 =
           ((-9.238795325112867e-1) + (3.8268343236508967e-1i));
       z[0] = s[0];
       z[1] = s[4];
       z[2] = s[8];
       z[3] = s[12];
       z[4] = s[1];
-      z[5] = (s[5] * wn_m1_16);
-      z[6] = (s[9] * wn_p7_8);
-      z[7] = (s[13] * wn_p13_16);
+      z[5] = (s[5] * w16m1_16);
+      z[6] = (s[9] * w16p7_8);
+      z[7] = (s[13] * w16p13_16);
       z[8] = s[2];
-      z[9] = (s[6] * wn_p7_8);
-      z[10] = (s[10] * wn_p3_4);
-      z[11] = (s[14] * wn_p5_8);
+      z[9] = (s[6] * w16p7_8);
+      z[10] = (s[10] * w16p3_4);
+      z[11] = (s[14] * w16p5_8);
       z[12] = s[3];
-      z[13] = (s[7] * wn_p13_16);
-      z[14] = (s[11] * wn_p5_8);
-      z[15] = (s[15] * wn_p7_16);
+      z[13] = (s[7] * w16p13_16);
+      z[14] = (s[11] * w16p5_8);
+      z[15] = (s[15] * w16p7_16);
       // dft on each row;
       {
         static float complex y[(4 * 4)] = {0.0fi};
-        const float complex wn1_m1_4 = ((0.0e+0) + (-1.e+0i));
-        const float complex wn1_p1_2 = ((-1.e+0) + (0.0e+0i));
-        const float complex wn1_p1_4 = ((0.0e+0) + (1.e+0i));
-        const float complex wn1_p0_1 = ((1.e+0) + (0.0e+0i));
         y[0] = (z[0] + z[4] + z[8] + z[12]);
         y[1] = (z[1] + z[5] + z[9] + z[13]);
         y[2] = (z[2] + z[6] + z[10] + z[14]);
         y[3] = (z[3] + z[7] + z[11] + z[15]);
-        y[4] =
-            (z[0] + (wn1_m1_4 * z[4]) + (wn1_p1_2 * z[8]) + (wn1_p1_4 * z[12]));
-        y[5] =
-            (z[1] + (wn1_m1_4 * z[5]) + (wn1_p1_2 * z[9]) + (wn1_p1_4 * z[13]));
-        y[6] = (z[2] + (wn1_m1_4 * z[6]) + (wn1_p1_2 * z[10]) +
-                (wn1_p1_4 * z[14]));
-        y[7] = (z[3] + (wn1_m1_4 * z[7]) + (wn1_p1_2 * z[11]) +
-                (wn1_p1_4 * z[15]));
-        y[8] =
-            (z[0] + (wn1_p1_2 * z[4]) + (wn1_p0_1 * z[8]) + (wn1_p1_2 * z[12]));
-        y[9] =
-            (z[1] + (wn1_p1_2 * z[5]) + (wn1_p0_1 * z[9]) + (wn1_p1_2 * z[13]));
-        y[10] = (z[2] + (wn1_p1_2 * z[6]) + (wn1_p0_1 * z[10]) +
-                 (wn1_p1_2 * z[14]));
-        y[11] = (z[3] + (wn1_p1_2 * z[7]) + (wn1_p0_1 * z[11]) +
-                 (wn1_p1_2 * z[15]));
-        y[12] =
-            (z[0] + (wn1_p1_4 * z[4]) + (wn1_p1_2 * z[8]) + (wn1_m1_4 * z[12]));
-        y[13] =
-            (z[1] + (wn1_p1_4 * z[5]) + (wn1_p1_2 * z[9]) + (wn1_m1_4 * z[13]));
-        y[14] = (z[2] + (wn1_p1_4 * z[6]) + (wn1_p1_2 * z[10]) +
-                 (wn1_m1_4 * z[14]));
-        y[15] = (z[3] + (wn1_p1_4 * z[7]) + (wn1_p1_2 * z[11]) +
-                 (wn1_m1_4 * z[15]));
+        y[4] = (z[0] + (CMPLXF(cimagf(z[4]), (-1 * crealf(z[4])))) +
+                (-1 * z[8]) + (CMPLXF((-1 * cimagf(z[12])), crealf(z[12]))));
+        y[5] = (z[1] + (CMPLXF(cimagf(z[5]), (-1 * crealf(z[5])))) +
+                (-1 * z[9]) + (CMPLXF((-1 * cimagf(z[13])), crealf(z[13]))));
+        y[6] = (z[2] + (CMPLXF(cimagf(z[6]), (-1 * crealf(z[6])))) +
+                (-1 * z[10]) + (CMPLXF((-1 * cimagf(z[14])), crealf(z[14]))));
+        y[7] = (z[3] + (CMPLXF(cimagf(z[7]), (-1 * crealf(z[7])))) +
+                (-1 * z[11]) + (CMPLXF((-1 * cimagf(z[15])), crealf(z[15]))));
+        y[8] = (z[0] + (-1 * z[4]) + z[8] + (-1 * z[12]));
+        y[9] = (z[1] + (-1 * z[5]) + z[9] + (-1 * z[13]));
+        y[10] = (z[2] + (-1 * z[6]) + z[10] + (-1 * z[14]));
+        y[11] = (z[3] + (-1 * z[7]) + z[11] + (-1 * z[15]));
+        y[12] = (z[0] + (CMPLXF((-1 * cimagf(z[4])), crealf(z[4]))) +
+                 (-1 * z[8]) + (CMPLXF(cimagf(z[12]), (-1 * crealf(z[12])))));
+        y[13] = (z[1] + (CMPLXF((-1 * cimagf(z[5])), crealf(z[5]))) +
+                 (-1 * z[9]) + (CMPLXF(cimagf(z[13]), (-1 * crealf(z[13])))));
+        y[14] = (z[2] + (CMPLXF((-1 * cimagf(z[6])), crealf(z[6]))) +
+                 (-1 * z[10]) + (CMPLXF(cimagf(z[14]), (-1 * crealf(z[14])))));
+        y[15] = (z[3] + (CMPLXF((-1 * cimagf(z[7])), crealf(z[7]))) +
+                 (-1 * z[11]) + (CMPLXF(cimagf(z[15]), (-1 * crealf(z[15])))));
         return y;
       }
     }

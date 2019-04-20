@@ -46,11 +46,29 @@
        (/ 1 n)))
   (defun twiddle-arg-name (j k n)
     (let ((arg (twiddle-arg j k n)))
-      (format nil "~a~a_~a" (if (< arg 0)
-				"m"
-				"p")
+      (format nil "~a~a~a_~a" n
+	      (if (< arg 0)
+		  "m"
+		  "p")
 	      (abs (numerator arg))
 	      (denominator arg))))
+
+  (defun twiddle-mul (e
+		       j k n)
+    "compute product of a complex number and a twiddle factor. express without multiplication if possible."
+    (case (twiddle-arg j k n)	;if (eq 0 (* j2 k))
+      (0 e)
+      (1/2 `(* -1 ,e))
+      (1/4 `(* (funcall ;;__builtin_complex ;;
+		CMPLXF
+		(* -1 (funcall cimagf ,e))
+		(funcall crealf ,e))))
+      (-1/4 `(* (funcall ;; __builtin_complex ;;
+		 CMPLXF
+		 (funcall cimagf ,e)
+		 (* -1 (funcall crealf ,e)))))
+      (t `(* ,e
+	     ,(format nil "w~a" (twiddle-arg-name j k n))))))
   
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cpu_try"
@@ -114,7 +132,7 @@
 						(progn
 						  (push (twiddle-arg j2 k n2)
 							args-seen)
-						  `(,(format nil "wn2_~a" (twiddle-arg-name j2 k n2)) :type "const float complex"
+						  `(,(format nil "w~a" (twiddle-arg-name j2 k n2)) :type "const float complex"
 						     :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))))
 			      
 			    
@@ -122,19 +140,9 @@
 				      (loop for j1 below n1 collect
 					   `(setf (aref s ,(+ j1 (* n1 j2)))
 						  (+ ,@(loop for k below n2 collect
-							    (case (twiddle-arg j2 k n2) ;if (eq 0 (* j2 k))
-							      (0 `(aref x ,(+ j1 (* k n1))))
-							      (1/2 `(* -1 (aref x ,(+ j1 (* k n1)))))
-							      (1/4 `(* (funcall ;;__builtin_complex ;;
-									CMPLXF
-										(* -1 (funcall cimagf (aref x ,(+ j1 (* k n1)))))
-										(funcall crealf (aref x ,(+ j1 (* k n1)))))))
-							      (-1/4 `(* (funcall ;; __builtin_complex ;;
-										 CMPLXF
-										(funcall cimagf (aref x ,(+ j1 (* k n1))))
-										(* -1 (funcall crealf (aref x ,(+ j1 (* k n1))))))))
-							      (t `(* (aref x ,(+ j1 (* k n1)))
-								   ,(format nil "wn2_~a" (twiddle-arg-name j2 k n2))))))))))
+							    (twiddle-mul `(aref x ,(+ j1 (* k n1)))
+									 j2 k n2)
+							    )))))
 
 			       (raw "// transpose and elementwise multiplication")
 			       (let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
@@ -148,7 +156,7 @@
 						   (let ((arg (twiddle-arg j1 j2 (* n1 n2))))
 						     (push arg
 							   w-seen)
-						     `(,(format nil "wn_~a" (twiddle-arg-name j1 j2 (* n1 n2)))
+						     `(,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 						       :type "const float complex"
 						       :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
 				 ,@(loop for j1 below n1 appending
@@ -157,12 +165,12 @@
 						    ,(if (eq 0 (* j1 j2))
 							 `(aref s ,(+ j1 (* j2 n1)))
 							 `(*  (aref s ,(+ j1 (* j2 n1)))
-							      ,(format nil "wn_~a" (twiddle-arg-name j1 j2 (* n1 n2)))
+							      ,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 					;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
 							      )))))
 				 (raw "// dft on each row")
 				 (let (((aref y (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
-				       ,@(let ((seen ()))
+				       ,@(let ((seen (list 0 1/4 -1/4 1/2)))
 					   (loop for j1 below n1 appending
 						(loop for j2 below n2 when (and (/= 0 (* j1 j2))
 										(not (member (twiddle-arg j1 j2 n1)
@@ -170,7 +178,7 @@
 						   collect
 						     (let ((arg (twiddle-arg j1 j2 n1)))
 						       (push arg seen)
-						       `(,(format nil "wn1_~a" (twiddle-arg-name j1 j2 n1))
+						       `(,(format nil "w~a" (twiddle-arg-name j1 j2 n1))
 							  :type "const float complex"
 							  :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))))))
 				   
@@ -178,10 +186,13 @@
 					  (loop for j2 below n2 collect
 					       `(setf (aref y ,(+ (* j1 n2) j2))
 						      (+ ,@(loop for k below n1 collect
+								(twiddle-mul `(aref z ,(+ (* k n2) j2))
+									     j1 k n1)
+								#+nil
 								(if (eq 0 (* j1 k))
 								    `(aref z ,(+ (* k n2) j2))
 								    `(*
-								      ,(format nil "wn1_~a" (twiddle-arg-name j1 k n1))
+								      ,(format nil "w~a" (twiddle-arg-name j1 k n1))
 					;,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
 								      (aref z ,(+ (* k n2) j2)))))))))
 				   (return y)))))))	     
@@ -218,8 +229,9 @@
 			   )))
 		       (return 0)))))
     (write-source *main-cpp-filename* "c" code)
-    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
-    (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try.s")
+    ;(uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
+    (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize source/cpu_try.c -o source/cpu_try_gcc -lm")
+    (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try.s")
     ))
 
 
