@@ -102,7 +102,9 @@
 	     (include <math.h>)
 					;(raw "#typedef scomplex float complex")
 
-
+	     (raw "#ifndef CMPLXF")
+	     (raw "#define CMPLX(re,im) ((re)+(im)*1.0fi)")
+	     (raw "#endif")
 	     
 	     (function (dft16_slow ((a :type "float complex* __restrict__")
 				  )
