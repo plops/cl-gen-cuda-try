@@ -288,17 +288,21 @@
 			  `(let (((aref a_in ,n) :type "alignas(64) float complex")
 					;((aref a_out ,n) :type "alignas(64) float complex")
 				 (a_out :type "float complex*")
+				 (a_out_slow :type "float complex*")
 				)
 			    (funcall memset a_in 0 (* ,n (funcall sizeof "complex float")))
 			    ;(funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
 			    (dotimes (i ,n)
 			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3 (/ n)) i))))
 			    (setf a_out (funcall fft256 a_in))
+			    (setf a_out_slow (funcall dft256_slow a_in))
 			    (dotimes (i ,n)
-			      (funcall printf (string "%02d   %6.3f+(%6.3f)i\\n")
+			      (funcall printf (string "%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\\n")
 				       i
 				       (funcall crealf (aref a_out i))
-				       (funcall cimagf (aref a_out i))))))
+				       (funcall cimagf (aref a_out i))
+				       (funcall crealf (aref a_out_slow i))
+				       (funcall cimagf (aref a_out_slow i))))))
 		       
 		       
 		       #+nil ,@(loop for f in '(0 2 2.5123) collect

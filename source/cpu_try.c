@@ -631,13 +631,17 @@ int main() {
   {
     alignas(64) float complex a_in[256];
     float complex *a_out;
+    float complex *a_out_slow;
     memset(a_in, 0, (256 * sizeof(complex float)));
     for (unsigned int i = 0; (i < 256); i += 1) {
       a_in[i] = sinf(((-7.363107781851077e-2) * i));
     }
     a_out = fft256(a_in);
+    a_out_slow = dft256_slow(a_in);
     for (unsigned int i = 0; (i < 256); i += 1) {
-      printf("%02d   %6.3f+(%6.3f)i\n", i, crealf(a_out[i]), cimagf(a_out[i]));
+      printf("%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\n", i,
+             crealf(a_out[i]), cimagf(a_out[i]), crealf(a_out_slow[i]),
+             cimagf(a_out_slow[i]));
     }
   }
   return 0;
