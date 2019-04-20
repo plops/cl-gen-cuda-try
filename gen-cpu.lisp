@@ -67,6 +67,10 @@
 		 CMPLXF
 		 (funcall cimagf ,e)
 		 (* -1 (funcall crealf ,e)))))
+      (3/4 `(* (funcall ;; __builtin_complex ;;
+		 CMPLXF
+		 (funcall cimagf ,e)
+		 (* -1 (funcall crealf ,e)))))
       (t `(* ,e
 	     ,(format nil "w~a" (twiddle-arg-name j k n))))))
   
@@ -121,9 +125,9 @@
 		       ,(let ()
 			  `(statements
 			    (raw "// dft on each row")
-			    (raw "// Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision.")
+			    
 			    (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
-				  ,@(let ((args-seen (list 0 1/4 -1/4 1/2)))
+				  ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 				      (loop for j2 below n2 appending
 					   (loop for k below n2 when (not (member
 									   (twiddle-arg j2 k n2)
@@ -145,8 +149,9 @@
 							    )))))
 
 			       (raw "// transpose and elementwise multiplication")
+			       (raw "// Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision.")
 			       (let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
-				     ,@(let ((w-seen ()))
+				     ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
 					 (loop for j1 below n1 appending
 					      (loop for j2 below n2 when (and (/= 0 (* j1 j2))
 									      (not 
@@ -162,7 +167,9 @@
 				 ,@(loop for j1 below n1 appending
 					(loop for j2 below n2 collect
 					     `(setf (aref z ,(+ (* j1 n2) j2))
-						    ,(if (eq 0 (* j1 j2))
+						    ,(twiddle-mul `(aref s ,(+ j1 (* j2 n1)))
+								  j1 j2 (* n1 n2))
+						    #+nil ,(if (eq 0 (* j1 j2))
 							 `(aref s ,(+ j1 (* j2 n1)))
 							 `(*  (aref s ,(+ j1 (* j2 n1)))
 							      ,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
@@ -170,7 +177,7 @@
 							      )))))
 				 (raw "// dft on each row")
 				 (let (((aref y (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
-				       ,@(let ((seen (list 0 1/4 -1/4 1/2)))
+				       ,@(let ((seen (list 0 1/4 -1/4 3/4 1/2)))
 					   (loop for j1 below n1 appending
 						(loop for j2 below n2 when (and (/= 0 (* j1 j2))
 										(not (member (twiddle-arg j1 j2 n1)

@@ -31,9 +31,6 @@ float complex *fun_slow(float complex *__restrict__ a) {
 float complex *fun(float complex *__restrict__ x) {
   x = __builtin_assume_aligned(x, 64);
   // dft on each row;
-  // Twiddle factors are named by their angle in the unit turn turn
-  // https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational
-  // number doesn't loose precision.;
   {
     static float complex s[(4 * 4)] = {0.0fi};
     s[0] = (x[0] + x[4] + x[8] + x[12]);
@@ -61,6 +58,9 @@ float complex *fun(float complex *__restrict__ x) {
     s[15] = (x[3] + (CMPLXF((-1 * cimagf(x[7])), crealf(x[7]))) + (-1 * x[11]) +
              (CMPLXF(cimagf(x[15]), (-1 * crealf(x[15])))));
     // transpose and elementwise multiplication;
+    // Twiddle factors are named by their angle in the unit turn turn
+    // https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational
+    // number doesn't loose precision.;
     {
       static float complex z[(4 * 4)] = {0.0fi};
       const float complex w16m1_16 =
@@ -69,7 +69,6 @@ float complex *fun(float complex *__restrict__ x) {
           ((7.071067811865475e-1) + (-7.071067811865475e-1i));
       const float complex w16p13_16 =
           ((3.826834323650898e-1) + (-9.238795325112866e-1i));
-      const float complex w16p3_4 = ((0.0e+0) + (-1.e+0i));
       const float complex w16p5_8 =
           ((-7.071067811865475e-1) + (-7.071067811865475e-1i));
       const float complex w16p7_16 =
@@ -84,7 +83,7 @@ float complex *fun(float complex *__restrict__ x) {
       z[7] = (s[13] * w16p13_16);
       z[8] = s[2];
       z[9] = (s[6] * w16p7_8);
-      z[10] = (s[10] * w16p3_4);
+      z[10] = (CMPLXF(cimagf(s[10]), (-1 * crealf(s[10]))));
       z[11] = (s[14] * w16p5_8);
       z[12] = s[3];
       z[13] = (s[7] * w16p13_16);
