@@ -136,7 +136,7 @@
 			  `(statements
 			    (raw "// dft on each row")
 			    
-			    (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+			    (let (((aref s (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
 				  ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 				      (loop for j2 below n2 appending
 					   (loop for k below n2 when (not (member
@@ -160,7 +160,7 @@
 
 			       (raw "// transpose and elementwise multiplication")
 			       (raw "// Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision.")
-			       (let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+			       (let (((aref z (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
 				     ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
 					 (loop for j1 below n1 appending
 					      (loop for j2 below n2 when (and (/= 0 (* j1 j2))
@@ -187,7 +187,7 @@
 							      )))))
 				 (raw "// dft on each row")
 				 (setf out_y (funcall __builtin_assume_aligned out_y 64)) ;; tell compiler that argument ins 64byte aligned
-				 (let (;((aref y (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+				 (let (;((aref y (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
 				       ,@(let ((seen (list 0 1/4 -1/4 3/4 1/2)))
 					   (loop for j1 below n1 appending
 						(loop for j2 below n2 when (and (/= 0 (* j1 j2))
@@ -228,7 +228,7 @@
 			    `(statements
 			      (raw "// fft16 on each row")
 			    
-			      (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+			      (let (((aref s (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
 				    )
 			      
 			    
@@ -241,7 +241,7 @@
 				(raw "// transpose and elementwise multiplication")
 				(raw " ")
 				
-				(let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+				(let (((aref z (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
 				      ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
 					  (loop for j2 below n2 appending
 					   (loop for j1 below n1 					
@@ -263,7 +263,7 @@
 						     )))
 				  (raw "// fft16 on each row")
 				  (raw " ")
-				  (let (((aref y (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi)))
+				  (let (((aref y (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi)))
 				    ,@(loop for j2 below n2 collect
 					   `(funcall fft16_radix4
 						     (ref (aref z ,(+ 0 (* n1 j2))))

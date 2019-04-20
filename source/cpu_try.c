@@ -47,7 +47,7 @@ float complex *fft16_radix4(float complex *__restrict__ x,
   x = __builtin_assume_aligned(x, 64);
   // dft on each row;
   {
-    static float complex s[(4 * 4)] = {0.0fi};
+    static alignas(64) float complex s[(4 * 4)] = {0.0fi};
     s[0] = (x[0] + x[4] + x[8] + x[12]);
     s[1] = (x[1] + x[5] + x[9] + x[13]);
     s[2] = (x[2] + x[6] + x[10] + x[14]);
@@ -77,7 +77,7 @@ float complex *fft16_radix4(float complex *__restrict__ x,
     // https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational
     // number doesn't loose precision.;
     {
-      static float complex z[(4 * 4)] = {0.0fi};
+      static alignas(64) float complex z[(4 * 4)] = {0.0fi};
       const float complex w16m1_16 =
           ((9.238795325112866e-1) + (-3.826834323650897e-1i));
       const float complex w16p7_8 =
@@ -149,7 +149,7 @@ float complex *fft256(float complex *__restrict__ x) {
   x = __builtin_assume_aligned(x, 64);
   // fft16 on each row;
   {
-    static float complex s[(16 * 16)] = {0.0fi};
+    static alignas(64) float complex s[(16 * 16)] = {0.0fi};
     fft16_radix4((&(x[0])), (&(s[0])));
     fft16_radix4((&(x[16])), (&(s[16])));
     fft16_radix4((&(x[32])), (&(s[32])));
@@ -169,7 +169,7 @@ float complex *fft256(float complex *__restrict__ x) {
     // transpose and elementwise multiplication;
     ;
     {
-      static float complex z[(16 * 16)] = {0.0fi};
+      static alignas(64) float complex z[(16 * 16)] = {0.0fi};
       const float complex w256m1_256 =
           ((9.996988186962042e-1) + (-2.454122852291229e-2i));
       const float complex w256p127_128 =
@@ -605,7 +605,7 @@ float complex *fft256(float complex *__restrict__ x) {
       // fft16 on each row;
       ;
       {
-        static float complex y[(16 * 16)] = {0.0fi};
+        static alignas(64) float complex y[(16 * 16)] = {0.0fi};
         fft16_radix4((&(z[0])), (&(y[0])));
         fft16_radix4((&(z[16])), (&(y[16])));
         fft16_radix4((&(z[32])), (&(y[32])));
