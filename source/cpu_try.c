@@ -19,8 +19,8 @@ float complex *fun_slow(float complex *__restrict__ a) {
   {
     static alignas(64) float complex y[16] = {0.0fi};
     memset(y, 0, (16 * sizeof(complex float)));
-    for (unsigned int j = 0; (j < 16); j += 1) {
-      for (unsigned int k = 0; (k < 16); k += 1) {
+    for (int j = 0; (j < 16); j += 1) {
+      for (int k = 0; (k < 16); k += 1) {
         y[j] =
             (y[j] + (a[k] * cexpf((1.0fi * (-3.9269908169872414e-1) * j * k))));
       }
@@ -37,22 +37,70 @@ float complex *fun(float complex *__restrict__ x) {
     const float complex wn2_0_1 = ((0.0e+0) + (-1.e+0i));
     const float complex wn2_3_4 = ((-1.e+0) + (0.0e+0i));
     const float complex wn2_1_2 = ((0.0e+0) + (1.e+0i));
-    s[0] = (x[0] + x[4] + x[8] + x[12]);
-    s[1] = (x[1] + x[5] + x[9] + x[13]);
-    s[2] = (x[2] + x[6] + x[10] + x[14]);
-    s[3] = (x[3] + x[7] + x[11] + x[15]);
-    s[4] = (x[0] + (x[4] * wn2_0_1) + (x[8] * wn2_3_4) + (x[12] * wn2_1_2));
-    s[5] = (x[1] + (x[5] * wn2_0_1) + (x[9] * wn2_3_4) + (x[13] * wn2_1_2));
-    s[6] = (x[2] + (x[6] * wn2_0_1) + (x[10] * wn2_3_4) + (x[14] * wn2_1_2));
-    s[7] = (x[3] + (x[7] * wn2_0_1) + (x[11] * wn2_3_4) + (x[15] * wn2_1_2));
-    s[8] = (x[0] + (x[4] * wn2_3_4) + (x[8] * wn2_1_4) + (x[12] * wn2_3_4));
-    s[9] = (x[1] + (x[5] * wn2_3_4) + (x[9] * wn2_1_4) + (x[13] * wn2_3_4));
-    s[10] = (x[2] + (x[6] * wn2_3_4) + (x[10] * wn2_1_4) + (x[14] * wn2_3_4));
-    s[11] = (x[3] + (x[7] * wn2_3_4) + (x[11] * wn2_1_4) + (x[15] * wn2_3_4));
-    s[12] = (x[0] + (x[4] * wn2_1_2) + (x[8] * wn2_3_4) + (x[12] * wn2_0_1));
-    s[13] = (x[1] + (x[5] * wn2_1_2) + (x[9] * wn2_3_4) + (x[13] * wn2_0_1));
-    s[14] = (x[2] + (x[6] * wn2_1_2) + (x[10] * wn2_3_4) + (x[14] * wn2_0_1));
-    s[15] = (x[3] + (x[7] * wn2_1_2) + (x[11] * wn2_3_4) + (x[15] * wn2_0_1));
+    s[0] = (x[0]);
+    s[4] = (x[0]);
+    s[8] = (x[0]);
+    s[12] = (x[0]);
+    s[0] = (s[0] + x[4]);
+    s[4] = (s[4] + (x[4] * wn2_0_1));
+    s[8] = (s[8] + (x[4] * wn2_3_4));
+    s[12] = (s[12] + (x[4] * wn2_1_2));
+    s[0] = (s[0] + x[8]);
+    s[4] = (s[4] + (x[8] * wn2_3_4));
+    s[8] = (s[8] + (x[8] * wn2_1_4));
+    s[12] = (s[12] + (x[8] * wn2_3_4));
+    s[0] = (s[0] + x[12]);
+    s[4] = (s[4] + (x[12] * wn2_1_2));
+    s[8] = (s[8] + (x[12] * wn2_3_4));
+    s[12] = (s[12] + (x[12] * wn2_0_1));
+    s[1] = (x[1]);
+    s[5] = (x[1]);
+    s[9] = (x[1]);
+    s[13] = (x[1]);
+    s[1] = (s[1] + x[5]);
+    s[5] = (s[5] + (x[5] * wn2_0_1));
+    s[9] = (s[9] + (x[5] * wn2_3_4));
+    s[13] = (s[13] + (x[5] * wn2_1_2));
+    s[1] = (s[1] + x[9]);
+    s[5] = (s[5] + (x[9] * wn2_3_4));
+    s[9] = (s[9] + (x[9] * wn2_1_4));
+    s[13] = (s[13] + (x[9] * wn2_3_4));
+    s[1] = (s[1] + x[13]);
+    s[5] = (s[5] + (x[13] * wn2_1_2));
+    s[9] = (s[9] + (x[13] * wn2_3_4));
+    s[13] = (s[13] + (x[13] * wn2_0_1));
+    s[2] = (x[2]);
+    s[6] = (x[2]);
+    s[10] = (x[2]);
+    s[14] = (x[2]);
+    s[2] = (s[2] + x[6]);
+    s[6] = (s[6] + (x[6] * wn2_0_1));
+    s[10] = (s[10] + (x[6] * wn2_3_4));
+    s[14] = (s[14] + (x[6] * wn2_1_2));
+    s[2] = (s[2] + x[10]);
+    s[6] = (s[6] + (x[10] * wn2_3_4));
+    s[10] = (s[10] + (x[10] * wn2_1_4));
+    s[14] = (s[14] + (x[10] * wn2_3_4));
+    s[2] = (s[2] + x[14]);
+    s[6] = (s[6] + (x[14] * wn2_1_2));
+    s[10] = (s[10] + (x[14] * wn2_3_4));
+    s[14] = (s[14] + (x[14] * wn2_0_1));
+    s[3] = (x[3]);
+    s[7] = (x[3]);
+    s[11] = (x[3]);
+    s[15] = (x[3]);
+    s[3] = (s[3] + x[7]);
+    s[7] = (s[7] + (x[7] * wn2_0_1));
+    s[11] = (s[11] + (x[7] * wn2_3_4));
+    s[15] = (s[15] + (x[7] * wn2_1_2));
+    s[3] = (s[3] + x[11]);
+    s[7] = (s[7] + (x[11] * wn2_3_4));
+    s[11] = (s[11] + (x[11] * wn2_1_4));
+    s[15] = (s[15] + (x[11] * wn2_3_4));
+    s[3] = (s[3] + x[15]);
+    s[7] = (s[7] + (x[15] * wn2_1_2));
+    s[11] = (s[11] + (x[15] * wn2_3_4));
+    s[15] = (s[15] + (x[15] * wn2_0_1));
     // transpose and elementwise multiplication;
     {
       static float complex z[(4 * 4)] = {0.0fi};
@@ -146,7 +194,7 @@ int main() {
     complex float *k_slow = fun_slow(global_a);
     float complex *k_fast = fun(global_a);
     printf("idx     global_a          k_slow           k_fast f=0\n");
-    for (unsigned int i = 0; (i < 16); i += 1) {
+    for (int i = 0; (i < 16); i += 1) {
       {
 
         printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
@@ -175,7 +223,7 @@ int main() {
     complex float *k_slow = fun_slow(global_a);
     float complex *k_fast = fun(global_a);
     printf("idx     global_a          k_slow           k_fast f=2\n");
-    for (unsigned int i = 0; (i < 16); i += 1) {
+    for (int i = 0; (i < 16); i += 1) {
       {
 
         printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,
@@ -204,7 +252,7 @@ int main() {
     complex float *k_slow = fun_slow(global_a);
     float complex *k_fast = fun(global_a);
     printf("idx     global_a          k_slow           k_fast f=2.5123\n");
-    for (unsigned int i = 0; (i < 16); i += 1) {
+    for (int i = 0; (i < 16); i += 1) {
       {
 
         printf("%02d   %6.3f+(%6.3f)i %6.3f+(%6.3f)i %6.3f+(%6.3f)i \n", i,

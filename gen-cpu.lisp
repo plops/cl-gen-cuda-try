@@ -83,28 +83,55 @@
 		       ,(let ()
 			  `(statements
 			    (raw "// dft on each row")
-			     (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
-				   ,@(let ((args-seen nil))
-				       (loop for j2 below n2 appending
-					    (loop for k below n2 when (not (member
-									    (mod (+ (/ 1 n2)
-										    (/ (* -1 j2 k)
-										       n2))
-										 1)
-									    args-seen))					       collect
-						 (progn
-						   (push (mod (+ (/ 1 n2) (/ (* -1 j2 k)
-										    n2))
-							      1)
-							 args-seen)
-						   `(,(let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
+			    (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
+				  ,@(let ((args-seen nil))
+				      (loop for j2 below n2 appending
+					   (loop for k below n2 when (not (member
+									   (mod (+ (/ 1 n2)
+										   (/ (* -1 j2 k)
+										      n2))
+										1)
+									   args-seen))
+					      collect
+						(progn
+						  (push (mod (+ (/ 1 n2) (/ (* -1 j2 k)
+									    n2))
+							     1)
+							args-seen)
+						  `(,(let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
 										    n2))
 								     1)))
 						       (format nil "wn2_~a_~a"
 							       (numerator arg)
 							       (denominator arg))) :type "const float complex"
 						     :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))))
-			       ,@(loop for j2 below n2 appending
+			      
+			      ,@(loop for j1 below n1 appending
+				     (loop for k below n2 appending
+					  (loop for j2 below n2 collect
+					       `(setf (aref s ,(+ j1 (* n1 j2)))
+						      ,(if (eq k 0)
+							`(+ 
+							 ,(if (eq 0 (* j2 k))
+							      `(aref x ,(+ j1 (* k n1)))
+							      (let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
+											     n2))
+									      1)))
+								`(* (aref x ,(+ j1 (* k n1)))
+								    ,(format nil "wn2_~a_~a" (numerator arg)
+									     (denominator arg))))))
+							`(+
+							  (aref s ,(+ j1 (* n1 j2)))
+							 ,(if (eq 0 (* j2 k))
+							      `(aref x ,(+ j1 (* k n1)))
+							      (let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
+											     n2))
+									      1)))
+								`(* (aref x ,(+ j1 (* k n1)))
+								    ,(format nil "wn2_~a_~a" (numerator arg)
+									     (denominator arg)))))))))))
+			      #+nil
+			      ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
 					   `(setf (aref s ,(+ j1 (* n1 j2)))
 						  (+ ,@(loop for k below n2 collect
