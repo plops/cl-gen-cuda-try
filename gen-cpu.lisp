@@ -84,7 +84,7 @@
 	  `(with-compilation-unit
 
 	     ;; https://news.ycombinator.com/item?id=13147890
-	       (raw "//gcc -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize -mfma -mavx2")
+	       (raw "//gcc -std=c11 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize -mfma -mavx2")
 	     (raw " ")
 	     ;; https://dendibakh.github.io/blog/2017/10/30/Compiler-optimization-report
 	     (raw "//clang -std=c11 -Ofast -flto -ffast-math -march=skylake -msse2 -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize")

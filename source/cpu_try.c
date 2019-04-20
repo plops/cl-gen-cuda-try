@@ -1,4 +1,4 @@
-// gcc -std=c99 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize
+// gcc -std=c11 -Ofast -flto -ffast-math -march=skylake -msse2  -ftree-vectorize
 // -mfma -mavx2
 
 // clang -std=c11 -Ofast -flto -ffast-math -march=skylake -msse2
