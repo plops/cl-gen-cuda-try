@@ -243,10 +243,11 @@
 				
 				(let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
 				      ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
-					  (loop for j1 below n1 appending
-					       (loop for j2 below n2 when (not 
-									   (member (twiddle-arg j1 j2 (* n1 n2))
-										   w-seen))
+					  (loop for j2 below n2 appending
+					   (loop for j1 below n1 					
+					      when (not 
+						    (member (twiddle-arg j1 j2 (* n1 n2))
+							    w-seen))
 						  collect
 						    (let ((arg (twiddle-arg j1 j2 (* n1 n2))))
 						      (push arg
@@ -254,8 +255,8 @@
 						      `(,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 							 :type "const float complex"
 							 :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
-				  ,@(loop for j1 below n1 appending
-					 (loop for j2 below n2 collect
+				  ,@(loop for j2 below n2 appending
+					 (loop for j1 below n1 collect
 					      `(setf (aref z ,(+ (* j1 n2) j2))
 						     ,(twiddle-mul `(aref s ,(+ j1 (* j2 n1)))
 								   j1 j2 (* n1 n2))
