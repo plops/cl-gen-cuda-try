@@ -33,7 +33,21 @@
     (let ((a (realpart z))
 	  (b (imagpart z)))
       (complex (flush a) (flush b))))
-
+  
+  (defun twiddle-arg (j k n)
+    "Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision."
+    (- (mod (+ (/ 1 n) (/ (* -1 j k)
+			   n))
+	    1)
+       (/ 1 n)))
+  (defun twiddle-arg-name (j k n)
+    (let ((arg (twiddle-arg j k n)))
+      (format nil "~a~a_~a" (if (< arg 0)
+				"m"
+				"p")
+	      (abs (numerator arg))
+	      (denominator arg))))
+  
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/cpu_try"
 		     (user-homedir-pathname)))
@@ -50,6 +64,8 @@
 	     (raw "//clang -std=c11 -Ofast -flto -ffast-math -march=skylake -msse2 -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize")
 	     (raw " ")
 	     (raw "//icc -std=c11 -O2 -D NOFUNCCALL -qopt-report=1 -qopt-report-phase=vec -guide-vec -parallel")
+	     ;; icc with -O3 does cache blocking and prefetching https://www.youtube.com/watch?v=nvPYYE0OWVA
+	     ;; don't link with -lm explicitly icc
 	     (raw " ")
 	     
 	     (include <stdio.h>)
@@ -83,66 +99,29 @@
 		       ,(let ()
 			  `(statements
 			    (raw "// dft on each row")
+			    (raw "// Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision.")
 			    (let (((aref s (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
 				  ,@(let ((args-seen nil))
 				      (loop for j2 below n2 appending
 					   (loop for k below n2 when (not (member
-									   (mod (+ (/ 1 n2)
-										   (/ (* -1 j2 k)
-										      n2))
-										1)
+									   (twiddle-arg j2 k n2)
 									   args-seen))
 					      collect
 						(progn
-						  (push (mod (+ (/ 1 n2) (/ (* -1 j2 k)
-									    n2))
-							     1)
+						  (push (twiddle-arg j2 k n2)
 							args-seen)
-						  `(,(let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
-										    n2))
-								     1)))
-						       (format nil "wn2_~a_~a"
-							       (numerator arg)
-							       (denominator arg))) :type "const float complex"
+						  `(,(format nil "wn2_~a" (twiddle-arg-name j2 k n2)) :type "const float complex"
 						     :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))))
 			      
-			      ,@(loop for j1 below n1 appending
-				     (loop for k below n2 appending
-					  (loop for j2 below n2 collect
-					       `(setf (aref s ,(+ j1 (* n1 j2)))
-						      ,(if (eq k 0)
-							`(+ 
-							 ,(if (eq 0 (* j2 k))
-							      `(aref x ,(+ j1 (* k n1)))
-							      (let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
-											     n2))
-									      1)))
-								`(* (aref x ,(+ j1 (* k n1)))
-								    ,(format nil "wn2_~a_~a" (numerator arg)
-									     (denominator arg))))))
-							`(+
-							  (aref s ,(+ j1 (* n1 j2)))
-							 ,(if (eq 0 (* j2 k))
-							      `(aref x ,(+ j1 (* k n1)))
-							      (let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
-											     n2))
-									      1)))
-								`(* (aref x ,(+ j1 (* k n1)))
-								    ,(format nil "wn2_~a_~a" (numerator arg)
-									     (denominator arg)))))))))))
-			      #+nil
+			    
 			      ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
 					   `(setf (aref s ,(+ j1 (* n1 j2)))
 						  (+ ,@(loop for k below n2 collect
 							    (if (eq 0 (* j2 k))
 								  `(aref x ,(+ j1 (* k n1)))
-								  (let ((arg (mod (+ (/ 1 n2) (/ (* -1 j2 k)
-												 n2))
-										  1)))
-								    `(* (aref x ,(+ j1 (* k n1)))
-									,(format nil "wn2_~a_~a" (numerator arg)
-										 (denominator arg))))))))))
+								  `(* (aref x ,(+ j1 (* k n1)))
+								      ,(format nil "wn2_~a" (twiddle-arg-name j2 k n2)))))))))
 
 			       (raw "// transpose and elementwise multiplication")
 			       (let (((aref z (* ,n1 ,n2)) :type "static float complex" :init (list 0.0fi))
@@ -150,18 +129,13 @@
 					 (loop for j1 below n1 appending
 					      (loop for j2 below n2 when (and (/= 0 (* j1 j2))
 									      (not 
-										  (member (round (* 180000 (/ pi)
-												    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))
+										  (member (twiddle-arg j1 j2 (* n1 n2))
 											  w-seen)))
 						 collect
-						   (progn
-						     (push (round (* 180000 (/ pi)
-								     (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))
+						   (let ((arg (twiddle-arg j1 j2 (* n1 n2))))
+						     (push arg
 							   w-seen)
-						     `(,(format nil "wn_~{~a~}"
-								(let ((val (round (* 180000 (/ pi)
-										    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))
-								 (list (if (< val 0) "m" "p") (abs val))))
+						     `(,(format nil "wn_~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 						       :type "const float complex"
 						       :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
 				 ,@(loop for j1 below n1 appending
@@ -170,10 +144,7 @@
 						    ,(if (eq 0 (* j1 j2))
 							 `(aref s ,(+ j1 (* j2 n1)))
 							 `(*  (aref s ,(+ j1 (* j2 n1)))
-							      ,(format nil "wn_~{~a~}"
-							       (let ((val (round (* 180000 (/ pi)
-										    (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))
-								 (list (if (< val 0) "m" "p") (abs val))))
+							      ,(format nil "wn_~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 					;,(exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2)))))
 							      )))))
 				 (raw "// dft on each row")
@@ -181,19 +152,14 @@
 				       ,@(let ((seen ()))
 					   (loop for j1 below n1 appending
 						(loop for j2 below n2 when (and (/= 0 (* j1 j2))
-										(not (member (round (* 180000 (/ pi)
-												       (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))
+										(not (member (twiddle-arg j1 j2 n1)
 											     seen)))
 						   collect
-						     (progn
-						       (push (round (* 180000 (/ pi)
-												       (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ n1))))))) seen)
-						      `(,(format nil "wn1_~{~a~}"
-								 (let ((val (round (* 180000 (/ pi)
-										      (phase (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))))
-								   (list (if (< val 0) "m" "p") (abs val))))
-							 :type "const float complex"
-							 :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1))))))))))))
+						     (let ((arg (twiddle-arg j1 j2 n1)))
+						       (push arg seen)
+						       `(,(format nil "wn1_~a" (twiddle-arg-name j1 j2 n1))
+							  :type "const float complex"
+							  :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))))))
 				   
 				   ,@(loop for j1 below n1 appending
 					  (loop for j2 below n2 collect
@@ -202,11 +168,8 @@
 								(if (eq 0 (* j1 k))
 								    `(aref z ,(+ (* k n2) j2))
 								    `(*
-								      ,(format nil "wn1_~{~a~}"
-								 (let ((val (round (* 180000 (/ pi)
-										      (phase (exp (complex 0s0 (* -2 pi j1 k (/ n1)))))))))
-								   (list (if (< val 0) "m" "p") (abs val))))
-								      ;,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
+								      ,(format nil "wn1_~a" (twiddle-arg-name j1 k n1))
+					;,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
 								      (aref z ,(+ (* k n2) j2)))))))))
 				   (return y)))))))	     
 
