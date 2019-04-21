@@ -2,6 +2,10 @@
   (ql:quickload :cl-cpp-generator))
 (in-package :cl-cpp-generator)
 
+
+;(setf *features* (union *features* '(:memset)))
+;(setf *features* (set-difference *features* '(:memset)))
+
 (defmacro e (&body body)
   `(statements (<< "std::cout" ,@(loop for e in body collect
 				      (cond ((stringp e) `(string ,e))
