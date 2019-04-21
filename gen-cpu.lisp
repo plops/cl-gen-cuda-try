@@ -18,7 +18,8 @@
     (20 "is single cycle sinf, cosf good enough? https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html")
     (30 "compute twiddle factors using addition theorem exp(x+y)=exp(x)*exp(y)")
     (40 "only store twiddle factors that are necessary")
-    (50 "radix 4 and 2 are preferred as they don't require floating point multiplication in lower stages")))
+    (50 "radix 4 and 2 are preferred as they don't require floating point multiplication in lower stages")
+    (60 "will __builtin_prefetch help with strided memory access and make transposition unneccessary? https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html")))
 
 
 (let ((r 4))
