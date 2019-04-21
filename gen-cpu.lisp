@@ -136,6 +136,43 @@
 						  (* (aref a k)
 						     (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
 			  (return y))))
+
+
+	     ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
+	     ,(let* ((n1 3)
+		    (n2 7)
+		    (n (* n1 n2)))
+	       `(function (,(format nil "fft_~a_~a_~a" n n1 n2)
+			   ((x :type "float complex* __restrict__"))
+			   "float complex*")
+			 (raw "// tell compiler that argument ins 64byte aligned")
+			 (setf x (funcall __builtin_assume_aligned x 64))
+			 (raw "// n1 DFTs of size n2 in the column direction")
+			 (let (((aref x1 ,(* n1 n2)) :type "static alignas(64) float complex"
+				:init (list 0s0))
+			       ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
+				   (loop for k2 below n1 appending ;; column
+					(loop for n2_ below n2
+					   with arg = (twiddle-arg n2_ k2 n2)
+					   when (not (member arg args-seen))
+					   collect
+					     (progn
+					       (push arg args-seen)
+					       `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
+						  :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))))))
+			   ,@(loop for k2 below n1 appending 
+				  (loop for n2_ below n2 collect
+				       `(setf (aref x1 ,(+ (* n1 n2_) k2))
+					      (+ 
+					       ,@(loop for n1_ below n1 collect
+						      (twiddle-mul `(aref x ,(+ (* n1 n2_) n1_))
+								   n2_ k2 n2))))
+				    )
+			     ))
+			 )
+	       )
+
+	     #+nil
 	     (function (fft16_radix4 ((x :type "float complex* __restrict__")
 				      (out_y :type "float complex* __restrict__"))
 			    "float complex*")
@@ -216,7 +253,7 @@
 								(twiddle-mul `(aref z ,(+ (* k n2) j2))
 									     j1 k n1))))))
 				   (return out_y)))))))
-	     
+	     #+nil
 	     ,(let* ((n1 16)
 		     (n2 16)
 					;(r1 4)
@@ -295,7 +332,7 @@
 		      :init (list 0.0fi)))))
 
 
-	     
+	     #+nil
 	     (function ("main" ()
 			       int)
 
