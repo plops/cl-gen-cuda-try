@@ -226,7 +226,7 @@
 		     )
 	       `(function (fft256 ((x :type "float complex* __restrict__"))
 				 "float complex*")
-			 (setf x (funcall __builtin_assume_aligned x 64)) ;; tell compiler that argument ins 64byte aligned
+			  (setf x (funcall __builtin_assume_aligned x 64)) ;; tell compiler that argument ins 64byte aligned
 			 ,(let ()
 			    `(statements
 			      (raw "// fft16 on each row")
@@ -240,7 +240,7 @@
 						(ref (aref x ,(+ 0 (* n1 j2))))
 						(ref (aref s ,(+ 0 (* n1 j2)))) ;; s
 						))
-
+				(return s)
 				(raw "// transpose and elementwise multiplication")
 				(raw " ")
 				
@@ -296,9 +296,10 @@
 			    (funcall memset a_in 0 (* ,n (funcall sizeof "complex float")))
 			    ;(funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
 			    (dotimes (i ,n)
-			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3 (/ n)) i))))
+			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3 (/ 16)) i))))
 			    (setf a_out (funcall fft256 a_in))
 			    (setf a_out_slow (funcall dft256_slow a_in))
+			    (funcall printf (string "idx     fft256               dft256_slow\\n"))
 			    (dotimes (i ,n)
 			      (funcall printf (string "%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\\n")
 				       i
@@ -337,9 +338,9 @@
 	   
 	   ))
     (write-source *main-cpp-filename* "c" code)
-    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try_clang -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
-    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -S -o source/cpu_try_clang.s -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm ")
-    ;(uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize source/cpu_try.c -o source/cpu_try_gcc -lm")
+    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try_clang -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm 2>&1 > source/cpu_try_clang.out")
+    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -S -o source/cpu_try_clang.s -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
+    (uiop:run-program "gcc -Wall -Wextra -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize source/cpu_try.c -o source/cpu_try_gcc -lm  2>&1 > source/cpu_try_gcc.out")
     (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try_gcc.s")
     ))
 

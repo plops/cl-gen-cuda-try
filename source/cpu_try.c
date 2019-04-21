@@ -169,6 +169,7 @@ float complex *fft256(float complex *__restrict__ x) {
     fft16_radix4((&(x[208])), (&(s[208])));
     fft16_radix4((&(x[224])), (&(s[224])));
     fft16_radix4((&(x[240])), (&(s[240])));
+    return s;
     // transpose and elementwise multiplication;
     ;
     {
@@ -637,10 +638,11 @@ int main() {
     float complex *a_out_slow;
     memset(a_in, 0, (256 * sizeof(complex float)));
     for (unsigned int i = 0; (i < 256); i += 1) {
-      a_in[i] = sinf(((-7.363107781851077e-2) * i));
+      a_in[i] = sinf(((-1.1780972450961724e+0) * i));
     }
     a_out = fft256(a_in);
     a_out_slow = dft256_slow(a_in);
+    printf("idx     fft256               dft256_slow\n");
     for (unsigned int i = 0; (i < 256); i += 1) {
       printf("%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\n", i,
              crealf(a_out[i]), cimagf(a_out[i]), crealf(a_out_slow[i]),
