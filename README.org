@@ -27,3 +27,7 @@ mixed approach faster?
 - cuda complex library https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp
 
 - Vasily Volkov FFT on GPU (2008) https://people.eecs.berkeley.edu/~kubitron/courses/cs258-S08/projects/reports/project6_report.pdf
+- https://github.com/vetter/shoc/blob/master/src/cuda/level1/fft/fftlib.cu
+- http://www.bealto.com/gpu-fft_intro.html
+- https://mc.stanford.edu/cgi-bin/images/7/75/SC08_FFT_on_GPUs.pdf
+- eliminate power-of-two memory stride for better caching https://www.davidhbailey.com/dhbpapers/fftzp.pdf
