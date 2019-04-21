@@ -22,8 +22,9 @@ mixed approach faster?
 # Stages
 
 First I made a 16 element FFT with radix 4 work. It computes row-wise DFTs of a 4x4 matrix, transposes and does it again.
+This works on CPU.
 
-Then I use this function to implement a 256 element FFT. Currently both functions seem to work on CPU.  
+Then I use this function to implement a 256 element FFT. Currently, this function isn't working.
 
 
 # References

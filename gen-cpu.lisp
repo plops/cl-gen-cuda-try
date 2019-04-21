@@ -299,7 +299,7 @@
 			     (funcall memset a_in 0 (* ,n (funcall sizeof "complex float")))
 			    #+memset (funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
 			    (dotimes (i ,n)
-			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3 (/ 16)) i))))
+			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3.321 (/ n)) i))))
 			    (setf a_out (funcall fft256 a_in))
 			    (setf a_out_slow (funcall dft256_slow a_in))
 			    (funcall printf (string "idx     fft256               dft256_slow\\n"))

@@ -459,7 +459,7 @@ int main() {
     float complex *a_out_slow;
     memset(a_in, 0, (256 * sizeof(complex float)));
     for (unsigned int i = 0; (i < 256); i += 1) {
-      a_in[i] = sinf(((-1.1780972450961724e+0) * i));
+      a_in[i] = sinf(((-8.150960557938711e-2) * i));
     }
     a_out = fft256(a_in);
     a_out_slow = dft256_slow(a_in);
