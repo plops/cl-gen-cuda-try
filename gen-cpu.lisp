@@ -112,7 +112,7 @@
 				 "float complex*")
 		       (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned
 		       (let (((aref y 16) :type "static alignas(64) float complex" :init (list 0.0fi)))
-			 (funcall memset y 0 (* 16 (funcall sizeof "complex float")))
+			 #+memset (funcall memset y 0 (* 16 (funcall sizeof "complex float")))
 			 (dotimes (j 16)
 			   (dotimes (k ,n)
 			     (setf (aref y j) (+ (aref y j)
@@ -124,7 +124,7 @@
 				     "float complex*")
 			(setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned
 			(let (((aref y ,n) :type "static alignas(64) float complex" :init (list 0.0fi)))
-			  (funcall memset y 0 (* ,n (funcall sizeof "complex float")))
+			  #+memset (funcall memset y 0 (* ,n (funcall sizeof "complex float")))
 			  (dotimes (j ,n)
 			    (dotimes (k ,n)
 			      (setf (aref y j) (+ (aref y j)
@@ -152,7 +152,7 @@
 						  `(,(format nil "w~a" (twiddle-arg-name j2 k n2)) :type "const float complex"
 						     :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) j2 k))))))))))
 			      
-			      (funcall memset s 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
+			      #+memset (funcall memset s 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 			      ,@(loop for j2 below n2 appending
 				      (loop for j1 below n1 collect
 					   `(setf (aref s ,(+ j1 (* n1 j2)))
@@ -177,7 +177,7 @@
 						     `(,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 						       :type "const float complex"
 							:init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
-				 (funcall memset z 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
+				 #+memset (funcall memset z 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 				 ,@(loop for j1 below n1 appending
 					(loop for j2 below n2 collect
 					     `(setf (aref z ,(+ (* j1 n2) j2))
@@ -203,7 +203,7 @@
 						       `(,(format nil "w~a" (twiddle-arg-name j1 j2 n1))
 							  :type "const float complex"
 							  :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ n1)))))))))))
-				   (funcall memset out_y 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
+				   #+memset (funcall memset out_y 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 				   ,@(loop for j1 below n1 appending
 					  (loop for j2 below n2 collect
 					       `(setf (aref out_y ,(+ (* j1 n2) j2))
@@ -228,7 +228,7 @@
 			      (let (((aref s (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
 				    )
 			      
-				(funcall memset s 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
+				#+memset (funcall memset s 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 				,@(loop for j2 below n2 collect
 				       `(funcall fft16_radix4
 						(ref (aref x ,(+ 0 (* n1 j2))))
@@ -252,7 +252,7 @@
 						      `(,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 							 :type "const float complex"
 							 :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
-				  (funcall memset z 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
+				  #+memset (funcall memset z 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 				  ,@(loop for j2 below n2 appending
 					 (loop for j1 below n1 collect
 					      `(setf (aref z ,(+ (* j1 n2) j2))
@@ -265,7 +265,7 @@
 				  (raw "// fft16 on each row")
 				  (raw " ")
 				  (let (((aref y (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi)))
-				    (funcall memset y 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
+				    #+memset (funcall memset y 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 				    ,@(loop for j2 below n2 collect
 					   `(funcall fft16_radix4
 						     (ref (aref z ,(+ 0 (* n1 j2))))
@@ -293,7 +293,7 @@
 				 (a_out_slow :type "float complex*")
 				)
 			     (funcall memset a_in 0 (* ,n (funcall sizeof "complex float")))
-			    ;(funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
+			    #+memset (funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
 			    (dotimes (i ,n)
 			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3 (/ 16)) i))))
 			    (setf a_out (funcall fft256 a_in))
