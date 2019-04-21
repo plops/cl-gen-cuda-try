@@ -209,14 +209,7 @@
 					       `(setf (aref out_y ,(+ (* j1 n2) j2))
 						      (+ ,@(loop for k below n1 collect
 								(twiddle-mul `(aref z ,(+ (* k n2) j2))
-									     j1 k n1)
-								#+nil
-								(if (eq 0 (* j1 k))
-								    `(aref z ,(+ (* k n2) j2))
-								    `(*
-								      ,(format nil "w~a" (twiddle-arg-name j1 k n1))
-					;,(exp (complex 0s0 (* -2 pi j1 k (/ n1))))
-								      (aref z ,(+ (* k n2) j2)))))))))
+									     j1 k n1))))))
 				   (return out_y)))))))
 	     
 	     ,(let* ((n1 16)
@@ -235,7 +228,7 @@
 			      (let (((aref s (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
 				    )
 			      
-			    
+				(funcall memset s 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 				,@(loop for j2 below n2 collect
 				       `(funcall fft16_radix4
 						(ref (aref x ,(+ 0 (* n1 j2))))
@@ -246,7 +239,7 @@
 				(raw " ")
 				
 				(let (((aref z (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
-				      ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
+				      #+nil ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
 					  (loop for j2 below n2 appending
 					   (loop for j1 below n1 					
 					      when (not 
@@ -259,9 +252,12 @@
 						      `(,(format nil "w~a" (twiddle-arg-name j1 j2 (* n1 n2)))
 							 :type "const float complex"
 							 :init ,(flush-z (exp (complex 0s0 (* -2 pi j1 j2 (/ (* n1 n2))))))))))))
+				  (funcall memset z 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
 				  ,@(loop for j2 below n2 appending
 					 (loop for j1 below n1 collect
 					      `(setf (aref z ,(+ (* j1 n2) j2))
+						     #-nil (aref s ,(+ j1 (* j2 n1)))
+						     #+nil
 						     ,(twiddle-mul `(aref s ,(+ j1 (* j2 n1)))
 								   j1 j2 (* n1 n2))
 						     )))
@@ -341,10 +337,10 @@
 	   
 	   ))
     (write-source *main-cpp-filename* "c" code)
-    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try_clang -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm 2>&1 > source/cpu_try_clang.out")
-    (uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -S -o source/cpu_try_clang.s -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
+    ;(uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try_clang -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm 2>&1 > source/cpu_try_clang.out")
+    ;(uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -S -o source/cpu_try_clang.s -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
     (uiop:run-program "gcc -Wall -Wextra -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize source/cpu_try.c -o source/cpu_try_gcc -lm  2>&1 > source/cpu_try_gcc.out")
-    (uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try_gcc.s")
+    ;(uiop:run-program "gcc -march=native -std=c11 -Ofast -ffast-math -march=native  -ftree-vectorize -S source/cpu_try.c -o source/cpu_try_gcc.s")
     ))
 
 
