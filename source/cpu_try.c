@@ -51,6 +51,7 @@ float complex *fft16_radix4(float complex *__restrict__ x,
   // dft on each row;
   {
     static alignas(64) float complex s[(4 * 4)] = {0.0fi};
+    memset(s, 0, (16 * sizeof(complex float)));
     s[0] = (x[0] + x[4] + x[8] + x[12]);
     s[1] = (x[1] + x[5] + x[9] + x[13]);
     s[2] = (x[2] + x[6] + x[10] + x[14]);
@@ -91,6 +92,7 @@ float complex *fft16_radix4(float complex *__restrict__ x,
           ((-7.071067811865475e-1) + (-7.071067811865475e-1i));
       const float complex w16p7_16 =
           ((-9.238795325112867e-1) + (3.8268343236508967e-1i));
+      memset(z, 0, (16 * sizeof(complex float)));
       z[0] = s[0];
       z[1] = s[4];
       z[2] = s[8];
@@ -111,6 +113,7 @@ float complex *fft16_radix4(float complex *__restrict__ x,
       out_y = __builtin_assume_aligned(out_y, 64);
       {
 
+        memset(out_y, 0, (16 * sizeof(complex float)));
         out_y[0] = (z[0] + z[4] + z[8] + z[12]);
         out_y[1] = (z[1] + z[5] + z[9] + z[13]);
         out_y[2] = (z[2] + z[6] + z[10] + z[14]);
@@ -169,7 +172,6 @@ float complex *fft256(float complex *__restrict__ x) {
     fft16_radix4((&(x[208])), (&(s[208])));
     fft16_radix4((&(x[224])), (&(s[224])));
     fft16_radix4((&(x[240])), (&(s[240])));
-    return s;
     // transpose and elementwise multiplication;
     ;
     {
@@ -610,6 +612,7 @@ float complex *fft256(float complex *__restrict__ x) {
       ;
       {
         static alignas(64) float complex y[(16 * 16)] = {0.0fi};
+        memset(y, 0, (256 * sizeof(complex float)));
         fft16_radix4((&(z[0])), (&(y[0])));
         fft16_radix4((&(z[16])), (&(y[16])));
         fft16_radix4((&(z[32])), (&(y[32])));
