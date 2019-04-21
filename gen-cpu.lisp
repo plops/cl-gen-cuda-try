@@ -139,6 +139,7 @@
 
 
 	     ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
+	     ;; ka and na run from 0..Na-1 for a of 1 or 2
 	     ,(let* ((n1 3)
 		    (n2 7)
 		    (n (* n1 n2)))
@@ -151,25 +152,49 @@
 			 (let (((aref x1 ,(* n1 n2)) :type "static alignas(64) float complex"
 				:init (list 0s0))
 			       ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
-				   (loop for k2 below n1 appending ;; column
-					(loop for n2_ below n2
-					   with arg = (twiddle-arg n2_ k2 n2)
-					   when (not (member arg args-seen))
-					   collect
-					     (progn
-					       (push arg args-seen)
-					       `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
-						  :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))))))
-			   ,@(loop for k2 below n1 appending 
-				  (loop for n2_ below n2 collect
-				       `(setf (aref x1 ,(+ (* n1 n2_) k2))
+			       (loop for k2 below n2 appending ;; column
+				    (loop for n2_ below n2
+					 ; with arg = (twiddle-arg n2_ k2 n2)
+				       when (not (member (twiddle-arg n2_ k2 n2) args-seen))
+				       collect
+					 (progn
+					   (push (twiddle-arg n2_ k2 n2) args-seen)
+					   `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
+					      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2)))))))))
+			       )
+
+			   
+			   
+			   ,@(loop for k2 below n2 appending 
+				  (loop for n1_ below n1 collect
+				       `(setf (aref x1 ,(+ (* n1_ n2) k2))
 					      (+ 
-					       ,@(loop for n1_ below n1 collect
+					       ,@(loop for n2_ below n2 collect
 						      (twiddle-mul `(aref x ,(+ (* n1 n2_) n1_))
 								   n2_ k2 n2))))
 				    )
-			     ))
-			 )
+				  ))
+			 (raw "// multiply with twiddle factors")
+			 (let (((aref x2 ,(* n1 n2)) :type "static alignas(64) float complex"
+				:init (list 0s0))
+			       ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
+			       (loop for k2 below n2 appending
+				    (loop for n1_ below n1
+				       when (not (member (twiddle-arg n1_ k2 n) args-seen))
+				       collect
+					 (progn
+					   (push (twiddle-arg n1_ k2 n) args-seen)
+					   `(,(format nil "w~a" (twiddle-arg-name n1_ k2 n)) :type "const float complex"
+					      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n) n1_ k2)))))))))
+			       )
+
+			   
+			   
+			   ,@(loop for k2 below n2 appending 
+				  (loop for n1_ below n1 collect
+				       `(setf (aref x2 ,(+ (* n1_ n2) k2))
+					      ,(twiddle-mul `(aref x1 ,(+ (* n1_ n2) k2))
+							   n1_ k2 n))))))
 	       )
 
 	     #+nil
