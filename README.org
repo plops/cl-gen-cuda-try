@@ -36,3 +36,4 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - http://www.bealto.com/gpu-fft_intro.html
 - https://mc.stanford.edu/cgi-bin/images/7/75/SC08_FFT_on_GPUs.pdf
 - eliminate power-of-two memory stride for better caching https://www.davidhbailey.com/dhbpapers/fftzp.pdf
+- how to split dft into 2d https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
