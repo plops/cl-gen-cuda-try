@@ -3,7 +3,7 @@
 (in-package :cl-cpp-generator)
 
 
-;(setf *features* (union *features* '(:memset)))
+(setf *features* (union *features* '(:memset)))
 ;(setf *features* (set-difference *features* '(:memset)))
 
 (defmacro e (&body body)
@@ -222,11 +222,19 @@
 					;(r2 4)
 					;(n (* n1 n2))
 		     )
-	       `(function (fft256 ((x :type "float complex* __restrict__"))
+	       `(function (fft256 ((a :type "float complex* __restrict__"))
 				 "float complex*")
-			  (setf x (funcall __builtin_assume_aligned x 64)) ;; tell compiler that argument ins 64byte aligned
+			  (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned
 			 ,(let ()
-			    `(statements
+			    `(let (((aref x (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi)))
+			       (raw "// column major data into x")
+			       #+memset (funcall memset x 0 (* ,(* n1 n2) (funcall sizeof "complex float")))
+			       (dotimes (j1 ,n1)
+				 (dotimes (j2 ,n2)
+				   ;; j1 row of x
+				   ;; j2 col
+				   (setf (aref x (+ j1 (* j2 ,n1)))
+					 (aref a (+ j2 (* j1 ,n2))))))
 			      (raw "// fft16 on each row")
 			    
 			      (let (((aref s (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
@@ -243,7 +251,7 @@
 				(raw " ")
 				
 				(let (((aref z (* ,n1 ,n2)) :type "static alignas(64) float complex" :init (list 0.0fi))
-				      #+nil ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
+				      ,@(let ((w-seen (list 0 1/4 -1/4 3/4 1/2)))
 					  (loop for j2 below n2 appending
 					   (loop for j1 below n1 					
 					      when (not 
@@ -260,8 +268,8 @@
 				  ,@(loop for j2 below n2 appending
 					 (loop for j1 below n1 collect
 					      `(setf (aref z ,(+ (* j1 n2) j2))
-						     #-nil (aref s ,(+ j1 (* j2 n1)))
-						     #+nil
+						     #+nil (aref s ,(+ j1 (* j2 n1)))
+						     #-nil
 						     ,(twiddle-mul `(aref s ,(+ j1 (* j2 n1)))
 								   j1 j2 (* n1 n2))
 						     )))
@@ -299,7 +307,8 @@
 			     (funcall memset a_in 0 (* ,n (funcall sizeof "complex float")))
 			    #+memset (funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
 			    (dotimes (i ,n)
-			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3 (/ n1)) i))))
+			      (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3 (/ n1)) i))
+				    ))
 			    (setf a_out (funcall fft256 a_in))
 			    (setf a_out_slow (funcall dft256_slow a_in))
 			    (funcall printf (string "idx     fft256               dft256_slow\\n"))
