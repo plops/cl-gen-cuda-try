@@ -181,20 +181,14 @@
 						 (progn
 						   (push (twiddle-arg n2_ k2 n2) args-seen)
 						   `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
-						      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2)))))))))
-				   )
-
-			   
-			   
+						      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))))))
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below n1 collect
-					   `(setf (aref x1 ,(+ (* n1_ n2) k2))
+					   `(setf ,(row-major 'x1 n1_ k2)
 						  (+ 
 						   ,@(loop for n2_ below n2 collect
 							  (twiddle-mul (row-major 'x n1_ n2_)
-								       n2_ k2 n2))))
-					   )
-				      )
+								       n2_ k2 n2))))))
 			       (raw "// multiply with twiddle factors and transpose")
 			       (let (((aref x2 ,(* n1 n2)) :type "static alignas(64) float complex"
 					;:init (list 0s0)
@@ -214,8 +208,8 @@
 			       
 				 ,@(loop for k2 below n2 appending 
 					(loop for n1_ below n1 collect
-					     `(setf (aref x2 ,(+ (* n1_ n2) k2))
-						    ,(twiddle-mul `(aref x1 ,(+ (* n1_ 1) (* n1 k2)))
+					     `(setf ,(col-major 'x2 n1_ k2)
+						    ,(twiddle-mul (row-major 'x1 n1_ k2)
 								  n1_ k2 n))))
 				 (raw "// another dft")
 				 (let (((aref x3 ,(* n1 n2)) :type "static alignas(64) float complex"
@@ -233,10 +227,10 @@
 				 
 				   ,@(loop for k2 below n2 appending 
 					  (loop for k1 below n1 collect
-					       `(setf (aref x3 ,(+ (* 1 k2) (* n2 k1)))
+					       `(setf ,(col-major 'x3 k1 k2)
 						      (+ 
 						       ,@(loop for n1_ below n1 collect
-							      (twiddle-mul `(aref x2 ,(+ (* n1 k2) n1_))
+							      (twiddle-mul (col-major 'x2 n1_ k2)
 									   n1_ k1 n1))))
 					       )
 					  )
