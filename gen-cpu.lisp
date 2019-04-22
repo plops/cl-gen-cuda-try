@@ -191,7 +191,7 @@
 								     n2_ k2 n2))))
 					 )
 				    )
-			     (raw "// multiply with twiddle factors")
+			     (raw "// multiply with twiddle factors and transpose")
 			     (let (((aref x2 ,(* n1 n2)) :type "static alignas(64) float complex"
 					;:init (list 0s0)
 				    )
@@ -210,7 +210,7 @@
 			       
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below n1 collect
-					   `(setf (aref x2 ,(+ (* n1_ n2) k2))
+					   `(setf (aref x2 ,(+ n2 (* n1 k2)))
 						  ,(twiddle-mul `(aref x1 ,(+ (* n1_ n2) k2))
 								n1_ k2 n))))
 			       (raw "// another dft")
@@ -251,7 +251,7 @@
 				      ))
 			      (setf a_out (funcall ,fft a_in))
 			      (setf a_out_slow (funcall ,dft a_in))
-			      (funcall printf (string "idx     fft                   dft\\n"))
+			      (funcall printf (string "idx     fft                    dft\\n"))
 			      (dotimes (i ,n)
 				(funcall printf (string "%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\\n")
 					 i
