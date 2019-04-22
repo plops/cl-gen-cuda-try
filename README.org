@@ -26,6 +26,18 @@ This works on CPU.
 
 Then I use this function to implement a 256 element FFT. Currently, this function isn't working.
 
+# Caches
+
+## Intel x7-x8750
+
+- https://en.wikichip.org/wiki/intel/atom_x7/z8750
+
+|      |                 |                                                      |
+|------+-----------------+------------------------------------------------------|
+| L1I$ | 	128 KiB | 	4x32 KiB 8-way set associative (per core)    |
+| L1D$ | 	96 KiB  | 	4x24 KiB 6-way set associative (per core)    |
+| L2$  | 	2 MiB   | 	2x1 MiB 16-way set associative (per 2 cores) |
+| L3$  | 	0 KiB   | 	No L3$                                       |
 
 # References
 
