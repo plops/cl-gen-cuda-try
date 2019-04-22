@@ -43,6 +43,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 
 - rdpmc instruction https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/595214
   - PAPI overheads are typically in excess of 2000 cycles to read a single counter.  
+  -  "perf stat" command (or similar) will sometimes use these fixed function counters and will disable them on exit
 
 # References
 
