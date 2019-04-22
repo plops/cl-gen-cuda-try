@@ -39,6 +39,11 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 | L2$  | 	2 MiB   | 	2x1 MiB 16-way set associative (per 2 cores) |
 | L3$  | 	0 KiB   | 	No L3$                                       |
 
+# Read performance counters
+
+- rdpmc instruction https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/595214
+  - PAPI overheads are typically in excess of 2000 cycles to read a single counter.  
+
 # References
 
 - cuda complex library https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp
