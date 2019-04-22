@@ -174,7 +174,9 @@ int main() {
       a_in[i] = sinf(((-7.183775341024617e+0) * i));
     }
     a_out = fft_21_3_7(a_in);
-    a_out_slow = dft_21(a_in);
+    for (int j = 0; (j < 1); j += 1) {
+      a_out_slow = dft_21(a_in);
+    }
     printf("idx     fft                    dft\n");
     for (int i = 0; (i < 21); i += 1) {
       printf("%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\n", i,
