@@ -210,8 +210,8 @@
 			       
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below n1 collect
-					   `(setf (aref x2 ,(+ n2 (* n1 k2)))
-						  ,(twiddle-mul `(aref x1 ,(+ (* n1_ n2) k2))
+					   `(setf (aref x2 ,(+ (* n1_ n2) k2))
+						  ,(twiddle-mul `(aref x1 ,(+ (* n1_ 1) (* n1 k2)))
 								n1_ k2 n))))
 			       (raw "// another dft")
 			       (let (((aref x3 ,(* n1 n2)) :type "static alignas(64) float complex"
