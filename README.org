@@ -42,3 +42,5 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - profile mem access (2007) https://lwn.net/Articles/257209/
   - opannotate .. lists the source or assembler code of the program
     and shows the instructions where the event was recognized
+
+- how to use perf https://www.youtube.com/watch?v=M6ldFtwWup0
