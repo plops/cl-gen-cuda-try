@@ -147,119 +147,123 @@
 		     (n (* n1 n2))
 		     (dft (format nil "dft_~a" n))
 		     (fft (format nil "fft_~a_~a_~a" n n1 n2)))
-		`(statements
-		  (function (,dft ((a :type "float complex* __restrict__"))
-				     "float complex*")
-			(setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned
-			(let (((aref y ,n) :type "static alignas(64) float complex" :init (list 0.0fi)))
-			  #+memset (funcall memset y 0 (* ,n (funcall sizeof "complex float")))
-			  (dotimes (j ,n)
-			    (dotimes (k ,n)
-			      (setf (aref y j) (+ (aref y j)
-						  (* (aref a k)
-						     (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
-			  (return y)))
-		  (function (,fft
-			     ((x :type "float complex* __restrict__"))
-			     "float complex*")
-			   (raw "// tell compiler that argument ins 64byte aligned")
-			   (setf x (funcall __builtin_assume_aligned x 64))
-			   (raw "// n1 DFTs of size n2 in the column direction")
-			   (let (((aref x1 ,(* n1 n2)) :type "static alignas(64) float complex"
-				  ; :init (list 0s0)
-				  )
-				 ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
-				     (loop for k2 below n2 appending ;; column
-					  (loop for n2_ below n2
-					; with arg = (twiddle-arg n2_ k2 n2)
-					     when (not (member (twiddle-arg n2_ k2 n2) args-seen))
-					     collect
-					       (progn
-						 (push (twiddle-arg n2_ k2 n2) args-seen)
-						 `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
-						    :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2)))))))))
-				 )
-
-			   
-			   
-			     ,@(loop for k2 below n2 appending 
-				    (loop for n1_ below n1 collect
-					 `(setf (aref x1 ,(+ (* n1_ n2) k2))
-						(+ 
-						 ,@(loop for n2_ below n2 collect
-							(twiddle-mul `(aref x ,(+ (* n1 n2_) n1_))
-								     n2_ k2 n2))))
-					 )
-				    )
-			     (raw "// multiply with twiddle factors and transpose")
-			     (let (((aref x2 ,(* n1 n2)) :type "static alignas(64) float complex"
-					;:init (list 0s0)
+		(flet ((row-major (a x y)
+			 `(aref ,a ,(+ (* 1 x) (* n1 y))))
+		       (col-major (a x y)
+			 `(aref ,a ,(+ (* n2 x) (* 1 y)))))
+		 `(statements
+		   (function (,dft ((a :type "float complex* __restrict__"))
+				   "float complex*")
+			     (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned
+			     (let (((aref y ,n) :type "static alignas(64) float complex" :init (list 0.0fi)))
+			       #+memset (funcall memset y 0 (* ,n (funcall sizeof "complex float")))
+			       (dotimes (j ,n)
+				 (dotimes (k ,n)
+				   (setf (aref y j) (+ (aref y j)
+						       (* (aref a k)
+							  (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
+			       (return y)))
+		   (function (,fft
+			      ((x :type "float complex* __restrict__"))
+			      "float complex*")
+			     (raw "// tell compiler that argument ins 64byte aligned")
+			     (setf x (funcall __builtin_assume_aligned x 64))
+			     (raw "// n1 DFTs of size n2 in the column direction")
+			     (let (((aref x1 ,(* n1 n2)) :type "static alignas(64) float complex"
+					; :init (list 0s0)
 				    )
 				   ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
-				       (loop for k2 below n2 appending
-					    (loop for n1_ below n1
-					       when (not (member (twiddle-arg n1_ k2 n) args-seen))
+				       (loop for k2 below n2 appending ;; column
+					    (loop for n2_ below n2
+					; with arg = (twiddle-arg n2_ k2 n2)
+					       when (not (member (twiddle-arg n2_ k2 n2) args-seen))
 					       collect
 						 (progn
-						   (push (twiddle-arg n1_ k2 n) args-seen)
-						   `(,(format nil "w~a" (twiddle-arg-name n1_ k2 n)) :type "const float complex"
-						      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n) n1_ k2)))))))))
+						   (push (twiddle-arg n2_ k2 n2) args-seen)
+						   `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
+						      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2)))))))))
 				   )
 
-			       
-			       
+			   
+			   
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below n1 collect
-					   `(setf (aref x2 ,(+ (* n1_ n2) k2))
-						  ,(twiddle-mul `(aref x1 ,(+ (* n1_ 1) (* n1 k2)))
-								n1_ k2 n))))
-			       (raw "// another dft")
-			       (let (((aref x3 ,(* n1 n2)) :type "static alignas(64) float complex"
+					   `(setf (aref x1 ,(+ (* n1_ n2) k2))
+						  (+ 
+						   ,@(loop for n2_ below n2 collect
+							  (twiddle-mul (row-major 'x n1_ n2_)
+								       n2_ k2 n2))))
+					   )
+				      )
+			       (raw "// multiply with twiddle factors and transpose")
+			       (let (((aref x2 ,(* n1 n2)) :type "static alignas(64) float complex"
 					;:init (list 0s0)
 				      )
 				     ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
-					 (loop for k1 below n1 appending ;; column
+					 (loop for k2 below n2 appending
 					      (loop for n1_ below n1
-						 when (not (member (twiddle-arg n1_ k1 n1) args-seen))
+						 when (not (member (twiddle-arg n1_ k2 n) args-seen))
 						 collect
 						   (progn
-						     (push (twiddle-arg n1_ k1 n1) args-seen)
-						     `(,(format nil "w~a" (twiddle-arg-name n1_ k1 n1)) :type "const float complex"
-							:init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n1) n1_ k1))))))))))
-				 
+						     (push (twiddle-arg n1_ k2 n) args-seen)
+						     `(,(format nil "w~a" (twiddle-arg-name n1_ k2 n)) :type "const float complex"
+							:init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n) n1_ k2)))))))))
+				     )
+
+			       
+			       
 				 ,@(loop for k2 below n2 appending 
-					(loop for k1 below n1 collect
-					     `(setf (aref x3 ,(+ (* n1 k2) k1))
-						    (+ 
-						     ,@(loop for n1_ below n1 collect
-							    (twiddle-mul `(aref x2 ,(+ (* n1 k2) n1_))
-									 n1_ k1 n1))))
-					     )
+					(loop for n1_ below n1 collect
+					     `(setf (aref x2 ,(+ (* n1_ n2) k2))
+						    ,(twiddle-mul `(aref x1 ,(+ (* n1_ 1) (* n1 k2)))
+								  n1_ k2 n))))
+				 (raw "// another dft")
+				 (let (((aref x3 ,(* n1 n2)) :type "static alignas(64) float complex"
+					;:init (list 0s0)
 					)
-				 (return x3)))))
-		  (function ("main" ()
-				    int)
-			    (let (((aref a_in ,n) :type "alignas(64) float complex")
+				       ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
+					   (loop for k1 below n1 appending ;; column
+						(loop for n1_ below n1
+						   when (not (member (twiddle-arg n1_ k1 n1) args-seen))
+						   collect
+						     (progn
+						       (push (twiddle-arg n1_ k1 n1) args-seen)
+						       `(,(format nil "w~a" (twiddle-arg-name n1_ k1 n1)) :type "const float complex"
+							  :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n1) n1_ k1))))))))))
+				 
+				   ,@(loop for k2 below n2 appending 
+					  (loop for k1 below n1 collect
+					       `(setf (aref x3 ,(+ (* 1 k2) (* n2 k1)))
+						      (+ 
+						       ,@(loop for n1_ below n1 collect
+							      (twiddle-mul `(aref x2 ,(+ (* n1 k2) n1_))
+									   n1_ k1 n1))))
+					       )
+					  )
+				   (return x3)))))
+		   (function ("main" ()
+				     int)
+			     (let (((aref a_in ,n) :type "alignas(64) float complex")
 					;((aref a_out ,n) :type "alignas(64) float complex")
-				  (a_out :type "float complex*")
-				  (a_out_slow :type "float complex*")
-				  )
-			      (funcall memset a_in 0 (* ,n (funcall sizeof "complex float")))
-			      #+memset (funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
-			      (dotimes (i ,n)
-				(setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3.43 (/ n1)) i))
-				      ))
-			      (setf a_out (funcall ,fft a_in))
-			      (setf a_out_slow (funcall ,dft a_in))
-			      (funcall printf (string "idx     fft                    dft\\n"))
-			      (dotimes (i ,n)
-				(funcall printf (string "%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\\n")
-					 i
-					 (funcall crealf (aref a_out i))
-					 (funcall cimagf (aref a_out i))
-					 (funcall crealf (aref a_out_slow i))
-					 (funcall cimagf (aref a_out_slow i)))))
-			    (return 0))))
+				   (a_out :type "float complex*")
+				   (a_out_slow :type "float complex*")
+				   )
+			       (funcall memset a_in 0 (* ,n (funcall sizeof "complex float")))
+			       #+memset (funcall memset a_out 0 (* ,n (funcall sizeof "complex float")))
+			       (dotimes (i ,n)
+				 (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3.43 (/ n1)) i))
+				       ))
+			       (setf a_out (funcall ,fft a_in))
+			       (setf a_out_slow (funcall ,dft a_in))
+			       (funcall printf (string "idx     fft                    dft\\n"))
+			       (dotimes (i ,n)
+				 (funcall printf (string "%02d   %6.3f+(%6.3f)i       %6.3f+(%6.3f)i\\n")
+					  i
+					  (funcall crealf (aref a_out i))
+					  (funcall cimagf (aref a_out i))
+					  (funcall crealf (aref a_out_slow i))
+					  (funcall cimagf (aref a_out_slow i)))))
+			     (return 0)))))
 
 	     #+nil
 	     (function (fft16_radix4 ((x :type "float complex* __restrict__")
