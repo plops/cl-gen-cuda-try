@@ -45,6 +45,8 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
   - PAPI overheads are typically in excess of 2000 cycles to read a single counter.  
   -  "perf stat" command (or similar) will sometimes use these fixed function counters and will disable them on exit
 
+- use kernel parameters isolcpus=0 to free one of the cpus for benchmarking
+
 # References
 
 - cuda complex library https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp
@@ -64,5 +66,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - https://github.com/RRZE-HPC/likwid/wiki
 - http://www.brendangregg.com/blog/2017-05-09/cpu-utilization-is-wrong.html
 
+
+- good explanation how to measure and interprete timing http://sites.utexas.edu/jdm4372/2018/07/23/comments-on-timing-short-code-sections-on-intel-processors/
 - https://github.com/jdmccalpin/low-overhead-timers
-- http://sites.utexas.edu/jdm4372/2018/07/23/comments-on-timing-short-code-sections-on-intel-processors/
+- https://github.com/jdmccalpin/periodic-performance-counters
