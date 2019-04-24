@@ -111,6 +111,8 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
     -  sudo ./toplev.py --all --core C0 taskset -c 0 ~/stage/cl-gen-cuda-try/source/cpu_try_gcc
     - http://www.cs.technion.ac.il/~erangi/TMA_using_Linux_perf__Ahmad_Yasin.pdf
       - turning hyperthreading off gives 8 (instead of 4 general purpose counters) since sandy bridge
+      - for profiling disable virtualization, turbo and smt 
+      - affinity: taskset0x<mask> in Linux or start /affinity 0x<mask> in Windows
     - Performance Analysis in Modern Multicores (cpu architect intel)  http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf
     - Butterfly FFT   http://cs.haifa.ac.il/courses/verilog/p2011.html
   - LikwidPerfCtr https://github.com/rrze-likwid/likwid
