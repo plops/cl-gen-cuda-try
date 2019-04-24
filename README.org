@@ -98,3 +98,5 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - good explanation how to measure and interprete timing http://sites.utexas.edu/jdm4372/2018/07/23/comments-on-timing-short-code-sections-on-intel-processors/
 - https://github.com/jdmccalpin/low-overhead-timers
 - https://github.com/jdmccalpin/periodic-performance-counters
+- offloading https://www.youtube.com/watch?v=kIA_UtdVabQ
+  - #pragma omp target teams distribute parallel for collapse(2) map(to:zr,zi,xscale,yscale) map(from:results[0:npixels])
