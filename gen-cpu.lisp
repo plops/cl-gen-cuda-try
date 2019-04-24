@@ -248,7 +248,7 @@
 				 (setf (aref a_in i) (funcall sinf (* ,(* -2 pi 3.43 (/ n1)) i))
 				       ))
 			       (setf a_out (funcall ,fft a_in))
-			       (dotimes (j 10000)
+			       (dotimes (j 10000) 
 				(setf a_out_slow (funcall ,dft a_in)))
 			       (funcall printf (string "idx     fft                    dft\\n"))
 			       (dotimes (i ,n)
