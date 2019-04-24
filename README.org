@@ -110,5 +110,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
     - toplev .. Estimate on which part of the CPU pipeline a workload bottlenecks using the TopDown mode 
     -  sudo ./toplev.py --all --core C0 taskset -c 0 ~/stage/cl-gen-cuda-try/source/cpu_try_gcc
     - http://www.cs.technion.ac.il/~erangi/TMA_using_Linux_perf__Ahmad_Yasin.pdf
+      - turning hyperthreading off gives 8 (instead of 4 general purpose counters) since sandy bridge
     - Performance Analysis in Modern Multicores (cpu architect intel)  http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf
+    - Butterfly FFT   http://cs.haifa.ac.il/courses/verilog/p2011.html
   - LikwidPerfCtr https://github.com/rrze-likwid/likwid
