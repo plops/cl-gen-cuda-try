@@ -107,7 +107,8 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - https://www.blackhat.com/docs/us-15/materials/us-15-Herath-These-Are-Not-Your-Grand-Daddys-CPU-Performance-Counters-CPU-Hardware-Performance-Counters-For-Security.pdf
   - Performance Application Programming Interface http://icl.cs.utk.edu/papi/Perfmon2 http://perfmon2.sourceforge.net/
   - Andi Kleen's pmu-tools https://github.com/andikleen/pmu-tools
-    - toplev .. Estimate on which part of the CPU pipeline a workload bottlenecks using the TopDown model
-    -  sudo ./toplev.py --all --core C0 taskset -c 0,1 ~/stage/cl-gen-cuda-try/source/cpu_try_gcc
+    - toplev .. Estimate on which part of the CPU pipeline a workload bottlenecks using the TopDown mode 
+    -  sudo ./toplev.py --all --core C0 taskset -c 0 ~/stage/cl-gen-cuda-try/source/cpu_try_gcc
     - http://www.cs.technion.ac.il/~erangi/TMA_using_Linux_perf__Ahmad_Yasin.pdf
+    - Performance Analysis in Modern Multicores (cpu architect intel)  http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf
   - LikwidPerfCtr https://github.com/rrze-likwid/likwid
