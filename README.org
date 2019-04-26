@@ -116,3 +116,11 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
     - Performance Analysis in Modern Multicores (cpu architect intel)  http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf
     - Butterfly FFT   http://cs.haifa.ac.il/courses/verilog/p2011.html
   - LikwidPerfCtr https://github.com/rrze-likwid/likwid
+
+# References Radar
+
+- https://fas.org/irp/agency/dod/jason/
+- https://fas.org/irp/agency/dod/jason/compress.pdf
+- https://fas.org/irp/agency/dod/jason/wind.pdf
+- https://fas.org/irp/agency/dod/jason/widearea.pdf
+- https://fas.org/irp/agency/dod/jason/dbs.pdf
