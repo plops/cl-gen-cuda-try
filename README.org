@@ -122,6 +122,13 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
   - https://news.ycombinator.com/item?id=16050812
   - some simd helpers https://godbolt.org/g/N9VvXZ
   - how to load https://stackoverflow.com/questions/9318115/loading-data-for-gccs-vector-extensions
+  - complex number https://stackoverflow.com/questions/41417061/how-to-enable-sse3-autovectorization-in-gcc
+  - complex https://github.com/Roger-luo/CSIMD
+  - complex https://nullprogram.com/blog/2015/07/10/
+  - complex with eigen https://stackoverflow.com/questions/45298855/how-to-write-portable-simd-code-for-complex-multiplicative-reduction
+    - store real and imaginary parts in a way that they
+      can be directly loaded one packet at once, interleaved is not
+      good
 - https://github.com/p12tic/libsimdpp
   - http://p12tic.github.io/libsimdpp/v2.2-dev/libsimdpp/w/
 - https://www.ti.uni-bielefeld.de/downloads/publications/templateSIMD.pdf
