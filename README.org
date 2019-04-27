@@ -117,6 +117,21 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
     - Butterfly FFT   http://cs.haifa.ac.il/courses/verilog/p2011.html
   - LikwidPerfCtr https://github.com/rrze-likwid/likwid
 
+# References SIMD
+- gcc simd https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
+  - https://news.ycombinator.com/item?id=16050812
+  - some simd helpers https://godbolt.org/g/N9VvXZ
+  - how to load https://stackoverflow.com/questions/9318115/loading-data-for-gccs-vector-extensions
+- https://github.com/p12tic/libsimdpp
+  - http://p12tic.github.io/libsimdpp/v2.2-dev/libsimdpp/w/
+- https://www.ti.uni-bielefeld.de/downloads/publications/templateSIMD.pdf
+  - http://www.ti.uni-bielefeld.de/html/people/moeller/tsimd_warpingsimd.html
+  - only academic license
+- https://www.agner.org/optimize/vectorclass.pdf
+- https://github.com/google/dimsum
+- ispc
+- how risc-v does simd https://www.youtube.com/watch?v=GzZ-8bHsD5s
+
 # References Radar
 
 - https://fas.org/irp/agency/dod/jason/
