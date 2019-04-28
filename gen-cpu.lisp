@@ -153,13 +153,7 @@
 		 `(statements
 		   (raw ,(format nil "typedef float ~a __attribute__ ((vector_size (~a)));"
 				 simd-name (* 4 simd-length)))
-		   (function (simd_driver ()
-					  void)
-			     (let (,@ (loop for e in '(in_re in_im out_re out_im)
-					 collect
-					   `((aref ,e ,(* (/ n1 simd-length) n2)) :type "static v16sf"))
-				   )
-			       (funcall ,fft &in_re &in_im &out_re &out_im)))
+		   
 		   (function (,fft (,@(loop for e in '(re_in im_in re_out im_out) collect
 					   `(,e :type "v16sf* __restrict__")))
 				   "extern void")
@@ -167,7 +161,10 @@
 				    `(setf ,e (funcall __builtin_assume_aligned ,e 64)))
 			     (let (((aref x1_re ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
 				   ((aref x1_im ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
-				   ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
+				   (con :type "const alignas(64) v16sf" :init (list ,@(loop for i below simd-length
+											 collect
+											   (* 1s0 i))))
+				   #+nil ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 				       (loop for k2 below n2 appending ;; column
 					    (loop for n2_ below n2
 					       when (not (member (twiddle-arg n2_ k2 n2) args-seen))
@@ -181,14 +178,29 @@
 					   `(setf ,(row-major 'x1_re n1_ k2)
 						  (+ 
 						   ,@(loop for n2_ below n2 collect
-							  (row-major 're_in n1_ n2_)
+							  `(* con 
+							     ,(row-major 're_in n1_ n2_))
 							  #+nil
 							  (twiddle-mul (row-major 're_in n1_ n2_)
 								       n2_ k2 n2))))))
-			       (funcall memcpy x1_re re_out (funcall sizeof x1_re)))))))
+			       (funcall memcpy x1_re re_out (funcall sizeof x1_re))))
+		   (function (simd_driver ()
+					  void)
+			     (let (,@ (loop for e in '(in_re in_im out_re out_im)
+					 collect
+					   `((aref ,e ,(* (/ n1 simd-length) n2)) :type "static v16sf"))
+				   )
+			       (funcall ,fft in_re in_im out_re out_im)
+			       (dotimes (i ,simd-length)
+				 (funcall printf (string "%f\\n") (aref out_re 0 i)))))
+		   (function ("main" ()
+				     int)
+			     (funcall simd_driver)
+			     (return 0)))))
 
 	     ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
 	     ;; ka and na run from 0..Na-1 for a of 1 or 2
+	     #+nil
 	     ,(let* ((n1 3)
 		    (n2 7)
 		     (n (* n1 n2))
