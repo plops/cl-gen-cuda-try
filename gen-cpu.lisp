@@ -156,7 +156,7 @@
 		   
 		   (function (,fft (,@(loop for e in '(re_in im_in re_out im_out) collect
 					   `(,e :type "v16sf* __restrict__")))
-				   "extern void")
+				   float)
 			     ,@(loop for e in '(re_in im_in re_out im_out) collect
 				    `(setf ,e (funcall __builtin_assume_aligned ,e 64)))
 			     (let (((aref x1_re ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
@@ -183,7 +183,13 @@
 							  #+nil
 							  (twiddle-mul (row-major 're_in n1_ n2_)
 								       n2_ k2 n2))))))
-			       (funcall memcpy x1_re re_out (funcall sizeof x1_re))))
+			       (funcall memcpy x1_re re_out (funcall sizeof x1_re))
+			       (dotimes (j ,n2)
+				 (dotimes (i ,(/ n1 simd-length))
+				   (dotimes (k ,simd-length)
+				     (funcall printf (string "%f\\n") (aref x1_re (+ i (* j ,(/ n1 simd-length)))
+									    k)))))
+			       (return (aref x1_re 0 0))))
 		   (function (simd_driver ()
 					  void)
 			     (let (,@ (loop for e in '(in_re in_im out_re out_im)

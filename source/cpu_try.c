@@ -19,10 +19,9 @@
 #endif
 typedef float v16sf __attribute__((vector_size(64)));
 ;
-extern void simd_16_fft_112_16_7(v16sf *__restrict__ re_in,
-                                 v16sf *__restrict__ im_in,
-                                 v16sf *__restrict__ re_out,
-                                 v16sf *__restrict__ im_out) {
+float simd_16_fft_112_16_7(v16sf *__restrict__ re_in, v16sf *__restrict__ im_in,
+                           v16sf *__restrict__ re_out,
+                           v16sf *__restrict__ im_out) {
   re_in = __builtin_assume_aligned(re_in, 64);
   im_in = __builtin_assume_aligned(im_in, 64);
   re_out = __builtin_assume_aligned(re_out, 64);
@@ -371,6 +370,14 @@ extern void simd_16_fft_112_16_7(v16sf *__restrict__ re_in,
                   (con * re_in[63]) + (con * re_in[79]) + (con * re_in[95]) +
                   (con * re_in[111]));
     memcpy(x1_re, re_out, sizeof(x1_re));
+    for (int j = 0; (j < 7); j += 1) {
+      for (int i = 0; (i < 1); i += 1) {
+        for (int k = 0; (k < 16); k += 1) {
+          printf("%f\n", x1_re[(i + (j * 1))][k]);
+        }
+      }
+    }
+    return x1_re[0][0];
   }
 }
 void simd_driver() {
