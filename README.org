@@ -129,6 +129,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
     - store real and imaginary parts in a way that they
       can be directly loaded one packet at once, interleaved is not
       good
+    - -mfma -mavx512f
 - https://github.com/p12tic/libsimdpp
   - http://p12tic.github.io/libsimdpp/v2.2-dev/libsimdpp/w/
 - https://www.ti.uni-bielefeld.de/downloads/publications/templateSIMD.pdf

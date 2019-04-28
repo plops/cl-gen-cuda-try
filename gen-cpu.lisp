@@ -19,7 +19,8 @@
     (30 "compute twiddle factors using addition theorem exp(x+y)=exp(x)*exp(y)")
     (40 "only store twiddle factors that are necessary")
     (50 "radix 4 and 2 are preferred as they don't require floating point multiplication in lower stages")
-    (60 "will __builtin_prefetch help with strided memory access and make transposition unneccessary? https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html")))
+    (60 "will __builtin_prefetch help with strided memory access and make transposition unneccessary? https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html")
+    (70 "in order to simplify implementing simd with complex numbers, store real and imaginary parts in separate arrays")))
 
 
 (let ((r 4))
