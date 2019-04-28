@@ -19,9 +19,19 @@
 #endif
 typedef float v16sf __attribute__((vector_size(64)));
 ;
-void simd_16_fft_112_16_7(v16sf *__restrict__ re_in, v16sf *__restrict__ im_in,
-                          v16sf *__restrict__ re_out,
-                          v16sf *__restrict__ im_out) {
+void simd_driver() {
+  {
+    static v16sf in_re[7];
+    static v16sf in_im[7];
+    static v16sf out_re[7];
+    static v16sf out_im[7];
+    simd_16_fft_112_16_7(&in_re, &in_im, &out_re, &out_im);
+  }
+}
+extern void simd_16_fft_112_16_7(v16sf *__restrict__ re_in,
+                                 v16sf *__restrict__ im_in,
+                                 v16sf *__restrict__ re_out,
+                                 v16sf *__restrict__ im_out) {
   re_in = __builtin_assume_aligned(re_in, 64);
   im_in = __builtin_assume_aligned(im_in, 64);
   re_out = __builtin_assume_aligned(re_out, 64);
@@ -265,6 +275,7 @@ void simd_16_fft_112_16_7(v16sf *__restrict__ re_in, v16sf *__restrict__ im_in,
                   re_in[94] + re_in[110]);
     x1_re[111] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
                   re_in[95] + re_in[111]);
+    memcpy(x1_re, re_out, sizeof(x1_re));
   }
 }
 float complex *dft_21(float complex *__restrict__ a) {
@@ -414,6 +425,7 @@ float complex *fft_21_3_7(float complex *__restrict__ x) {
   }
 }
 int main() {
+  simd_driver();
   {
     alignas(64) float complex a_in[21];
     float complex *a_out;

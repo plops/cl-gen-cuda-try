@@ -153,9 +153,16 @@
 		 `(statements
 		   (raw ,(format nil "typedef float ~a __attribute__ ((vector_size (~a)));"
 				 simd-name (* 4 simd-length)))
+		   (function (simd_driver ()
+					  void)
+			     (let (,@ (loop for e in '(in_re in_im out_re out_im)
+					 collect
+					   `((aref ,e ,(* (/ n1 simd-length) n2)) :type "static v16sf"))
+				   )
+			       (funcall ,fft &in_re &in_im &out_re &out_im)))
 		   (function (,fft (,@(loop for e in '(re_in im_in re_out im_out) collect
 					   `(,e :type "v16sf* __restrict__")))
-				   void)
+				   "extern void")
 			     ,@(loop for e in '(re_in im_in re_out im_out) collect
 				    `(setf ,e (funcall __builtin_assume_aligned ,e 64)))
 			     (let (((aref x1_re ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
@@ -177,7 +184,8 @@
 							  (row-major 're_in n1_ n2_)
 							  #+nil
 							  (twiddle-mul (row-major 're_in n1_ n2_)
-								       n2_ k2 n2)))))))))))
+								       n2_ k2 n2))))))
+			       (funcall memcpy x1_re re_out (funcall sizeof x1_re)))))))
 
 	     ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
 	     ;; ka and na run from 0..Na-1 for a of 1 or 2
@@ -277,6 +285,7 @@
 				   (return x3)))))
 		   (function ("main" ()
 				     int)
+			     (funcall simd_driver)
 			     (let (((aref a_in ,n) :type "alignas(64) float complex")
 					;((aref a_out ,n) :type "alignas(64) float complex")
 				   (a_out :type "float complex*")
