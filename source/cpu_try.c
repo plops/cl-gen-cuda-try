@@ -17,22 +17,21 @@
 #ifndef CMPLXF
 #define CMPLXF(real, imag) ((real) + _Complex_I * (imag))
 #endif
-typedef float v16sf __attribute__((vector_size(64)));
+typedef float vsf __attribute__((vector_size(64)));
 ;
-float simd_16_fft_112_16_7(v16sf *__restrict__ re_in, v16sf *__restrict__ im_in,
-                           v16sf *__restrict__ re_out,
-                           v16sf *__restrict__ im_out) {
+float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
+                           vsf *__restrict__ re_out, vsf *__restrict__ im_out) {
   re_in = __builtin_assume_aligned(re_in, 64);
   im_in = __builtin_assume_aligned(im_in, 64);
   re_out = __builtin_assume_aligned(re_out, 64);
   im_out = __builtin_assume_aligned(im_out, 64);
   {
-    static alignas(64) v16sf x1_re[7];
-    static alignas(64) v16sf x1_im[7];
-    const alignas(64) v16sf con = {(0.0e+0f), (1.e+0f),  (2.e+0f),  (3.e+0f),
-                                   (4.e+0f),  (5.e+0f),  (6.e+0f),  (7.e+0f),
-                                   (8.e+0f),  (9.e+0f),  (1.e+1f),  (1.1e+1f),
-                                   (1.2e+1f), (1.3e+1f), (1.4e+1f), (1.5e+1f)};
+    static alignas(64) vsf x1_re[7];
+    static alignas(64) vsf x1_im[7];
+    const alignas(64) vsf con = {(0.0e+0f), (1.e+0f),  (2.e+0f),  (3.e+0f),
+                                 (4.e+0f),  (5.e+0f),  (6.e+0f),  (7.e+0f),
+                                 (8.e+0f),  (9.e+0f),  (1.e+1f),  (1.1e+1f),
+                                 (1.2e+1f), (1.3e+1f), (1.4e+1f), (1.5e+1f)};
     x1_re[0] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
                 (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
                 (con * re_in[96]));
@@ -369,23 +368,16 @@ float simd_16_fft_112_16_7(v16sf *__restrict__ re_in, v16sf *__restrict__ im_in,
     x1_re[111] = ((con * re_in[15]) + (con * re_in[31]) + (con * re_in[47]) +
                   (con * re_in[63]) + (con * re_in[79]) + (con * re_in[95]) +
                   (con * re_in[111]));
-    memcpy(x1_re, re_out, sizeof(x1_re));
-    for (int j = 0; (j < 7); j += 1) {
-      for (int i = 0; (i < 1); i += 1) {
-        for (int k = 0; (k < 16); k += 1) {
-          printf("%f\n", x1_re[(i + (j * 1))][k]);
-        }
-      }
-    }
+    memcpy(re_out, x1_re, sizeof(x1_re));
     return x1_re[0][0];
   }
 }
 void simd_driver() {
   {
-    static v16sf in_re[7];
-    static v16sf in_im[7];
-    static v16sf out_re[7];
-    static v16sf out_im[7];
+    static vsf in_re[7];
+    static vsf in_im[7];
+    static vsf out_re[7];
+    static vsf out_im[7];
     simd_16_fft_112_16_7(in_re, in_im, out_re, out_im);
     for (int i = 0; (i < 16); i += 1) {
       printf("%f\n", out_re[0][i]);

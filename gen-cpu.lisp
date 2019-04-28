@@ -141,7 +141,8 @@
 			  (return y))))
 
 	     ,(let* ((simd-length 16)
-		     (simd-name (format nil "v~asf" simd-length))
+		     (simd-name (format nil "vsf" ; simd-length
+					))
 		     (n1 simd-length)
 		     (n2 7)
 		     (n (* n1 n2))
@@ -155,13 +156,13 @@
 				 simd-name (* 4 simd-length)))
 		   
 		   (function (,fft (,@(loop for e in '(re_in im_in re_out im_out) collect
-					   `(,e :type "v16sf* __restrict__")))
+					   `(,e :type "vsf* __restrict__")))
 				   float)
 			     ,@(loop for e in '(re_in im_in re_out im_out) collect
 				    `(setf ,e (funcall __builtin_assume_aligned ,e 64)))
-			     (let (((aref x1_re ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
-				   ((aref x1_im ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
-				   (con :type "const alignas(64) v16sf" :init (list ,@(loop for i below simd-length
+			     (let (((aref x1_re ,(* (/ n1 simd-length) n2)) :type "static alignas(64) vsf")
+				   ((aref x1_im ,(* (/ n1 simd-length) n2)) :type "static alignas(64) vsf")
+				   (con :type "const alignas(64) vsf" :init (list ,@(loop for i below simd-length
 											 collect
 											   (* 1s0 i))))
 				   #+nil ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
@@ -183,8 +184,8 @@
 							  #+nil
 							  (twiddle-mul (row-major 're_in n1_ n2_)
 								       n2_ k2 n2))))))
-			       (funcall memcpy x1_re re_out (funcall sizeof x1_re))
-			       (dotimes (j ,n2)
+			       (funcall memcpy re_out x1_re (funcall sizeof x1_re))
+			       #+nil(dotimes (j ,n2)
 				 (dotimes (i ,(/ n1 simd-length))
 				   (dotimes (k ,simd-length)
 				     (funcall printf (string "%f\\n") (aref x1_re (+ i (* j ,(/ n1 simd-length)))
@@ -194,7 +195,7 @@
 					  void)
 			     (let (,@ (loop for e in '(in_re in_im out_re out_im)
 					 collect
-					   `((aref ,e ,(* (/ n1 simd-length) n2)) :type "static v16sf"))
+					   `((aref ,e ,(* (/ n1 simd-length) n2)) :type "static vsf"))
 				   )
 			       (funcall ,fft in_re in_im out_re out_im)
 			       (dotimes (i ,simd-length)
@@ -546,8 +547,8 @@
     ;(uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try_clang -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm 2>&1 > source/cpu_try_clang.out")
 					;(uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -S -o source/cpu_try_clang.s -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm")
     ;; -Ofast -ffast-math
-    (uiop:run-program "gcc -Wall -Wextra -march=native -std=c11 -g -O3 -march=native source/cpu_try.c -o source/cpu_try_gcc -lm  2>&1 > source/cpu_try_gcc.out")
-    (uiop:run-program "gcc -march=native -std=c11 -O3 -march=native -S source/cpu_try.c -o source/cpu_try_gcc.s")
+    (uiop:run-program "gcc -Wall -Wextra -std=c11 -g -O3 -march=native -mfma -ffast-math source/cpu_try.c -o source/cpu_try_gcc -lm  2>&1 > source/cpu_try_gcc.out")
+    (uiop:run-program "gcc -march=native -std=c11 -O3 -march=native -mfma -ffast-math -S source/cpu_try.c -o source/cpu_try_gcc.s")
     ))
 
 
