@@ -17,6 +17,256 @@
 #ifndef CMPLXF
 #define CMPLXF(real, imag) ((real) + _Complex_I * (imag))
 #endif
+typedef float v16sf __attribute__((vector_size(64)));
+;
+void simd_16_fft_112_16_7(v16sf *__restrict__ re_in, v16sf *__restrict__ im_in,
+                          v16sf *__restrict__ re_out,
+                          v16sf *__restrict__ im_out) {
+  re_in = __builtin_assume_aligned(re_in, 64);
+  im_in = __builtin_assume_aligned(im_in, 64);
+  re_out = __builtin_assume_aligned(re_out, 64);
+  im_out = __builtin_assume_aligned(im_out, 64);
+  {
+    static alignas(64) v16sf x1_re[7];
+    static alignas(64) v16sf x1_im[7];
+    const float complex w7m1_7 =
+        ((6.234898018587335e-1) + (-7.818314824680297e-1i));
+    const float complex w7p5_7 =
+        ((-2.2252093395631434e-1) + (-9.749279121818235e-1i));
+    const float complex w7p4_7 =
+        ((-9.009688679024189e-1) + (-4.3388373911755823e-1i));
+    const float complex w7p3_7 =
+        ((-9.009688679024191e-1) + (4.33883739117558e-1i));
+    const float complex w7p2_7 =
+        ((-2.2252093395631461e-1) + (9.749279121818235e-1i));
+    const float complex w7p1_7 =
+        ((6.234898018587334e-1) + (7.818314824680298e-1i));
+    x1_re[0] = (re_in[0] + re_in[16] + re_in[32] + re_in[48] + re_in[64] +
+                re_in[80] + re_in[96]);
+    x1_re[1] = (re_in[1] + re_in[17] + re_in[33] + re_in[49] + re_in[65] +
+                re_in[81] + re_in[97]);
+    x1_re[2] = (re_in[2] + re_in[18] + re_in[34] + re_in[50] + re_in[66] +
+                re_in[82] + re_in[98]);
+    x1_re[3] = (re_in[3] + re_in[19] + re_in[35] + re_in[51] + re_in[67] +
+                re_in[83] + re_in[99]);
+    x1_re[4] = (re_in[4] + re_in[20] + re_in[36] + re_in[52] + re_in[68] +
+                re_in[84] + re_in[100]);
+    x1_re[5] = (re_in[5] + re_in[21] + re_in[37] + re_in[53] + re_in[69] +
+                re_in[85] + re_in[101]);
+    x1_re[6] = (re_in[6] + re_in[22] + re_in[38] + re_in[54] + re_in[70] +
+                re_in[86] + re_in[102]);
+    x1_re[7] = (re_in[7] + re_in[23] + re_in[39] + re_in[55] + re_in[71] +
+                re_in[87] + re_in[103]);
+    x1_re[8] = (re_in[8] + re_in[24] + re_in[40] + re_in[56] + re_in[72] +
+                re_in[88] + re_in[104]);
+    x1_re[9] = (re_in[9] + re_in[25] + re_in[41] + re_in[57] + re_in[73] +
+                re_in[89] + re_in[105]);
+    x1_re[10] = (re_in[10] + re_in[26] + re_in[42] + re_in[58] + re_in[74] +
+                 re_in[90] + re_in[106]);
+    x1_re[11] = (re_in[11] + re_in[27] + re_in[43] + re_in[59] + re_in[75] +
+                 re_in[91] + re_in[107]);
+    x1_re[12] = (re_in[12] + re_in[28] + re_in[44] + re_in[60] + re_in[76] +
+                 re_in[92] + re_in[108]);
+    x1_re[13] = (re_in[13] + re_in[29] + re_in[45] + re_in[61] + re_in[77] +
+                 re_in[93] + re_in[109]);
+    x1_re[14] = (re_in[14] + re_in[30] + re_in[46] + re_in[62] + re_in[78] +
+                 re_in[94] + re_in[110]);
+    x1_re[15] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
+                 re_in[95] + re_in[111]);
+    x1_re[16] = (re_in[0] + re_in[16] + re_in[32] + re_in[48] + re_in[64] +
+                 re_in[80] + re_in[96]);
+    x1_re[17] = (re_in[1] + re_in[17] + re_in[33] + re_in[49] + re_in[65] +
+                 re_in[81] + re_in[97]);
+    x1_re[18] = (re_in[2] + re_in[18] + re_in[34] + re_in[50] + re_in[66] +
+                 re_in[82] + re_in[98]);
+    x1_re[19] = (re_in[3] + re_in[19] + re_in[35] + re_in[51] + re_in[67] +
+                 re_in[83] + re_in[99]);
+    x1_re[20] = (re_in[4] + re_in[20] + re_in[36] + re_in[52] + re_in[68] +
+                 re_in[84] + re_in[100]);
+    x1_re[21] = (re_in[5] + re_in[21] + re_in[37] + re_in[53] + re_in[69] +
+                 re_in[85] + re_in[101]);
+    x1_re[22] = (re_in[6] + re_in[22] + re_in[38] + re_in[54] + re_in[70] +
+                 re_in[86] + re_in[102]);
+    x1_re[23] = (re_in[7] + re_in[23] + re_in[39] + re_in[55] + re_in[71] +
+                 re_in[87] + re_in[103]);
+    x1_re[24] = (re_in[8] + re_in[24] + re_in[40] + re_in[56] + re_in[72] +
+                 re_in[88] + re_in[104]);
+    x1_re[25] = (re_in[9] + re_in[25] + re_in[41] + re_in[57] + re_in[73] +
+                 re_in[89] + re_in[105]);
+    x1_re[26] = (re_in[10] + re_in[26] + re_in[42] + re_in[58] + re_in[74] +
+                 re_in[90] + re_in[106]);
+    x1_re[27] = (re_in[11] + re_in[27] + re_in[43] + re_in[59] + re_in[75] +
+                 re_in[91] + re_in[107]);
+    x1_re[28] = (re_in[12] + re_in[28] + re_in[44] + re_in[60] + re_in[76] +
+                 re_in[92] + re_in[108]);
+    x1_re[29] = (re_in[13] + re_in[29] + re_in[45] + re_in[61] + re_in[77] +
+                 re_in[93] + re_in[109]);
+    x1_re[30] = (re_in[14] + re_in[30] + re_in[46] + re_in[62] + re_in[78] +
+                 re_in[94] + re_in[110]);
+    x1_re[31] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
+                 re_in[95] + re_in[111]);
+    x1_re[32] = (re_in[0] + re_in[16] + re_in[32] + re_in[48] + re_in[64] +
+                 re_in[80] + re_in[96]);
+    x1_re[33] = (re_in[1] + re_in[17] + re_in[33] + re_in[49] + re_in[65] +
+                 re_in[81] + re_in[97]);
+    x1_re[34] = (re_in[2] + re_in[18] + re_in[34] + re_in[50] + re_in[66] +
+                 re_in[82] + re_in[98]);
+    x1_re[35] = (re_in[3] + re_in[19] + re_in[35] + re_in[51] + re_in[67] +
+                 re_in[83] + re_in[99]);
+    x1_re[36] = (re_in[4] + re_in[20] + re_in[36] + re_in[52] + re_in[68] +
+                 re_in[84] + re_in[100]);
+    x1_re[37] = (re_in[5] + re_in[21] + re_in[37] + re_in[53] + re_in[69] +
+                 re_in[85] + re_in[101]);
+    x1_re[38] = (re_in[6] + re_in[22] + re_in[38] + re_in[54] + re_in[70] +
+                 re_in[86] + re_in[102]);
+    x1_re[39] = (re_in[7] + re_in[23] + re_in[39] + re_in[55] + re_in[71] +
+                 re_in[87] + re_in[103]);
+    x1_re[40] = (re_in[8] + re_in[24] + re_in[40] + re_in[56] + re_in[72] +
+                 re_in[88] + re_in[104]);
+    x1_re[41] = (re_in[9] + re_in[25] + re_in[41] + re_in[57] + re_in[73] +
+                 re_in[89] + re_in[105]);
+    x1_re[42] = (re_in[10] + re_in[26] + re_in[42] + re_in[58] + re_in[74] +
+                 re_in[90] + re_in[106]);
+    x1_re[43] = (re_in[11] + re_in[27] + re_in[43] + re_in[59] + re_in[75] +
+                 re_in[91] + re_in[107]);
+    x1_re[44] = (re_in[12] + re_in[28] + re_in[44] + re_in[60] + re_in[76] +
+                 re_in[92] + re_in[108]);
+    x1_re[45] = (re_in[13] + re_in[29] + re_in[45] + re_in[61] + re_in[77] +
+                 re_in[93] + re_in[109]);
+    x1_re[46] = (re_in[14] + re_in[30] + re_in[46] + re_in[62] + re_in[78] +
+                 re_in[94] + re_in[110]);
+    x1_re[47] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
+                 re_in[95] + re_in[111]);
+    x1_re[48] = (re_in[0] + re_in[16] + re_in[32] + re_in[48] + re_in[64] +
+                 re_in[80] + re_in[96]);
+    x1_re[49] = (re_in[1] + re_in[17] + re_in[33] + re_in[49] + re_in[65] +
+                 re_in[81] + re_in[97]);
+    x1_re[50] = (re_in[2] + re_in[18] + re_in[34] + re_in[50] + re_in[66] +
+                 re_in[82] + re_in[98]);
+    x1_re[51] = (re_in[3] + re_in[19] + re_in[35] + re_in[51] + re_in[67] +
+                 re_in[83] + re_in[99]);
+    x1_re[52] = (re_in[4] + re_in[20] + re_in[36] + re_in[52] + re_in[68] +
+                 re_in[84] + re_in[100]);
+    x1_re[53] = (re_in[5] + re_in[21] + re_in[37] + re_in[53] + re_in[69] +
+                 re_in[85] + re_in[101]);
+    x1_re[54] = (re_in[6] + re_in[22] + re_in[38] + re_in[54] + re_in[70] +
+                 re_in[86] + re_in[102]);
+    x1_re[55] = (re_in[7] + re_in[23] + re_in[39] + re_in[55] + re_in[71] +
+                 re_in[87] + re_in[103]);
+    x1_re[56] = (re_in[8] + re_in[24] + re_in[40] + re_in[56] + re_in[72] +
+                 re_in[88] + re_in[104]);
+    x1_re[57] = (re_in[9] + re_in[25] + re_in[41] + re_in[57] + re_in[73] +
+                 re_in[89] + re_in[105]);
+    x1_re[58] = (re_in[10] + re_in[26] + re_in[42] + re_in[58] + re_in[74] +
+                 re_in[90] + re_in[106]);
+    x1_re[59] = (re_in[11] + re_in[27] + re_in[43] + re_in[59] + re_in[75] +
+                 re_in[91] + re_in[107]);
+    x1_re[60] = (re_in[12] + re_in[28] + re_in[44] + re_in[60] + re_in[76] +
+                 re_in[92] + re_in[108]);
+    x1_re[61] = (re_in[13] + re_in[29] + re_in[45] + re_in[61] + re_in[77] +
+                 re_in[93] + re_in[109]);
+    x1_re[62] = (re_in[14] + re_in[30] + re_in[46] + re_in[62] + re_in[78] +
+                 re_in[94] + re_in[110]);
+    x1_re[63] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
+                 re_in[95] + re_in[111]);
+    x1_re[64] = (re_in[0] + re_in[16] + re_in[32] + re_in[48] + re_in[64] +
+                 re_in[80] + re_in[96]);
+    x1_re[65] = (re_in[1] + re_in[17] + re_in[33] + re_in[49] + re_in[65] +
+                 re_in[81] + re_in[97]);
+    x1_re[66] = (re_in[2] + re_in[18] + re_in[34] + re_in[50] + re_in[66] +
+                 re_in[82] + re_in[98]);
+    x1_re[67] = (re_in[3] + re_in[19] + re_in[35] + re_in[51] + re_in[67] +
+                 re_in[83] + re_in[99]);
+    x1_re[68] = (re_in[4] + re_in[20] + re_in[36] + re_in[52] + re_in[68] +
+                 re_in[84] + re_in[100]);
+    x1_re[69] = (re_in[5] + re_in[21] + re_in[37] + re_in[53] + re_in[69] +
+                 re_in[85] + re_in[101]);
+    x1_re[70] = (re_in[6] + re_in[22] + re_in[38] + re_in[54] + re_in[70] +
+                 re_in[86] + re_in[102]);
+    x1_re[71] = (re_in[7] + re_in[23] + re_in[39] + re_in[55] + re_in[71] +
+                 re_in[87] + re_in[103]);
+    x1_re[72] = (re_in[8] + re_in[24] + re_in[40] + re_in[56] + re_in[72] +
+                 re_in[88] + re_in[104]);
+    x1_re[73] = (re_in[9] + re_in[25] + re_in[41] + re_in[57] + re_in[73] +
+                 re_in[89] + re_in[105]);
+    x1_re[74] = (re_in[10] + re_in[26] + re_in[42] + re_in[58] + re_in[74] +
+                 re_in[90] + re_in[106]);
+    x1_re[75] = (re_in[11] + re_in[27] + re_in[43] + re_in[59] + re_in[75] +
+                 re_in[91] + re_in[107]);
+    x1_re[76] = (re_in[12] + re_in[28] + re_in[44] + re_in[60] + re_in[76] +
+                 re_in[92] + re_in[108]);
+    x1_re[77] = (re_in[13] + re_in[29] + re_in[45] + re_in[61] + re_in[77] +
+                 re_in[93] + re_in[109]);
+    x1_re[78] = (re_in[14] + re_in[30] + re_in[46] + re_in[62] + re_in[78] +
+                 re_in[94] + re_in[110]);
+    x1_re[79] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
+                 re_in[95] + re_in[111]);
+    x1_re[80] = (re_in[0] + re_in[16] + re_in[32] + re_in[48] + re_in[64] +
+                 re_in[80] + re_in[96]);
+    x1_re[81] = (re_in[1] + re_in[17] + re_in[33] + re_in[49] + re_in[65] +
+                 re_in[81] + re_in[97]);
+    x1_re[82] = (re_in[2] + re_in[18] + re_in[34] + re_in[50] + re_in[66] +
+                 re_in[82] + re_in[98]);
+    x1_re[83] = (re_in[3] + re_in[19] + re_in[35] + re_in[51] + re_in[67] +
+                 re_in[83] + re_in[99]);
+    x1_re[84] = (re_in[4] + re_in[20] + re_in[36] + re_in[52] + re_in[68] +
+                 re_in[84] + re_in[100]);
+    x1_re[85] = (re_in[5] + re_in[21] + re_in[37] + re_in[53] + re_in[69] +
+                 re_in[85] + re_in[101]);
+    x1_re[86] = (re_in[6] + re_in[22] + re_in[38] + re_in[54] + re_in[70] +
+                 re_in[86] + re_in[102]);
+    x1_re[87] = (re_in[7] + re_in[23] + re_in[39] + re_in[55] + re_in[71] +
+                 re_in[87] + re_in[103]);
+    x1_re[88] = (re_in[8] + re_in[24] + re_in[40] + re_in[56] + re_in[72] +
+                 re_in[88] + re_in[104]);
+    x1_re[89] = (re_in[9] + re_in[25] + re_in[41] + re_in[57] + re_in[73] +
+                 re_in[89] + re_in[105]);
+    x1_re[90] = (re_in[10] + re_in[26] + re_in[42] + re_in[58] + re_in[74] +
+                 re_in[90] + re_in[106]);
+    x1_re[91] = (re_in[11] + re_in[27] + re_in[43] + re_in[59] + re_in[75] +
+                 re_in[91] + re_in[107]);
+    x1_re[92] = (re_in[12] + re_in[28] + re_in[44] + re_in[60] + re_in[76] +
+                 re_in[92] + re_in[108]);
+    x1_re[93] = (re_in[13] + re_in[29] + re_in[45] + re_in[61] + re_in[77] +
+                 re_in[93] + re_in[109]);
+    x1_re[94] = (re_in[14] + re_in[30] + re_in[46] + re_in[62] + re_in[78] +
+                 re_in[94] + re_in[110]);
+    x1_re[95] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
+                 re_in[95] + re_in[111]);
+    x1_re[96] = (re_in[0] + re_in[16] + re_in[32] + re_in[48] + re_in[64] +
+                 re_in[80] + re_in[96]);
+    x1_re[97] = (re_in[1] + re_in[17] + re_in[33] + re_in[49] + re_in[65] +
+                 re_in[81] + re_in[97]);
+    x1_re[98] = (re_in[2] + re_in[18] + re_in[34] + re_in[50] + re_in[66] +
+                 re_in[82] + re_in[98]);
+    x1_re[99] = (re_in[3] + re_in[19] + re_in[35] + re_in[51] + re_in[67] +
+                 re_in[83] + re_in[99]);
+    x1_re[100] = (re_in[4] + re_in[20] + re_in[36] + re_in[52] + re_in[68] +
+                  re_in[84] + re_in[100]);
+    x1_re[101] = (re_in[5] + re_in[21] + re_in[37] + re_in[53] + re_in[69] +
+                  re_in[85] + re_in[101]);
+    x1_re[102] = (re_in[6] + re_in[22] + re_in[38] + re_in[54] + re_in[70] +
+                  re_in[86] + re_in[102]);
+    x1_re[103] = (re_in[7] + re_in[23] + re_in[39] + re_in[55] + re_in[71] +
+                  re_in[87] + re_in[103]);
+    x1_re[104] = (re_in[8] + re_in[24] + re_in[40] + re_in[56] + re_in[72] +
+                  re_in[88] + re_in[104]);
+    x1_re[105] = (re_in[9] + re_in[25] + re_in[41] + re_in[57] + re_in[73] +
+                  re_in[89] + re_in[105]);
+    x1_re[106] = (re_in[10] + re_in[26] + re_in[42] + re_in[58] + re_in[74] +
+                  re_in[90] + re_in[106]);
+    x1_re[107] = (re_in[11] + re_in[27] + re_in[43] + re_in[59] + re_in[75] +
+                  re_in[91] + re_in[107]);
+    x1_re[108] = (re_in[12] + re_in[28] + re_in[44] + re_in[60] + re_in[76] +
+                  re_in[92] + re_in[108]);
+    x1_re[109] = (re_in[13] + re_in[29] + re_in[45] + re_in[61] + re_in[77] +
+                  re_in[93] + re_in[109]);
+    x1_re[110] = (re_in[14] + re_in[30] + re_in[46] + re_in[62] + re_in[78] +
+                  re_in[94] + re_in[110]);
+    x1_re[111] = (re_in[15] + re_in[31] + re_in[47] + re_in[63] + re_in[79] +
+                  re_in[95] + re_in[111]);
+  }
+}
 float complex *dft_21(float complex *__restrict__ a) {
   a = __builtin_assume_aligned(a, 64);
   {

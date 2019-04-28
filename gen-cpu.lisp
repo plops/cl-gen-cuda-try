@@ -140,6 +140,44 @@
 						     (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
 			  (return y))))
 
+	     ,(let* ((simd-length 16)
+		     (simd-name (format nil "v~asf" simd-length))
+		     (n1 simd-length)
+		     (n2 7)
+		     (n (* n1 n2))
+		     (fft (format nil "simd_~a_fft_~a_~a_~a" simd-length n n1 n2)))
+		(flet ((row-major (a x y)
+			 `(aref ,a ,(+ (* 1 x) (* n1 y))))
+		       (col-major (a x y)
+			 `(aref ,a ,(+ (* n2 x) (* 1 y)))))
+		 `(statements
+		   (raw ,(format nil "typedef float ~a __attribute__ ((vector_size (~a)));"
+				 simd-name (* 4 simd-length)))
+		   (function (,fft (,@(loop for e in '(re_in im_in re_out im_out) collect
+					   `(,e :type "v16sf* __restrict__")))
+				   void)
+			     ,@(loop for e in '(re_in im_in re_out im_out) collect
+				    `(setf ,e (funcall __builtin_assume_aligned ,e 64)))
+			     (let (((aref x1_re ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
+				   ((aref x1_im ,(* (/ n1 simd-length) n2)) :type "static alignas(64) v16sf")
+				   ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
+				       (loop for k2 below n2 appending ;; column
+					    (loop for n2_ below n2
+					       when (not (member (twiddle-arg n2_ k2 n2) args-seen))
+					       collect
+						 (progn
+						   (push (twiddle-arg n2_ k2 n2) args-seen)
+						   `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
+						      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))))))
+			       ,@(loop for k2 below n2 appending 
+				      (loop for n1_ below n1 collect
+					   `(setf ,(row-major 'x1_re n1_ k2)
+						  (+ 
+						   ,@(loop for n2_ below n2 collect
+							  (row-major 're_in n1_ n2_)
+							  #+nil
+							  (twiddle-mul (row-major 're_in n1_ n2_)
+								       n2_ k2 n2)))))))))))
 
 	     ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
 	     ;; ka and na run from 0..Na-1 for a of 1 or 2
@@ -164,6 +202,7 @@
 						       (* (aref a k)
 							  (funcall cexpf (* "1.0fi" ,(* -2 pi (/ n)) j k)))))))
 			       (return y)))
+		   
 		   (function (,fft
 			      ((x :type "float complex* __restrict__"))
 			      "float complex*")
