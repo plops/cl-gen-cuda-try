@@ -36,7 +36,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 
 - https://en.wikichip.org/wiki/intel/core_i5/i5-520m
 
-|     |                         |                           |                                       |                    |
+
 |-----+-------------------------+---------------------------+---------------------------------------+--------------------|
 | L1I | 	64 KiB          | 	2x32 KiB          | 	4-way set associative	 | write-back         |
 | L1D | 	64 KiB          | 	 2x32 KiB         | 	8-way set associative         | 	write-back |
@@ -47,7 +47,6 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 
 - https://en.wikichip.org/wiki/intel/atom_x7/z8750
 
-|     |                 |                                                      |
 |-----+-----------------+------------------------------------------------------|
 | L1I | 	128 KiB | 	4x32 KiB 8-way set associative (per core)    |
 | L1D | 	96 KiB  | 	4x24 KiB 6-way set associative (per core)    |
@@ -61,6 +60,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 
 - https://en.wikichip.org/wiki/intel/core_i5/i5-7400
 
+|-----+-------------------------+-------------------+--------------------------------+--------------------|
 | L1I | 	128 KiB	 | 4x32 KiB          | 	8-way set associative  | 	           |
 | L1D | 	128 KiB	 | 4x32 KiB          | 	8-way set associative  | 	write-back |
 | L2  | 	1 MiB	   | 4x256 KiB         | 	4-way set associative  | 	write-back |
@@ -69,12 +69,12 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 ## Intel Xeon E3 1245-v5 @ 3.5GHz
 
 - https://en.wikichip.org/wiki/intel/xeon_e3/e3-1245_v5
-
-| L1$	  | 256 KiB        |                                  | 	                      |                    |
-| L1I$	 | 128 KiB        | 	4x32 KiB                 | 	8-way set associative |                    |
-| L1D$	 | 128 KiB        | 	4x32 KiB                 | 	8-way set associative | 	write-back |
-| L2$	  | 1 MiB 	 | 	4x256 KiB                | 	4-way set associative | 	write-back |
-| L3$	  | 8 MiB          | 	 	4x2 MiB	 |                               | 	write-back |
+|-------------+----------------+----------------------------------+-------------------------------+--------------------|
+| L1	  | 256 KiB        |                                  | 	                      |                    |
+| L1I	 | 128 KiB        | 	4x32 KiB                 | 	8-way set associative |                    |
+| L1D	 | 128 KiB        | 	4x32 KiB                 | 	8-way set associative | 	write-back |
+| L2	  | 1 MiB 	 | 	4x256 KiB                | 	4-way set associative | 	write-back |
+| L3	  | 8 MiB          | 	 	4x2 MiB	 |                               | 	write-back |
 
 
 ## Intel Xeon (Skylake, IBRS) @ 2.10 GHz  
@@ -154,6 +154,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - https://github.com/google/dimsum
 - ispc
 - how risc-v does simd https://www.youtube.com/watch?v=GzZ-8bHsD5s
+- handmade ray 03 https://www.youtube.com/watch?v=dpvrPYdTkPw
 
 # References Radar
 
