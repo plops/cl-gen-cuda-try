@@ -66,6 +66,21 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 | L2  | 	1 MiB	   | 4x256 KiB         | 	4-way set associative  | 	write-back |
 | L3  | 	6 MiB           | 	4x1.5 MiB | 	12-way set associative | 	write-back |
 
+## Intel Xeon E3 1245-v5 @ 3.5GHz
+
+- https://en.wikichip.org/wiki/intel/xeon_e3/e3-1245_v5
+
+| L1$	  | 256 KiB        |                                  | 	                      |                    |
+| L1I$	 | 128 KiB        | 	4x32 KiB                 | 	8-way set associative |                    |
+| L1D$	 | 128 KiB        | 	4x32 KiB                 | 	8-way set associative | 	write-back |
+| L2$	  | 1 MiB 	 | 	4x256 KiB                | 	4-way set associative | 	write-back |
+| L3$	  | 8 MiB          | 	 	4x2 MiB	 |                               | 	write-back |
+
+
+## Intel Xeon (Skylake, IBRS) @ 2.10 GHz  
+- GenuineIntel Family 6 Model 85 Stepping 4
+- https://browser.geekbench.com/geekbench3/8539129
+- https://en.wikichip.org/wiki/intel/microarchitectures/skylake_(server)
 
 # Read performance counters
 
