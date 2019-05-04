@@ -70,6 +70,31 @@
 (sb-posix:strtod "0x1.99999ap-4") 
 
 
+(defun strtof/base-string (chars offset)
+  (declare (simple-base-string chars))
+  ;; On x86, dx arrays are quicker to make than aliens.
+  (sb-int:dx-let ((end (make-array 1 :element-type 'sb-ext:word)))
+    (sb-sys:with-pinned-objects (chars)
+      (let* ((base (sb-sys:sap+ (sb-sys:vector-sap chars) offset))
+	     (answer
+	      (handler-case
+		  (sb-alien:alien-funcall
+		   (sb-alien:extern-alien "strtof" (function sb-alien:float
+							     sb-alien:system-area-pointer
+							     sb-alien:system-area-pointer))
+		   base
+		   (sb-sys:vector-sap end))
+		(floating-point-overflow () nil))))
+	(values answer
+		(if answer
+		    (the sb-int:index
+			 (- (aref end 0) (sb-sys:sap-int base)))))))))
+
+
+(strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0) ;; => 0.1, 13
+
+
+
 (decode-float 0.1s0)
 (decode-float 0.1d0)
 (integer-decode-float 0.1s0)
