@@ -100,6 +100,8 @@
 (format nil "~{~x~^ ~}" (multiple-value-list (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0))))  ;; => "CCCCCD -1B 1"
 
 
+(format nil "~b" #xCCCCCD)  ;; "110011001100110011001101"
+(format nil "~b" #x199999a) ;; "1100110011001100110011010"
 
 
 (decode-float 0.1s0)
