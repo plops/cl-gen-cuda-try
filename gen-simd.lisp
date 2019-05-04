@@ -34,6 +34,10 @@
     res))
 
 
+;; exact representation of floating point constants
+;; [1] http://clhs.lisp.se/Body/f_dec_fl.htm    decode-float float => significand, exponent, sign
+;; [2] https://www.exploringbinary.com/hexadecimal-floating-point-constants/ examples of c hex notation 0x1.999999999999ap-4 in decimal: 0.1
+
 (progn
   (defun flush (a)
   (if (< (abs a) 1e-15)
