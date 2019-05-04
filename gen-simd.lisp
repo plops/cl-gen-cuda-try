@@ -36,7 +36,28 @@
 
 ;; exact representation of floating point constants
 ;; [1] http://clhs.lisp.se/Body/f_dec_fl.htm    decode-float float => significand, exponent, sign
-;; [2] https://www.exploringbinary.com/hexadecimal-floating-point-constants/ examples of c hex notation 0x1.999999999999ap-4 in decimal: 0.1
+;; [2] https://www.exploringbinary.com/hexadecimal-floating-point-constants/ examples of c hex notation 
+;; [3] http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf page 57, parsing
+
+;; 0x1.99999ap-4 is the single-precision constant representing
+;; 0.1. Single-precision values don’t map as neatly to hexadecimal
+;; constants as double-precision values do; single-precision is 24
+;; bits, but a normalized hexadecimal constant shows 25 bits. This is
+;; not a problem, however; the last hex digit will always have a
+;; binary equivalent ending in 0.
+
+;; translation-time conversion of floating constants should match the
+;; execution-timeconversion of character strings by library functions,
+;; such as strtod
+
+(sb-posix:strtod "0x1.99999ap-4")
+
+
+(decode-float 0.1s0)
+(decode-float 0.1d0)
+(integer-decode-float 0.1s0)
+(integer-decode-float 0.1d0)
+
 
 (progn
   (defun flush (a)
