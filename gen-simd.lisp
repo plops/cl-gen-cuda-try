@@ -39,6 +39,17 @@
 ;; [2] https://www.exploringbinary.com/hexadecimal-floating-point-constants/ examples of c hex notation 
 ;; [3] http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf page 57, parsing
 
+;; 0x1.999999999999ap-4 is an example of a normalized,
+;; double-precision hexadecimal floating-point constant; it represents
+;; the double-precision floating-point number nearest to the decimal
+;; number 0.1. The constant is made up of four parts:
+
+    ;; The prefix ‘0x’, which shows it’s a hexadecimal constant.
+    ;; A one hex digit integer part ‘1’, which represents the leading 1 bit of a normalized binary fraction.
+    ;; A thirteen hex digit fractional part ‘.999999999999a’, which represents the remaining 52 significant bits of the normalized binary fraction.
+    ;; The suffix ‘p-4’, which represents the power of two, written in decimal: 2-4.
+
+
 ;; 0x1.99999ap-4 is the single-precision constant representing
 ;; 0.1. Single-precision values don’t map as neatly to hexadecimal
 ;; constants as double-precision values do; single-precision is 24
@@ -50,7 +61,13 @@
 ;; execution-timeconversion of character strings by library functions,
 ;; such as strtod
 
-(sb-posix:strtod "0x1.99999ap-4")
+
+(sb-posix:strtod "0x1.999999999999ap-4") ;; => 0.1d0, 20
+(integer-decode-float (sb-posix:strtod "0x1.999999999999ap-4")) ;; => 7205759403792794, -56, 1
+(format nil "~x" (integer-decode-float (sb-posix:strtod "0x1.999999999999ap-4"))) ;; => "1999999999999A"
+
+
+(sb-posix:strtod "0x1.99999ap-4") 
 
 
 (decode-float 0.1s0)
