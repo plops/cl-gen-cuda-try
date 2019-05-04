@@ -64,7 +64,7 @@
 
 (sb-posix:strtod "0x1.999999999999ap-4") ;; => 0.1d0, 20
 (integer-decode-float (sb-posix:strtod "0x1.999999999999ap-4")) ;; => 7205759403792794, -56, 1
-(format nil "~x" (integer-decode-float (sb-posix:strtod "0x1.999999999999ap-4"))) ;; => "1999999999999A"
+(format nil "~{~x~^ ~}" (multiple-value-list (integer-decode-float (sb-posix:strtod "0x1.999999999999ap-4")))) ;; => "1999999999999A -38 1"
 
 
 (sb-posix:strtod "0x1.99999ap-4") 
@@ -92,6 +92,13 @@
 
 
 (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0) ;; => 0.1, 13
+
+(type-of (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0)) ;; => single-float
+
+(integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0)) ;; => 13421773, -27, 1
+
+(format nil "~{~x~^ ~}" (multiple-value-list (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0))))  ;; => "CCCCCD -1B 1"
+
 
 
 
