@@ -89,7 +89,7 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
   -  "perf stat" command (or similar) will sometimes use these fixed function counters and will disable them on exit
 
 - use kernel parameters isolcpus=0 to free one of the cpus for benchmarking
-
+- https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf
 # References
 
 - cuda complex library https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp

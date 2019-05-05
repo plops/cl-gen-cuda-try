@@ -130,8 +130,7 @@
 	   (+ 23 b)))))
 
 
-(single-float-to-c-hex-string .1s0)
-
+(single-float-to-c-hex-string .1s0) ;; => "0x1.99999Ap-4"
 
 (single-float-to-c-hex-string (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0))
 
