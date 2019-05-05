@@ -98,7 +98,7 @@
 (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0)) ;; => 13421773, -27, 1
 (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-150" 'simple-base-string) 0))
 
-;; transfer of exponent
+;; transfer of exponent (seems to be decimal in c)
 ;; c    lisp
 ;; -151 0
 ;; -150 -172
@@ -107,7 +107,14 @@
 ;; -3 -26
 ;; 127 104
 ;; 128 fail
+;; 
 
+(multiple-value-bind (a b c) (integer-decode-float (strtof/base-string (coerce "0x1.99999ap1" 'simple-base-string) 0))
+  (let ((significand (ash a 1)))
+    (format nil "0x~x.~xp~d"
+	    (ldb (byte 4 (* 6 4)) significand)
+	    (ldb (byte (* 6 4) 0) significand)
+	   (+ 23 b))))
 
 (format nil "~{~x~^ ~}" (multiple-value-list (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0))))  ;; => "CCCCCD -1B 1"
 
