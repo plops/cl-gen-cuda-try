@@ -96,6 +96,18 @@
 (type-of (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0)) ;; => single-float
 
 (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0)) ;; => 13421773, -27, 1
+(integer-decode-float (strtof/base-string (coerce "0x1.99999ap-150" 'simple-base-string) 0))
+
+;; transfer of exponent
+;; c    lisp
+;; -151 0
+;; -150 -172
+;; -126 -149
+;; -4 -27
+;; -3 -26
+;; 127 104
+;; 128 fail
+
 
 (format nil "~{~x~^ ~}" (multiple-value-list (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0))))  ;; => "CCCCCD -1B 1"
 
