@@ -109,12 +109,32 @@
 ;; 128 fail
 ;; 
 
+
+
+
 (multiple-value-bind (a b c) (integer-decode-float (strtof/base-string (coerce "0x1.99999ap1" 'simple-base-string) 0))
   (let ((significand (ash a 1)))
     (format nil "0x~x.~xp~d"
 	    (ldb (byte 4 (* 6 4)) significand)
 	    (ldb (byte (* 6 4) 0) significand)
 	   (+ 23 b))))
+
+
+(defun single-float-to-c-hex-string (f)
+  (declare (type (single-float 0) f))
+  (multiple-value-bind (a b c) (integer-decode-float f)
+  (let ((significand (ash a 1)))
+    (format nil "0x~x.~xp~d"
+	    (ldb (byte 4 (* 6 4)) significand)
+	    (ldb (byte (* 6 4) 0) significand)
+	   (+ 23 b)))))
+
+
+(single-float-to-c-hex-string .1s0)
+
+
+(single-float-to-c-hex-string (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0))
+
 
 (format nil "~{~x~^ ~}" (multiple-value-list (integer-decode-float (strtof/base-string (coerce "0x1.99999ap-4" 'simple-base-string) 0))))  ;; => "CCCCCD -1B 1"
 
