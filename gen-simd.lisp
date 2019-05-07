@@ -148,10 +148,11 @@
 						    (let ((v (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
 								     'single-float
 								     )))
-						      `(,(format nil "w~{~a~^_~}" (mapcar (lambda (x) (if (< x 0)
-													  (format nil "m~a" (abs x))
-													  x))
-											  (multiple-value-list (integer-decode-float v)))) :type "const float"
+						      `(,(format nil "w~{~a~^_~} /* ~a */" (mapcar (lambda (x) (if (< x 0)
+														   (format nil "m~a" (abs x))
+														   x))
+												   (multiple-value-list (integer-decode-float v)))
+								 (abs v)) :type "const float"
 							:init (hex ,(abs v))
 							 ))
 						    `(,(format nil "w~a_re" (twiddle-arg-name n2_ k2 n2)) :type "const float"
