@@ -120,14 +120,7 @@
 	   (+ 23 b))))
 
 
-(defun single-float-to-c-hex-string (f)
-  (declare (type (single-float 0) f))
-  (multiple-value-bind (a b c) (integer-decode-float f)
-  (let ((significand (ash a 1)))
-    (format nil "0x~x.~xp~d"
-	    (ldb (byte 4 (* 6 4)) significand)
-	    (ldb (byte (* 6 4) 0) significand)
-	   (+ 23 b)))))
+
 
 
 (single-float-to-c-hex-string .1s0) ;; => "0x1.99999Ap-4"
@@ -293,7 +286,8 @@
 				 (funcall printf (string "%f\\n") (aref out_re 0 i)))))
 		   (function ("main" ()
 				     int)
-			     (funcall simd_driver)
+			     (let ((a :type float :init (hex .1s0)))
+			      (funcall simd_driver))
 			     (return 0))))))))
     (write-source *main-cpp-filename* "c" code)
     ;(uiop:run-program "clang -Wextra -Wall -march=native -std=c11 -Ofast -ffast-math -march=native -msse2  source/cpu_try.c -g -o source/cpu_try_clang -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -lm 2>&1 > source/cpu_try_clang.out")

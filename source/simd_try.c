@@ -84,6 +84,9 @@ void simd_driver() {
   }
 }
 int main() {
-  simd_driver();
+  {
+    float a = 0x1.99999Ap-4;
+    simd_driver();
+  }
   return 0;
 }
