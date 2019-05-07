@@ -155,6 +155,11 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - ispc
 - how risc-v does simd https://www.youtube.com/watch?v=GzZ-8bHsD5s
 - handmade ray 03 https://www.youtube.com/watch?v=dpvrPYdTkPw
+- -fmerge-constants Attempt to merge identical constants (string
+  constants and floating point constants) across compilation
+  units. This option is the default for optimized compilation if the
+  assembler and linker support it. Use -fno-merge-constants to inhibit
+  this behavior.
 
 # References Radar
 
