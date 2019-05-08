@@ -189,11 +189,13 @@
 					      (setf ,(row-major 'x1_re n1_ k2)
 						    (+ 
 						     ,@(loop for n2_ below n2 collect
-							    `(* con 
-								,(row-major 're_in n1_ n2_))
-							    #+nil
-							    (twiddle-mul (row-major 're_in n1_ n2_)
-									 n2_ k2 n2)))))))
+							    `(- (* coef_re ,(row-major 're_in n1_ n2_))
+								(* coef_im ,(row-major 'im_in n1_ n2_))))))
+					      (setf ,(row-major 'x1_im n1_ k2)
+						    (+ 
+						     ,@(loop for n2_ below n2 collect
+							    `(+ (* coef_im ,(row-major 're_in n1_ n2_))
+								(* coef_re ,(row-major 'im_in n1_ n2_)))))))))
 			       (funcall memcpy re_out x1_re (funcall sizeof x1_re))
 			       #+nil(dotimes (j ,n2)
 				 (dotimes (i ,(/ n1 simd-length))

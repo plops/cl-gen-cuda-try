@@ -47,9 +47,20 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
       const alignas(64) vsf coef_im = {
           w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1,
           w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1, w0_0_1};
-      x1_re[0] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
-                  (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
-                  (con * re_in[96]));
+      x1_re[0] = (((coef_re * re_in[0]) - (coef_im * im_in[0])) +
+                  ((coef_re * re_in[16]) - (coef_im * im_in[16])) +
+                  ((coef_re * re_in[32]) - (coef_im * im_in[32])) +
+                  ((coef_re * re_in[48]) - (coef_im * im_in[48])) +
+                  ((coef_re * re_in[64]) - (coef_im * im_in[64])) +
+                  ((coef_re * re_in[80]) - (coef_im * im_in[80])) +
+                  ((coef_re * re_in[96]) - (coef_im * im_in[96])));
+      x1_im[0] = (((coef_im * re_in[0]) + (coef_re * im_in[0])) +
+                  ((coef_im * re_in[16]) + (coef_re * im_in[16])) +
+                  ((coef_im * re_in[32]) + (coef_re * im_in[32])) +
+                  ((coef_im * re_in[48]) + (coef_re * im_in[48])) +
+                  ((coef_im * re_in[64]) + (coef_re * im_in[64])) +
+                  ((coef_im * re_in[80]) + (coef_re * im_in[80])) +
+                  ((coef_im * re_in[96]) + (coef_re * im_in[96])));
     }
     {
       const alignas(64)
@@ -77,9 +88,20 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
                                        w13116956_m24_1,
                                        w0_0_1,
                                        (-1 * w13116956_m24_m1)};
-      x1_re[16] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
-                   (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
-                   (con * re_in[96]));
+      x1_re[16] = (((coef_re * re_in[0]) - (coef_im * im_in[0])) +
+                   ((coef_re * re_in[16]) - (coef_im * im_in[16])) +
+                   ((coef_re * re_in[32]) - (coef_im * im_in[32])) +
+                   ((coef_re * re_in[48]) - (coef_im * im_in[48])) +
+                   ((coef_re * re_in[64]) - (coef_im * im_in[64])) +
+                   ((coef_re * re_in[80]) - (coef_im * im_in[80])) +
+                   ((coef_re * re_in[96]) - (coef_im * im_in[96])));
+      x1_im[16] = (((coef_im * re_in[0]) + (coef_re * im_in[0])) +
+                   ((coef_im * re_in[16]) + (coef_re * im_in[16])) +
+                   ((coef_im * re_in[32]) + (coef_re * im_in[32])) +
+                   ((coef_im * re_in[48]) + (coef_re * im_in[48])) +
+                   ((coef_im * re_in[64]) + (coef_re * im_in[64])) +
+                   ((coef_im * re_in[80]) + (coef_re * im_in[80])) +
+                   ((coef_im * re_in[96]) + (coef_re * im_in[96])));
     }
     {
       const alignas(64)
@@ -107,9 +129,20 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
                                        w16356576_m24_1,
                                        w0_0_1,
                                        (-1 * w16356576_m24_m1)};
-      x1_re[32] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
-                   (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
-                   (con * re_in[96]));
+      x1_re[32] = (((coef_re * re_in[0]) - (coef_im * im_in[0])) +
+                   ((coef_re * re_in[16]) - (coef_im * im_in[16])) +
+                   ((coef_re * re_in[32]) - (coef_im * im_in[32])) +
+                   ((coef_re * re_in[48]) - (coef_im * im_in[48])) +
+                   ((coef_re * re_in[64]) - (coef_im * im_in[64])) +
+                   ((coef_re * re_in[80]) - (coef_im * im_in[80])) +
+                   ((coef_re * re_in[96]) - (coef_im * im_in[96])));
+      x1_im[32] = (((coef_im * re_in[0]) + (coef_re * im_in[0])) +
+                   ((coef_im * re_in[16]) + (coef_re * im_in[16])) +
+                   ((coef_im * re_in[32]) + (coef_re * im_in[32])) +
+                   ((coef_im * re_in[48]) + (coef_re * im_in[48])) +
+                   ((coef_im * re_in[64]) + (coef_re * im_in[64])) +
+                   ((coef_im * re_in[80]) + (coef_re * im_in[80])) +
+                   ((coef_im * re_in[96]) + (coef_re * im_in[96])));
     }
     {
       const alignas(64)
@@ -137,9 +170,20 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
                                        w14558722_m25_1,
                                        w13879754_m73_1,
                                        (-1 * w14558722_m25_m1)};
-      x1_re[48] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
-                   (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
-                   (con * re_in[96]));
+      x1_re[48] = (((coef_re * re_in[0]) - (coef_im * im_in[0])) +
+                   ((coef_re * re_in[16]) - (coef_im * im_in[16])) +
+                   ((coef_re * re_in[32]) - (coef_im * im_in[32])) +
+                   ((coef_re * re_in[48]) - (coef_im * im_in[48])) +
+                   ((coef_re * re_in[64]) - (coef_im * im_in[64])) +
+                   ((coef_re * re_in[80]) - (coef_im * im_in[80])) +
+                   ((coef_re * re_in[96]) - (coef_im * im_in[96])));
+      x1_im[48] = (((coef_im * re_in[0]) + (coef_re * im_in[0])) +
+                   ((coef_im * re_in[16]) + (coef_re * im_in[16])) +
+                   ((coef_im * re_in[32]) + (coef_re * im_in[32])) +
+                   ((coef_im * re_in[48]) + (coef_re * im_in[48])) +
+                   ((coef_im * re_in[64]) + (coef_re * im_in[64])) +
+                   ((coef_im * re_in[80]) + (coef_re * im_in[80])) +
+                   ((coef_im * re_in[96]) + (coef_re * im_in[96])));
     }
     {
       const alignas(64)
@@ -167,9 +211,20 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
                                        (-1 * w14558722_m25_m1),
                                        w9253170_m72_1,
                                        w14558722_m25_1};
-      x1_re[64] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
-                   (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
-                   (con * re_in[96]));
+      x1_re[64] = (((coef_re * re_in[0]) - (coef_im * im_in[0])) +
+                   ((coef_re * re_in[16]) - (coef_im * im_in[16])) +
+                   ((coef_re * re_in[32]) - (coef_im * im_in[32])) +
+                   ((coef_re * re_in[48]) - (coef_im * im_in[48])) +
+                   ((coef_re * re_in[64]) - (coef_im * im_in[64])) +
+                   ((coef_re * re_in[80]) - (coef_im * im_in[80])) +
+                   ((coef_re * re_in[96]) - (coef_im * im_in[96])));
+      x1_im[64] = (((coef_im * re_in[0]) + (coef_re * im_in[0])) +
+                   ((coef_im * re_in[16]) + (coef_re * im_in[16])) +
+                   ((coef_im * re_in[32]) + (coef_re * im_in[32])) +
+                   ((coef_im * re_in[48]) + (coef_re * im_in[48])) +
+                   ((coef_im * re_in[64]) + (coef_re * im_in[64])) +
+                   ((coef_im * re_in[80]) + (coef_re * im_in[80])) +
+                   ((coef_im * re_in[96]) + (coef_re * im_in[96])));
     }
     {
       const alignas(64)
@@ -197,9 +252,20 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
                                        (-1 * w16356576_m24_m1),
                                        w11566462_m72_1,
                                        w16356576_m24_1};
-      x1_re[80] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
-                   (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
-                   (con * re_in[96]));
+      x1_re[80] = (((coef_re * re_in[0]) - (coef_im * im_in[0])) +
+                   ((coef_re * re_in[16]) - (coef_im * im_in[16])) +
+                   ((coef_re * re_in[32]) - (coef_im * im_in[32])) +
+                   ((coef_re * re_in[48]) - (coef_im * im_in[48])) +
+                   ((coef_re * re_in[64]) - (coef_im * im_in[64])) +
+                   ((coef_re * re_in[80]) - (coef_im * im_in[80])) +
+                   ((coef_re * re_in[96]) - (coef_im * im_in[96])));
+      x1_im[80] = (((coef_im * re_in[0]) + (coef_re * im_in[0])) +
+                   ((coef_im * re_in[16]) + (coef_re * im_in[16])) +
+                   ((coef_im * re_in[32]) + (coef_re * im_in[32])) +
+                   ((coef_im * re_in[48]) + (coef_re * im_in[48])) +
+                   ((coef_im * re_in[64]) + (coef_re * im_in[64])) +
+                   ((coef_im * re_in[80]) + (coef_re * im_in[80])) +
+                   ((coef_im * re_in[96]) + (coef_re * im_in[96])));
     }
     {
       const alignas(64)
@@ -227,9 +293,20 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
                                        (-1 * w13116956_m24_m1),
                                        w13879754_m72_1,
                                        w13116956_m24_1};
-      x1_re[96] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
-                   (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
-                   (con * re_in[96]));
+      x1_re[96] = (((coef_re * re_in[0]) - (coef_im * im_in[0])) +
+                   ((coef_re * re_in[16]) - (coef_im * im_in[16])) +
+                   ((coef_re * re_in[32]) - (coef_im * im_in[32])) +
+                   ((coef_re * re_in[48]) - (coef_im * im_in[48])) +
+                   ((coef_re * re_in[64]) - (coef_im * im_in[64])) +
+                   ((coef_re * re_in[80]) - (coef_im * im_in[80])) +
+                   ((coef_re * re_in[96]) - (coef_im * im_in[96])));
+      x1_im[96] = (((coef_im * re_in[0]) + (coef_re * im_in[0])) +
+                   ((coef_im * re_in[16]) + (coef_re * im_in[16])) +
+                   ((coef_im * re_in[32]) + (coef_re * im_in[32])) +
+                   ((coef_im * re_in[48]) + (coef_re * im_in[48])) +
+                   ((coef_im * re_in[64]) + (coef_re * im_in[64])) +
+                   ((coef_im * re_in[80]) + (coef_re * im_in[80])) +
+                   ((coef_im * re_in[96]) + (coef_re * im_in[96])));
     }
     memcpy(re_out, x1_re, sizeof(x1_re));
     return x1_re[0][0];
