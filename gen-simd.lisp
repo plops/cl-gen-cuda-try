@@ -144,17 +144,19 @@
 												   (multiple-value-list (integer-decode-float v)))
 								 (abs v)) :type "const float"
 							 :init (hex ,(abs v)))))
-						     (mapcar #'c-hex-float-def
-						      (remove-duplicates
-						       (loop for k2 below n2 appending
-							    (loop for n2_ below n2 appending
-								 (let ((u (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
-										  'single-float
-										  ))
-								       (v (coerce (abs (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
-										  'single-float
-										  )))
-								   `(,u ,v))))))))
+				       (mapcar #'c-hex-float-def
+					       (sort
+						(remove-duplicates
+						 (loop for k2 below n2 appending
+						      (loop for n2_ below n2 appending
+							   (let ((u (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+									    'single-float
+									    ))
+								 (v (coerce (abs (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+									    'single-float
+									    )))
+							     `(,u ,v)))))
+						#'<))))
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below (/ n1 simd-length) collect
 					   `(setf ,(row-major 'x1_re n1_ k2)
