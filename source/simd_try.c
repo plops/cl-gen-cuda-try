@@ -33,26 +33,13 @@ float simd_16_fft_112_16_7(vsf *__restrict__ re_in, vsf *__restrict__ im_in,
                                  (8.e+0f),  (9.e+0f),  (1.e+1f),  (1.1e+1f),
                                  (1.2e+1f), (1.3e+1f), (1.4e+1f), (1.5e+1f)};
     const float w8388608_m23_1 /* 1.0 */ = 0x1.0p0;
-    const float w7p0_1_re = ((1.e+0f) * 0x1.0p0);
-    const float w7p0_1_im = ((0.0e+0f) * 0x0.0p23);
-    const float w10460423_m24_1 /* 0.6234898 */ = 0x1.3F3A0Ep-1;
-    const float w7m1_7_re = ((1.e+0f) * 0x1.3F3A0Ep-1);
-    const float w7m1_7_im = ((-1.e+0f) * 0x1.904C38p-1);
-    const float w14933127_m26_1 /* 0.22252093 */ = 0x1.C7B90Ep-3;
-    const float w7p5_7_re = ((-1.e+0f) * 0x1.C7B90Ep-3);
-    const float w7p5_7_im = ((-1.e+0f) * 0x1.F329C0p-1);
+    const float w0_0_1 /* 0.0 */ = 0x0.0p23;
     const float w15115749_m24_1 /* 0.90096885 */ = 0x1.CD4BCAp-1;
-    const float w7p4_7_re = ((-1.e+0f) * 0x1.CD4BCAp-1);
-    const float w7p4_7_im = ((-1.e+0f) * 0x1.BC4C04p-2);
-    const float w15115749_m24_1 /* 0.90096885 */ = 0x1.CD4BCAp-1;
-    const float w7p3_7_re = ((-1.e+0f) * 0x1.CD4BCAp-1);
-    const float w7p3_7_im = ((1.e+0f) * 0x1.BC4C04p-2);
+    const float w14558722_m25_1 /* 0.43388373 */ = 0x1.BC4C04p-2;
     const float w14933127_m26_1 /* 0.22252093 */ = 0x1.C7B90Ep-3;
-    const float w7p2_7_re = ((-1.e+0f) * 0x1.C7B90Ep-3);
-    const float w7p2_7_im = ((1.e+0f) * 0x1.F329C0p-1);
+    const float w16356576_m24_1 /* 0.9749279 */ = 0x1.F329C0p-1;
     const float w10460423_m24_1 /* 0.6234898 */ = 0x1.3F3A0Ep-1;
-    const float w7p1_7_re = ((1.e+0f) * 0x1.3F3A0Ep-1);
-    const float w7p1_7_im = ((1.e+0f) * 0x1.904C38p-1);
+    const float w13116956_m24_1 /* 0.7818315 */ = 0x1.904C38p-1;
     x1_re[0] = ((con * re_in[0]) + (con * re_in[16]) + (con * re_in[32]) +
                 (con * re_in[48]) + (con * re_in[64]) + (con * re_in[80]) +
                 (con * re_in[96]));

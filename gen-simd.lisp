@@ -137,35 +137,24 @@
 				   (con :type "const alignas(64) vsf" :init (list ,@(loop for i below simd-length
 											 collect
 											   (* 1s0 i))))
-				   ,@(let ((args-seen () #+nil (list 0 1/4 -1/4 3/4 1/2)))
-				       (loop for k2 below n2 appending ;; column
-					    (loop for n2_ below n2
-					       when (not (member (twiddle-arg n2_ k2 n2) args-seen))
-					       appending
-						 (progn
-						   (push (twiddle-arg n2_ k2 n2) args-seen)
-						   (list
-						    (let ((v (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
-								     'single-float
-								     )))
-						      `(,(format nil "w~{~a~^_~} /* ~a */" (mapcar (lambda (x) (if (< x 0)
+				   ,@(flet ((c-hex-float-def (v)
+							    `(,(format nil "w~{~a~^_~} /* ~a */" (mapcar (lambda (x) (if (< x 0)
 														   (format nil "m~a" (abs x))
 														   x))
 												   (multiple-value-list (integer-decode-float v)))
 								 (abs v)) :type "const float"
-							:init (hex ,(abs v))
-							 ))
-						    `(,(format nil "w~a_re" (twiddle-arg-name n2_ k2 n2)) :type "const float"
-						       :init ,(let ((v (coerce
-									(realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2)))))
-									'single-float
-									)))
-								`(* ,(signum v) (hex ,(abs v))))
-						       )
-						    `(,(format nil "w~a_im" (twiddle-arg-name n2_ k2 n2)) :type "const float"
-						       :init ,(let ((v (coerce (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2)))))
-									       'single-float)))
-								`(* ,(signum v) (hex ,(abs v)))))))))))
+							 :init (hex ,(abs v)))))
+						     (mapcar #'c-hex-float-def
+						      (remove-duplicates
+						       (loop for k2 below n2 appending
+							    (loop for n2_ below n2 appending
+								 (let ((u (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+										  'single-float
+										  ))
+								       (v (coerce (abs (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+										  'single-float
+										  )))
+								   `(,u ,v))))))))
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below (/ n1 simd-length) collect
 					   `(setf ,(row-major 'x1_re n1_ k2)
