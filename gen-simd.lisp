@@ -134,7 +134,7 @@
 				    `(setf ,e (funcall __builtin_assume_aligned ,e 64)))
 			     (let (((aref x1_re ,(* (/ n1 simd-length) n2)) :type "static alignas(64) vsf")
 				   ((aref x1_im ,(* (/ n1 simd-length) n2)) :type "static alignas(64) vsf")
-				   (con :type "const alignas(64) vsf" :init (list ,@(loop for i below simd-length
+				   #+nil (con :type "const alignas(64) vsf" :init (list ,@(loop for i below simd-length
 											 collect
 											   (* 1s0 i))))
 				   ,@(flet ((c-hex-float-def (v)
@@ -159,14 +159,41 @@
 						#'<))))
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below (/ n1 simd-length) collect
-					   `(setf ,(row-major 'x1_re n1_ k2)
-						  (+ 
-						   ,@(loop for n2_ below n2 collect
-							  `(* con 
-							     ,(row-major 're_in n1_ n2_))
-							  #+nil
-							  (twiddle-mul (row-major 're_in n1_ n2_)
-								       n2_ k2 n2))))))
+					   `(let ((coef_re :type "const alignas(64) vsf"
+							   :init (list ,@(loop for i below simd-length
+									    collect
+									      (let ((v (coerce (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
+											       'single-float
+											       )))
+										`(* ,(floor (signum v))
+										    ,(format nil "w~{~a~^_~}" (mapcar (lambda (x) (if (< x 0)
+																      (format nil "m~a" (abs x))
+																      x))
+														      (multiple-value-list (integer-decode-float v)))
+											     ))))))
+						  (coef_im :type "const alignas(64) vsf"
+							   :init (list ,@(loop for i below simd-length
+									    collect
+									      (let* ((v (coerce (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
+												  'single-float
+												  ))
+										     (name (format nil "w~{~a~^_~}" (mapcar (lambda (x) (if (< x 0)
+																      (format nil "m~a" (abs x))
+																      x))
+														      (multiple-value-list (integer-decode-float v)))
+											     )))
+										(if (< (floor (signum v)) 0)
+										    `(* -1 ,name)
+										    name)))))
+						  )
+					      (setf ,(row-major 'x1_re n1_ k2)
+						    (+ 
+						     ,@(loop for n2_ below n2 collect
+							    `(* con 
+								,(row-major 're_in n1_ n2_))
+							    #+nil
+							    (twiddle-mul (row-major 're_in n1_ n2_)
+									 n2_ k2 n2)))))))
 			       (funcall memcpy re_out x1_re (funcall sizeof x1_re))
 			       #+nil(dotimes (j ,n2)
 				 (dotimes (i ,(/ n1 simd-length))
