@@ -36,7 +36,7 @@
 
 (progn
   (defun flush (a)
-  (if (< (abs a) 1e-15)
+  (if (< (abs a) 10e-15)
       0s0
       a))
   (defun flush-z (z)
@@ -79,10 +79,29 @@
 		 (* -1 (funcall crealf ,e)))))
       (t `(* ,e
 	     ,(format nil "w~a" (twiddle-arg-name j k n))))))
+
+  (defun c-hex-float-name (v)
+    (declare (type (single-float 0s0) v))
+    (format nil "w~{~a~^_~}"
+	    (mapcar (lambda (x) (if (< x 0)
+				    (format nil "m~a" (abs x))
+				    x))
+		    (multiple-value-list (integer-decode-float (abs v))))))
+  (defun c-hex-float-name-with-comment (v)
+    (format nil "~a /* ~a */"
+	       (c-hex-float-name v)
+	       v))
+  (defun c-hex-float-def (v)
+    `(,(c-hex-float-name-with-comment v)
+       :type "const float"
+       :init (hex ,v)))
   
   (defparameter *main-cpp-filename*
     (merge-pathnames "stage/cl-gen-cuda-try/source/simd_try"
 		     (user-homedir-pathname)))
+
+
+  
   (let* ((n1 4)
 	 (n2 4)
 	 (n (* n1 n2))
@@ -137,55 +156,37 @@
 				   #+nil (con :type "const alignas(64) vsf" :init (list ,@(loop for i below simd-length
 											 collect
 											   (* 1s0 i))))
-				   ,@(labels ((c-hex-float-name (v)
-						(declare (type (single-float 0) v))
-						(format nil "~{~a~^_~}"
-							(mapcar (lambda (x) (if (< x 0)
-										(format nil "m~a" (abs x))
-										x))
-								(multiple-value-list (integer-decode-float (abs v))))))
-					      (c-hex-float-def (v)
-						`(,(format nil "w~a /* ~a */"
-							   (c-hex-float-name v)
-							   v)
-						   :type "const float"
-						   :init (hex ,v))))
-				       (mapcar #'c-hex-float-def
-					       (sort
-						(remove-duplicates
-						 (loop for k2 below n2 appending
-						      (loop for n2_ below n2 appending
-							   (let ((u (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
-									    'single-float
-									    ))
-								 (v (coerce (abs (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
-									    'single-float
-									    )))
-							     `(,u ,v)))))
-						#'<))))
+				   ,@(mapcar #'c-hex-float-def
+					     (sort
+					      (remove-duplicates
+					       (loop for k2 below n2 appending
+						    (loop for n2_ below n2 appending
+							 (let ((u (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+									  'single-float
+									  ))
+							       (v (coerce (abs (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+									  'single-float
+									  )))
+							   `(,u ,v)))))
+					      #'<)))
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below (/ n1 simd-length) collect
-					   `(let ((coef_re :type "const alignas(64) vsf"
+					   `(let (
+						  (coef_re :type "const alignas(64) vsf"
 							   :init (list ,@(loop for i below simd-length
 									    collect
-									      (let ((v (coerce (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
-											       'single-float)))
-										`(* ,(floor (signum v))
-										    ,(format nil "w~{~a~^_~}" (mapcar (lambda (x) (if (< x 0)
-																      (format nil "m~a" (abs x))
-																      x))
-														      (multiple-value-list (integer-decode-float (abs v))))
-											     ))))))
+									      (let* ((v (coerce (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
+												  'single-float))
+										     (name (c-hex-float-name-with-comment (abs v))))
+										(if (< (floor (signum v)) 0)
+										    `(* -1 ,name)
+										    name)))))
 						  (coef_im :type "const alignas(64) vsf"
 							   :init (list ,@(loop for i below simd-length
 									    collect
 									      (let* ((v (coerce (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
 												  'single-float))
-										     (name (format nil "w~{~a~^_~}" (mapcar (lambda (x) (if (< x 0)
-																      (format nil "m~a" (abs x))
-																      x))
-															    (multiple-value-list (integer-decode-float (abs  v))))
-											     )))
+										     (name (c-hex-float-name-with-comment (abs v))))
 										(if (< (floor (signum v)) 0)
 										    `(* -1 ,name)
 										    name)))))
