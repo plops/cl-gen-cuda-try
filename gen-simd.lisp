@@ -137,13 +137,19 @@
 				   #+nil (con :type "const alignas(64) vsf" :init (list ,@(loop for i below simd-length
 											 collect
 											   (* 1s0 i))))
-				   ,@(flet ((c-hex-float-def (v)
-							    `(,(format nil "w~{~a~^_~} /* ~a */" (mapcar (lambda (x) (if (< x 0)
-														   (format nil "m~a" (abs x))
-														   x))
-												   (multiple-value-list (integer-decode-float v)))
-								 (abs v)) :type "const float"
-							 :init (hex ,(abs v)))))
+				   ,@(labels ((c-hex-float-name (v)
+						(declare (type (single-float 0) v))
+						(format nil "~{~a~^_~}"
+							(mapcar (lambda (x) (if (< x 0)
+										(format nil "m~a" (abs x))
+										x))
+								(multiple-value-list (integer-decode-float (abs v))))))
+					      (c-hex-float-def (v)
+						`(,(format nil "w~a /* ~a */"
+							   (c-hex-float-name v)
+							   v)
+						   :type "const float"
+						   :init (hex ,v))))
 				       (mapcar #'c-hex-float-def
 					       (sort
 						(remove-duplicates
@@ -163,24 +169,22 @@
 							   :init (list ,@(loop for i below simd-length
 									    collect
 									      (let ((v (coerce (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
-											       'single-float
-											       )))
+											       'single-float)))
 										`(* ,(floor (signum v))
 										    ,(format nil "w~{~a~^_~}" (mapcar (lambda (x) (if (< x 0)
 																      (format nil "m~a" (abs x))
 																      x))
-														      (multiple-value-list (integer-decode-float v)))
+														      (multiple-value-list (integer-decode-float (abs v))))
 											     ))))))
 						  (coef_im :type "const alignas(64) vsf"
 							   :init (list ,@(loop for i below simd-length
 									    collect
 									      (let* ((v (coerce (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
-												  'single-float
-												  ))
+												  'single-float))
 										     (name (format nil "w~{~a~^_~}" (mapcar (lambda (x) (if (< x 0)
 																      (format nil "m~a" (abs x))
 																      x))
-														      (multiple-value-list (integer-decode-float v)))
+															    (multiple-value-list (integer-decode-float (abs  v))))
 											     )))
 										(if (< (floor (signum v)) 0)
 										    `(* -1 ,name)
