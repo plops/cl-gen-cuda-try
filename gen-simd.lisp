@@ -36,7 +36,7 @@
 
 (progn
   (defun flush (a)
-  (if (< (abs a) 10e-15)
+  (if (< (abs a) 3e-15)
       0s0
       a))
   (defun flush-z (z)
@@ -161,10 +161,10 @@
 					      (remove-duplicates
 					       (loop for k2 below n2 appending
 						    (loop for n2_ below n2 appending
-							 (let ((u (coerce (abs (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+							 (let ((u (coerce (abs (realpart (flush-z (exp (complex 0d0 (* -2 (/ pi n2) n2_ k2))))))
 									  'single-float
 									  ))
-							       (v (coerce (abs (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))
+							       (v (coerce (abs (imagpart (flush-z (exp (complex 0d0 (* -2 (/ pi n2) n2_ k2))))))
 									  'single-float
 									  )))
 							   `(,u ,v)))))
@@ -175,7 +175,7 @@
 						  (coef_re :type "const alignas(64) vsf"
 							   :init (list ,@(loop for i below simd-length
 									    collect
-									      (let* ((v (coerce (realpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
+									      (let* ((v (coerce (realpart (flush-z (exp (complex 0d0 (* -2 (/ pi n2) i k2)))))
 												  'single-float))
 										     (name (c-hex-float-name-with-comment (abs v))))
 										(if (< (floor (signum v)) 0)
@@ -184,7 +184,7 @@
 						  (coef_im :type "const alignas(64) vsf"
 							   :init (list ,@(loop for i below simd-length
 									    collect
-									      (let* ((v (coerce (imagpart (flush-z (exp (complex 0s0 (* -2 (/ pi n2) i k2)))))
+									      (let* ((v (coerce (imagpart (flush-z (exp (complex 0d0 (* -2 (/ pi n2) i k2)))))
 												  'single-float))
 										     (name (c-hex-float-name-with-comment (abs v))))
 										(if (< (floor (signum v)) 0)
