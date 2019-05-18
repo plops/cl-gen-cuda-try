@@ -15,10 +15,10 @@
     (defparameter *cl-program*
       (cl-cpp-generator::beautify-source
        `(with-compilation-unit
-	    (function (dot ((result :type int*)
+	    (function (cu_dot ((result :type int*)
 			  (a :type int*)
 			  (b :type int*))
-                                   "__global void")
+                                   "__global__ void")
 	   (let ((i :type "const int" :init threadIdx.x)
 		 )
 	     (setf result (+ result (aref a i) (aref b i)))))
@@ -40,11 +40,11 @@
 			   (np numpy)))
 		 (setf mod (pycuda.compiler.SourceModule
 			    (string3 ,cl-cpp-generator::*cl-program*))
-		       multiply_them (mod.get_function (string "dot")))
+		       cu_dot (mod.get_function (string "cu_dot")))
 		 (setf a (np.random.randint 1 20 5)
 		       b (np.random.randint 1 20 5)
 		       result 0)
-		 ("dot" (drv.Out result)
+		 (cu_dot (drv.Out result)
 		      (drv.In a)
 		      (drv.In b)
 		      :block (tuple 5 1 1))
