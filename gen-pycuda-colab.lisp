@@ -38,8 +38,16 @@
 			   pycuda.compiler
 			   (np numpy)))
 		 (setf mod (pycuda.compiler.SourceModule
-			    (string3 ,cl-cpp-generator::*cl-program*)))
-		 (setf multiply_them (mod.get_function (string "dot")))
+			    (string3 ,cl-cpp-generator::*cl-program*))
+		       multiply_them (mod.get_function (string "dot")))
+		 (setf a (np.random.randint 1 20 5)
+		       b (np.random.randint 1 20 5)
+		       result 0)
+		 ("dot" (drv.Out result)
+		      (drv.In a)
+		      (drv.In b)
+		      :block (tuple 5 1 1))
+		 (print result)
 		 )))
     (write-source *source* code)))
 

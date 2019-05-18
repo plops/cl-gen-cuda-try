@@ -11,3 +11,8 @@ mod=pycuda.compiler.SourceModule("""__global void dot(int *result, int *a, int *
   }
 }""")
 multiply_them=mod.get_function("dot")
+a=np.random.randint(1, 20, 5)
+b=np.random.randint(1, 20, 5)
+result=0
+dot(drv.Out(result), drv.In(a), drv.In(b), block=(5,1,1,))
+print(result)
