@@ -9,7 +9,8 @@ mod=pycuda.compiler.SourceModule("""__global void dot(int *result, int *a, int *
     const int i = threadIdx.x;
     result = (result + a[i] + b[i]);
   }
-}""")
+}
+""")
 multiply_them=mod.get_function("dot")
 a=np.random.randint(1, 20, 5)
 b=np.random.randint(1, 20, 5)

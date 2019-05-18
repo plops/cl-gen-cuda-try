@@ -21,7 +21,8 @@
                                    "__global void")
 	   (let ((i :type "const int" :init threadIdx.x)
 		 )
-	     (setf result (+ result (aref a i) (aref b i)))))))))
+	     (setf result (+ result (aref a i) (aref b i)))))
+	  (raw " ")))))
   #.(in-package :cl-py-generator)
   (defparameter *path* "/home/martin/stage/cl-gen-cuda-try/")
   (defparameter *code-file* "pycuda_colab")
@@ -49,5 +50,6 @@
 		      :block (tuple 5 1 1))
 		 (print result)
 		 )))
-    (write-source *source* code)))
+    (write-source *source* code)
+    (sb-ext:run-program "/usr/bin/xclip" (list (format nil "~a.py" *source*)))))
 
