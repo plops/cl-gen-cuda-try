@@ -15,13 +15,14 @@
     (defparameter *cl-program*
       (cl-cpp-generator::beautify-source
        `(with-compilation-unit
-	    (function (cu_dot ((result :type int*)
-			  (a :type int*)
-			  (b :type int*))
+	    (raw " ")
+	    (function (cu_mul ((result :type float*)
+			  (a :type float*)
+			  (b :type float*))
                                    "__global__ void")
 	   (let ((i :type "const int" :init threadIdx.x)
 		 )
-	     (setf result (+ result (aref a i) (aref b i)))))
+	     (setf (aref result i) (* (aref a i) (aref b i)))))
 	  (raw " ")))))
   #.(in-package :cl-py-generator)
   (defparameter *path* "/home/martin/stage/cl-gen-cuda-try/")
@@ -32,7 +33,7 @@
       ))
 
   (let* ((code `(do0
-		 "! pip install pycuda"			
+		 ;"! pip install pycuda"			
 		 (imports ((drv pycuda.driver)
 			   pycuda.tools
 			   pycuda.autoinit
@@ -40,14 +41,17 @@
 			   (np numpy)))
 		 (setf mod (pycuda.compiler.SourceModule
 			    (string3 ,cl-cpp-generator::*cl-program*))
-		       cu_dot (mod.get_function (string "cu_dot")))
-		 (setf a (np.random.randint 1 20 5)
-		       b (np.random.randint 1 20 5)
-		       result 0)
-		 (cu_dot (drv.Out result)
+		       cu_mul (mod.get_function (string "cu_mul")))
+		 (setf n 400
+		       a (dot (np.random.randn n)
+			      (astype np.float32))
+		       b (dot (np.random.randn n)
+			      (astype np.float32))
+		       result (np.zeros_like a))
+		 (cu_mul (drv.Out result)
 		      (drv.In a)
 		      (drv.In b)
-		      :block (tuple 5 1 1))
+		      :block (tuple n 1 1))
 		 (print result)
 		 )))
     (write-source *source* code)
