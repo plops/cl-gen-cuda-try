@@ -9,7 +9,7 @@ __global__ void fft_21_3_7(float complex *dst, float complex *src) {
   // n1 DFTs of size n2 in the column direction;
   {
     const int i = threadIdx.x;
-    float complex *x = (src + (64 * i));
+    float complex *x = (src + (21 * i));
     float complex x1[21];
     const float complex w7m1_7 =
         ((6.234898018587335e-1) + (-7.818314824680297e-1i));
@@ -106,7 +106,7 @@ __global__ void fft_21_3_7(float complex *dst, float complex *src) {
       x2[20] = (x1[20] * w21p3_7);
       // another dft;
       {
-        float complex *x3 = (dst + (64 * i));
+        float complex *x3 = (dst + (21 * i));
         const float complex w3m1_3 =
             ((-4.999999999999997e-1) + (-8.660254037844386e-1i));
         const float complex w3p1_3 =
@@ -137,10 +137,11 @@ __global__ void fft_21_3_7(float complex *dst, float complex *src) {
   }
 }
 """)
-cu_mul=mod.get_function("cu_mul")
-n=400
-a=np.random.randn(n).astype(np.float32)
-b=np.random.randn(n).astype(np.float32)
+fft_21_3_7=mod.get_function("fft_21_3_7")
+N2=64
+n1=3
+n2=7
+src=np.random.randn([((n1)*(n2)), n2]).astype(np.complex64)
 result=np.zeros_like(a)
-cu_mul(drv.Out(result), drv.In(a), drv.In(b), block=(n,1,1,))
-print(result)
+fft_21_3_7(drv.Out(dst), drv.In(src), block=(N2,1,1,))
+print(dst)

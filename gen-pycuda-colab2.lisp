@@ -81,7 +81,7 @@
 			      "__global__ void")
 			     (raw "// n1 DFTs of size n2 in the column direction")
 			     (let ((i :type "const int" :init threadIdx.x)
-				   (x :type "float complex*" :init (+ src (* ,N2 i)))
+				   (x :type "float complex*" :init (+ src (* ,(* n1 n2) i)))
 				   ((aref x1 ,(* n1 n2)) :type "float complex")
 				   ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 				       (loop for k2 below n2 appending ;; column
@@ -118,7 +118,7 @@
 								  n1_ k2 n))))
 				 (raw "// another dft")
 				 (let ((;(aref x3 ,(* n1 n2)) :type "float complex"
-					x3 :type "float complex*" :init (+ dst (* ,N2 i)))
+					x3 :type "float complex*" :init (+ dst (* ,(* n1 n2) i)))
 				       ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 					   (loop for k1 below n1 appending ;; column
 						(loop for n1_ below n1
@@ -153,18 +153,17 @@
 			   (np numpy)))
 		 (setf mod (pycuda.compiler.SourceModule
 			    (string3 ,cl-cpp-generator::*cl-program*))
-		       cu_mul (mod.get_function (string "cu_mul")))
-		 (setf n 400
-		       a (dot (np.random.randn n)
-			      (astype np.float32))
-		       b (dot (np.random.randn n)
-			      (astype np.float32))
+		       fft_21_3_7 (mod.get_function (string "fft_21_3_7")))
+		 (setf N2 64
+		       n1 3
+		       n2 7
+		       src (dot (np.random.randn (list (* n1 n2) n2))
+			      (astype np.complex64))
 		       result (np.zeros_like a))
-		 (cu_mul (drv.Out result)
-		      (drv.In a)
-		      (drv.In b)
-		      :block (tuple n 1 1))
-		 (print result)
+		 (fft_21_3_7 (drv.Out dst)
+			     (drv.In src)
+			     :block (tuple N2 1 1))
+		 (print dst)
 		 )))
     (write-source *source* code)
     (sb-ext:run-program "/usr/bin/xclip" (list (format nil "~a.py" *source*)))))
