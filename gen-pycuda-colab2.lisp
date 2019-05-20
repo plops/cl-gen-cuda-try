@@ -52,6 +52,7 @@
 	     (raw " ")
 	    ,(let* ((n1 3)
 		    (n2 7)
+		    (N2 64)
 		     (n (* n1 n2))
 		    ;(dft (format nil "dft_~a" n))
 		     (fft (format nil "fft_~a_~a_~a" n n1 n2)))
@@ -74,18 +75,17 @@
 			       (return y)))
 		   
 		   (function (,fft
-			      ((x :type "float complex* __restrict__"))
+			      (;(x :type "float complex* __restrict__")
+			       (dst :type "float complex*")
+			       (src :type "float complex*"))
 			      "__global__ void")
-			     (raw "// tell compiler that argument ins 64byte aligned")
-			     (setf x (funcall __builtin_assume_aligned x 64))
 			     (raw "// n1 DFTs of size n2 in the column direction")
-			     (let (((aref x1 ,(* n1 n2)) :type "static alignas(64) float complex"
-					; :init (list 0s0)
-				    )
+			     (let ((i :type "const int" :init threadIdx.x)
+				   (x :type "float complex*" :init (+ src (* ,N2 i)))
+				   ((aref x1 ,(* n1 n2)) :type "float complex")
 				   ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 				       (loop for k2 below n2 appending ;; column
 					    (loop for n2_ below n2
-					; with arg = (twiddle-arg n2_ k2 n2)
 					       when (not (member (twiddle-arg n2_ k2 n2) args-seen))
 					       collect
 						 (progn
@@ -100,9 +100,7 @@
 							  (twiddle-mul (row-major 'x n1_ n2_)
 								       n2_ k2 n2))))))
 			       (raw "// multiply with twiddle factors and transpose")
-			       (let (((aref x2 ,(* n1 n2)) :type "static alignas(64) float complex"
-					;:init (list 0s0)
-				      )
+			       (let (((aref x2 ,(* n1 n2)) :type "float complex")
 				     ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 					 (loop for k2 below n2 appending
 					      (loop for n1_ below n1
@@ -111,10 +109,7 @@
 						   (progn
 						     (push (twiddle-arg n1_ k2 n) args-seen)
 						     `(,(format nil "w~a" (twiddle-arg-name n1_ k2 n)) :type "const float complex"
-							:init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n) n1_ k2)))))))))
-				     )
-
-			       
+							:init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n) n1_ k2))))))))))
 			       
 				 ,@(loop for k2 below n2 appending 
 					(loop for n1_ below n1 collect
@@ -122,9 +117,8 @@
 						    ,(twiddle-mul (row-major 'x1 n1_ k2)
 								  n1_ k2 n))))
 				 (raw "// another dft")
-				 (let (((aref x3 ,(* n1 n2)) :type "static alignas(64) float complex"
-					;:init (list 0s0)
-					)
+				 (let ((;(aref x3 ,(* n1 n2)) :type "float complex"
+					x3 :type "float complex*" :init (+ dst (* ,N2 i)))
 				       ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 					   (loop for k1 below n1 appending ;; column
 						(loop for n1_ below n1
@@ -138,22 +132,10 @@
 				   ,@(loop for k2 below n2 appending 
 					  (loop for k1 below n1 collect
 					       `(setf ,(col-major 'x3 k1 k2)
-						      (+ 
-						       ,@(loop for n1_ below n1 collect
-							      (twiddle-mul (col-major 'x2 n1_ k2)
-									   n1_ k1 n1)))))))))))))
-
-	    
-	 
-	  #+nil
-	    (function (cu_mul ((result :type float*)
-			  (a :type float*)
-			  (b :type float*))
-                                   "__global__ void")
-	   (let ((i :type "const int" :init threadIdx.x)
-		 )
-	     (setf (aref result i) (* (aref a i) (aref b i)))))
-	  (raw " ")))))
+						      (+ ,@(loop for n1_ below n1 collect
+								(twiddle-mul (col-major 'x2 n1_ k2)
+									     n1_ k1 n1)))))))))))))
+	    (raw " ")))))
   #.(in-package :cl-py-generator)
   (defparameter *path* "/home/martin/stage/cl-gen-cuda-try/")
   (defparameter *code-file* "pycuda_colab2")
