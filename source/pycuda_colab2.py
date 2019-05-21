@@ -176,27 +176,41 @@ __global__ void fft_21_3_7(complex *dst, complex *src) {
             CMPLXF((-4.999999999999997e-1), (-8.660254037844386e-1));
         const complex w3p1_3 =
             CMPLXF((-5.000000000000004e-1), (8.660254037844384e-1));
-        x3[0] = (x2[0] + x2[7] + x2[14]);
-        x3[7] = (x2[0] + cuCmulf(x2[7], w3m1_3) + cuCmulf(x2[14], w3p1_3));
-        x3[14] = (x2[0] + cuCmulf(x2[7], w3p1_3) + cuCmulf(x2[14], w3m1_3));
-        x3[1] = (x2[1] + x2[8] + x2[15]);
-        x3[8] = (x2[1] + cuCmulf(x2[8], w3m1_3) + cuCmulf(x2[15], w3p1_3));
-        x3[15] = (x2[1] + cuCmulf(x2[8], w3p1_3) + cuCmulf(x2[15], w3m1_3));
-        x3[2] = (x2[2] + x2[9] + x2[16]);
-        x3[9] = (x2[2] + cuCmulf(x2[9], w3m1_3) + cuCmulf(x2[16], w3p1_3));
-        x3[16] = (x2[2] + cuCmulf(x2[9], w3p1_3) + cuCmulf(x2[16], w3m1_3));
-        x3[3] = (x2[3] + x2[10] + x2[17]);
-        x3[10] = (x2[3] + cuCmulf(x2[10], w3m1_3) + cuCmulf(x2[17], w3p1_3));
-        x3[17] = (x2[3] + cuCmulf(x2[10], w3p1_3) + cuCmulf(x2[17], w3m1_3));
-        x3[4] = (x2[4] + x2[11] + x2[18]);
-        x3[11] = (x2[4] + cuCmulf(x2[11], w3m1_3) + cuCmulf(x2[18], w3p1_3));
-        x3[18] = (x2[4] + cuCmulf(x2[11], w3p1_3) + cuCmulf(x2[18], w3m1_3));
-        x3[5] = (x2[5] + x2[12] + x2[19]);
-        x3[12] = (x2[5] + cuCmulf(x2[12], w3m1_3) + cuCmulf(x2[19], w3p1_3));
-        x3[19] = (x2[5] + cuCmulf(x2[12], w3p1_3) + cuCmulf(x2[19], w3m1_3));
-        x3[6] = (x2[6] + x2[13] + x2[20]);
-        x3[13] = (x2[6] + cuCmulf(x2[13], w3m1_3) + cuCmulf(x2[20], w3p1_3));
-        x3[20] = (x2[6] + cuCmulf(x2[13], w3p1_3) + cuCmulf(x2[20], w3m1_3));
+        x3[0] = cuCaddf(cuCaddf(x2[0], x2[7]), x2[14]);
+        x3[7] = cuCaddf(cuCaddf(x2[0], cuCmulf(x2[7], w3m1_3)),
+                        cuCmulf(x2[14], w3p1_3));
+        x3[14] = cuCaddf(cuCaddf(x2[0], cuCmulf(x2[7], w3p1_3)),
+                         cuCmulf(x2[14], w3m1_3));
+        x3[1] = cuCaddf(cuCaddf(x2[1], x2[8]), x2[15]);
+        x3[8] = cuCaddf(cuCaddf(x2[1], cuCmulf(x2[8], w3m1_3)),
+                        cuCmulf(x2[15], w3p1_3));
+        x3[15] = cuCaddf(cuCaddf(x2[1], cuCmulf(x2[8], w3p1_3)),
+                         cuCmulf(x2[15], w3m1_3));
+        x3[2] = cuCaddf(cuCaddf(x2[2], x2[9]), x2[16]);
+        x3[9] = cuCaddf(cuCaddf(x2[2], cuCmulf(x2[9], w3m1_3)),
+                        cuCmulf(x2[16], w3p1_3));
+        x3[16] = cuCaddf(cuCaddf(x2[2], cuCmulf(x2[9], w3p1_3)),
+                         cuCmulf(x2[16], w3m1_3));
+        x3[3] = cuCaddf(cuCaddf(x2[3], x2[10]), x2[17]);
+        x3[10] = cuCaddf(cuCaddf(x2[3], cuCmulf(x2[10], w3m1_3)),
+                         cuCmulf(x2[17], w3p1_3));
+        x3[17] = cuCaddf(cuCaddf(x2[3], cuCmulf(x2[10], w3p1_3)),
+                         cuCmulf(x2[17], w3m1_3));
+        x3[4] = cuCaddf(cuCaddf(x2[4], x2[11]), x2[18]);
+        x3[11] = cuCaddf(cuCaddf(x2[4], cuCmulf(x2[11], w3m1_3)),
+                         cuCmulf(x2[18], w3p1_3));
+        x3[18] = cuCaddf(cuCaddf(x2[4], cuCmulf(x2[11], w3p1_3)),
+                         cuCmulf(x2[18], w3m1_3));
+        x3[5] = cuCaddf(cuCaddf(x2[5], x2[12]), x2[19]);
+        x3[12] = cuCaddf(cuCaddf(x2[5], cuCmulf(x2[12], w3m1_3)),
+                         cuCmulf(x2[19], w3p1_3));
+        x3[19] = cuCaddf(cuCaddf(x2[5], cuCmulf(x2[12], w3p1_3)),
+                         cuCmulf(x2[19], w3m1_3));
+        x3[6] = cuCaddf(cuCaddf(x2[6], x2[13]), x2[20]);
+        x3[13] = cuCaddf(cuCaddf(x2[6], cuCmulf(x2[13], w3m1_3)),
+                         cuCmulf(x2[20], w3p1_3));
+        x3[20] = cuCaddf(cuCaddf(x2[6], cuCmulf(x2[13], w3p1_3)),
+                         cuCmulf(x2[20], w3m1_3));
       }
     }
   }
@@ -206,7 +220,7 @@ fft_21_3_7=mod.get_function("fft_21_3_7")
 N2=64
 n1=3
 n2=7
-src=np.random.randn([((n1)*(n2)), n2]).astype(np.complex64)
-result=np.zeros_like(a)
+src=np.random.randn(((n1)*(n2)), n2).astype(np.complex64)
+dst=np.zeros_like(src)
 fft_21_3_7(drv.Out(dst), drv.In(src), block=(N2,1,1,))
 print(dst)

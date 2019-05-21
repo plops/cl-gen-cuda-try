@@ -180,7 +180,7 @@ which is treated specially."
 				 ,@(loop for k2 below n2 appending 
 					(loop for k1 below n1 collect
 					     `(setf ,(col-major 'x3 k1 k2)
-						    (+ ,@(loop for n1_ below n1 collect
+						    ,(c+ (loop for n1_ below n1 collect
 							      (twiddle-mul (col-major 'x2 n1_ k2)
 									   n1_ k1 n1)))))))))))))
 	  (raw " ")))))
@@ -205,9 +205,9 @@ which is treated specially."
 		 (setf N2 64
 		       n1 3
 		       n2 7
-		       src (dot (np.random.randn (list (* n1 n2) n2))
+		       src (dot (np.random.randn (* n1 n2) n2)
 				(astype np.complex64))
-		       result (np.zeros_like a))
+		       dst (np.zeros_like src))
 		 (fft_21_3_7 (drv.Out dst)
 			     (drv.In src)
 			     :block (tuple N2 1 1))
