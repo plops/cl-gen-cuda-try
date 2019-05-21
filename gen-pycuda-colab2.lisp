@@ -7,6 +7,20 @@
 #+nil(setf *features* (union *features* '())) 
 #+nil(setf *features* (set-difference *features* '()))
 
+(defun pairup (l)
+  (cond ((null l) nil)
+        ((null (cdr l)) (list l))   
+        (t (cons (list (car l) (cadr l))
+                 (pairup (cddr l))))))
+
+(pairup '(1 2 3 4 4 5))
+
+(defun c+ (&rest rest)
+  (labels ((frob (l)
+	     (loop for (a b) in (pairup l) collect
+		  `(funcall cuCaddf a b))))
+    (frob rest)))
+(c+ 1 2 3 4)
 
 (progn
   (progn
