@@ -18,7 +18,9 @@
   (defun flush-z (z)
     (let ((a (realpart z))
 	  (b (imagpart z)))
-      (complex (flush a) (flush b))))
+      `(funcall CMPLXF ;complex
+		,(flush a) ,(flush b)
+		)))
   
     (defun twiddle-arg (j k n)
     "Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision."
@@ -41,23 +43,25 @@
     (case (twiddle-arg j k n)	;if (eq 0 (* j2 k))
       (0 e)
       (1/2 `(* -1 ,e))
-      (1/4 `(* (funcall ;;__builtin_complex ;;
+      (1/4 `(funcall cuCmulf (funcall ;;__builtin_complex ;;
 					;make_cuFloatComplex ;
 		CMPLXF
 		(* -1 (funcall cimagf ,e))
 		(funcall crealf ,e))))
-      (-1/4 `(* (funcall ;; __builtin_complex ;;
+      (-1/4 `(funcall cuCmulf (funcall ;; __builtin_complex ;;
 		 ;make_cuFloatComplex ;
 		 CMPLXF
 		 (funcall cimagf ,e)
 		 (* -1 (funcall crealf ,e)))))
-      (3/4 `(* (funcall ;; __builtin_complex ;;
+      (3/4 `(funcall cuCmulf (funcall ;; __builtin_complex ;;
 					; make_cuFloatComplex ;
 		CMPLXF
 		 (funcall cimagf ,e)
 		 (* -1 (funcall crealf ,e)))))
-      (t `(* ,e
-	     ,(format nil "w~a" (twiddle-arg-name j k n))))))
+      (t `(funcall cuCmulf ,e
+		   ,(format nil "w~a" (twiddle-arg-name j k n))))))
+  #+nil(defun c+ (&rest rest)
+    `())
     (defparameter *cl-program*
       (cl-cpp-generator::beautify-source
        `(with-compilation-unit
