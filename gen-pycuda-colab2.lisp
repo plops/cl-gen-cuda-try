@@ -22,10 +22,11 @@
   (labels ((frob (l)
 	     (cond ((null l) 0)
 		   ((not (listp l)) l)
-		   ((and (listp l) (null (cdr l))) (car l))
+		   ((and (listp l) (null (cdr l))) (frob (car l)))
 		   ((listp l) `(funcall cuCaddf ,(frob (car l)) ,(frob (cdr l))))
 		   (t (break "error ~a" l)))))
     (frob (pairup rest))))
+(pairup '(1 2 3 4))
 (c+ 1 2 3 4)
 
 
