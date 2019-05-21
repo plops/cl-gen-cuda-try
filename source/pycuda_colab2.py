@@ -4,25 +4,26 @@ import pycuda.autoinit
 import pycuda.compiler
 import numpy as np
 mod=pycuda.compiler.SourceModule("""
+#include <cuComplex.h>
+#define cimagf(x) cuCimagf(x)
+#define crealf(x) cuCrealf(x)
+#define CMPLXF(x, y) make_cuFloatComplex((x), (y))
+typedef cuFloatComplex complex;
 // https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm;
-__global__ void fft_21_3_7(float complex *dst, float complex *src) {
+__global__ void fft_21_3_7(complex *dst, complex *src) {
   // n1 DFTs of size n2 in the column direction;
   {
     const int i = threadIdx.x;
-    float complex *x = (src + (21 * i));
-    float complex x1[21];
-    const float complex w7m1_7 =
-        ((6.234898018587335e-1) + (-7.818314824680297e-1i));
-    const float complex w7p5_7 =
+    complex *x = (src + (21 * i));
+    complex x1[21];
+    const complex w7m1_7 = ((6.234898018587335e-1) + (-7.818314824680297e-1i));
+    const complex w7p5_7 =
         ((-2.2252093395631434e-1) + (-9.749279121818235e-1i));
-    const float complex w7p4_7 =
+    const complex w7p4_7 =
         ((-9.009688679024189e-1) + (-4.3388373911755823e-1i));
-    const float complex w7p3_7 =
-        ((-9.009688679024191e-1) + (4.33883739117558e-1i));
-    const float complex w7p2_7 =
-        ((-2.2252093395631461e-1) + (9.749279121818235e-1i));
-    const float complex w7p1_7 =
-        ((6.234898018587334e-1) + (7.818314824680298e-1i));
+    const complex w7p3_7 = ((-9.009688679024191e-1) + (4.33883739117558e-1i));
+    const complex w7p2_7 = ((-2.2252093395631461e-1) + (9.749279121818235e-1i));
+    const complex w7p1_7 = ((6.234898018587334e-1) + (7.818314824680298e-1i));
     x1[0] = (x[0] + x[3] + x[6] + x[9] + x[12] + x[15] + x[18]);
     x1[1] = (x[1] + x[4] + x[7] + x[10] + x[13] + x[16] + x[19]);
     x1[2] = (x[2] + x[5] + x[8] + x[11] + x[14] + x[17] + x[20]);
@@ -64,24 +65,24 @@ __global__ void fft_21_3_7(float complex *dst, float complex *src) {
               (x[14] * w7p4_7) + (x[17] * w7p5_7) + (x[20] * w7m1_7));
     // multiply with twiddle factors and transpose;
     {
-      float complex x2[21];
-      const float complex w21m1_21 =
+      complex x2[21];
+      const complex w21m1_21 =
           ((9.555728057861407e-1) + (-2.947551744109042e-1i));
-      const float complex w21p19_21 =
+      const complex w21p19_21 =
           ((8.262387743159949e-1) + (-5.63320058063622e-1i));
-      const float complex w21p17_21 =
+      const complex w21p17_21 =
           ((3.65341024366395e-1) + (-9.308737486442042e-1i));
-      const float complex w21p6_7 =
+      const complex w21p6_7 =
           ((6.234898018587335e-1) + (-7.818314824680297e-1i));
-      const float complex w21p5_7 =
+      const complex w21p5_7 =
           ((-2.2252093395631434e-1) + (-9.749279121818235e-1i));
-      const float complex w21p13_21 =
+      const complex w21p13_21 =
           ((-7.330518718298263e-1) + (-6.801727377709194e-1i));
-      const float complex w21p16_21 =
+      const complex w21p16_21 =
           ((7.473009358642417e-2) + (-9.9720379718118e-1i));
-      const float complex w21p11_21 =
+      const complex w21p11_21 =
           ((-9.888308262251285e-1) + (-1.4904226617617428e-1i));
-      const float complex w21p3_7 =
+      const complex w21p3_7 =
           ((-9.009688679024191e-1) + (4.33883739117558e-1i));
       x2[0] = x1[0];
       x2[7] = x1[1];
@@ -106,10 +107,10 @@ __global__ void fft_21_3_7(float complex *dst, float complex *src) {
       x2[20] = (x1[20] * w21p3_7);
       // another dft;
       {
-        float complex *x3 = (dst + (21 * i));
-        const float complex w3m1_3 =
+        complex *x3 = (dst + (21 * i));
+        const complex w3m1_3 =
             ((-4.999999999999997e-1) + (-8.660254037844386e-1i));
-        const float complex w3p1_3 =
+        const complex w3p1_3 =
             ((-5.000000000000004e-1) + (8.660254037844384e-1i));
         x3[0] = (x2[0] + x2[7] + x2[14]);
         x3[7] = (x2[0] + (x2[7] * w3m1_3) + (x2[14] * w3p1_3));

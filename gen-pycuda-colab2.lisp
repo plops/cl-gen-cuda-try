@@ -11,6 +11,15 @@
 (progn
   (progn
     #.(in-package #:cl-cpp-generator)
+    (defun flush (a)
+  (if (< (abs a) 1e-15)
+      0s0
+      a))
+  (defun flush-z (z)
+    (let ((a (realpart z))
+	  (b (imagpart z)))
+      (complex (flush a) (flush b))))
+  
     (defun twiddle-arg (j k n)
     "Twiddle factors are named by their angle in the unit turn turn https://en.wikipedia.org/wiki/Turn_(geometry). Storing it as a rational number doesn't loose precision."
     (- (mod (+ (/ 1 n) (/ (* -1 j k)
@@ -33,15 +42,18 @@
       (0 e)
       (1/2 `(* -1 ,e))
       (1/4 `(* (funcall ;;__builtin_complex ;;
+					;make_cuFloatComplex ;
 		CMPLXF
 		(* -1 (funcall cimagf ,e))
 		(funcall crealf ,e))))
       (-1/4 `(* (funcall ;; __builtin_complex ;;
+		 ;make_cuFloatComplex ;
 		 CMPLXF
 		 (funcall cimagf ,e)
 		 (* -1 (funcall crealf ,e)))))
       (3/4 `(* (funcall ;; __builtin_complex ;;
-		 CMPLXF
+					; make_cuFloatComplex ;
+		CMPLXF
 		 (funcall cimagf ,e)
 		 (* -1 (funcall crealf ,e)))))
       (t `(* ,e
@@ -49,10 +61,16 @@
     (defparameter *cl-program*
       (cl-cpp-generator::beautify-source
        `(with-compilation-unit
-	     (raw " ")
+	    (raw " ")
+	  ;(include "/usr/local/cuda-10.0/targets/x86_64-linux/include/cuComplex.h")
+	  (raw "#include <cuComplex.h>")
+	  (raw "#define cimagf(x) cuCimagf(x)")
+	  (raw "#define crealf(x) cuCrealf(x)")
+	  (raw "#define CMPLXF(x,y) make_cuFloatComplex((x),(y))")
+	  (raw "typedef cuFloatComplex complex;")
 	    ,(let* ((n1 3)
 		    (n2 7)
-		    (N2 64)
+		    ;(N2 64)
 		     (n (* n1 n2))
 		    ;(dft (format nil "dft_~a" n))
 		     (fft (format nil "fft_~a_~a_~a" n n1 n2)))
@@ -62,11 +80,11 @@
 			 `(aref ,a ,(+ (* n2 x) (* 1 y)))))
 		  `(statements
 		    (raw "// https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm")
-		    #+nil (function (,dft ((a :type "float complex* __restrict__"))
-				   "float complex*")
+		    #+nil (function (,dft ((a :type "complex* __restrict__"))
+				   "complex*")
 			     (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned
-			     (let (((aref y ,n) :type "static alignas(64) float complex" :init (list 0.0fi)))
-			       #+memset (funcall memset y 0 (* ,n (funcall sizeof "complex float")))
+			     (let (((aref y ,n) :type "static alignas(64) complex" :init (list 0.0fi)))
+			       #+memset (funcall memset y 0 (* ,n (funcall sizeof "complex")))
 			       (dotimes (j ,n)
 				 (dotimes (k ,n)
 				   (setf (aref y j) (+ (aref y j)
@@ -75,14 +93,14 @@
 			       (return y)))
 		   
 		   (function (,fft
-			      (;(x :type "float complex* __restrict__")
-			       (dst :type "float complex*")
-			       (src :type "float complex*"))
+			      (;(x :type "complex* __restrict__")
+			       (dst :type "complex*")
+			       (src :type "complex*"))
 			      "__global__ void")
 			     (raw "// n1 DFTs of size n2 in the column direction")
 			     (let ((i :type "const int" :init threadIdx.x)
-				   (x :type "float complex*" :init (+ src (* ,(* n1 n2) i)))
-				   ((aref x1 ,(* n1 n2)) :type "float complex")
+				   (x :type "complex*" :init (+ src (* ,(* n1 n2) i)))
+				   ((aref x1 ,(* n1 n2)) :type "complex")
 				   ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 				       (loop for k2 below n2 appending ;; column
 					    (loop for n2_ below n2
@@ -90,7 +108,7 @@
 					       collect
 						 (progn
 						   (push (twiddle-arg n2_ k2 n2) args-seen)
-						   `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const float complex"
+						   `(,(format nil "w~a" (twiddle-arg-name n2_ k2 n2)) :type "const complex"
 						      :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n2) n2_ k2))))))))))
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below n1 collect
@@ -100,7 +118,7 @@
 							  (twiddle-mul (row-major 'x n1_ n2_)
 								       n2_ k2 n2))))))
 			       (raw "// multiply with twiddle factors and transpose")
-			       (let (((aref x2 ,(* n1 n2)) :type "float complex")
+			       (let (((aref x2 ,(* n1 n2)) :type "complex")
 				     ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 					 (loop for k2 below n2 appending
 					      (loop for n1_ below n1
@@ -108,7 +126,7 @@
 						 collect
 						   (progn
 						     (push (twiddle-arg n1_ k2 n) args-seen)
-						     `(,(format nil "w~a" (twiddle-arg-name n1_ k2 n)) :type "const float complex"
+						     `(,(format nil "w~a" (twiddle-arg-name n1_ k2 n)) :type "const complex"
 							:init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n) n1_ k2))))))))))
 			       
 				 ,@(loop for k2 below n2 appending 
@@ -118,7 +136,7 @@
 								  n1_ k2 n))))
 				 (raw "// another dft")
 				 (let ((;(aref x3 ,(* n1 n2)) :type "float complex"
-					x3 :type "float complex*" :init (+ dst (* ,(* n1 n2) i)))
+					x3 :type "complex*" :init (+ dst (* ,(* n1 n2) i)))
 				       ,@(let ((args-seen (list 0 1/4 -1/4 3/4 1/2)))
 					   (loop for k1 below n1 appending ;; column
 						(loop for n1_ below n1
@@ -126,7 +144,7 @@
 						   collect
 						     (progn
 						       (push (twiddle-arg n1_ k1 n1) args-seen)
-						       `(,(format nil "w~a" (twiddle-arg-name n1_ k1 n1)) :type "const float complex"
+						       `(,(format nil "w~a" (twiddle-arg-name n1_ k1 n1)) :type "const complex"
 							  :init ,(flush-z (exp (complex 0s0 (* -2 (/ pi n1) n1_ k1))))))))))
 				 
 				   ,@(loop for k2 below n2 appending 
