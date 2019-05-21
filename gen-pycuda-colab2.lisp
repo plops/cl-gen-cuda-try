@@ -7,32 +7,35 @@
 #+nil(setf *features* (union *features* '())) 
 #+nil(setf *features* (set-difference *features* '()))
 
-(defun pairup (l)
-  (cond ((null l) nil)
-        ((null (cdr l)) (list l))   
-        (t (let ((p (pairup (cddr l))))
-	     (if p
-	      (list (list (car l) (cadr l))
-		    p)
-	      (list (car l) (cadr l)))))))
 
-(pairup '(1 2 3 4))
-
-(defun c+ (&rest rest)
-  (labels ((frob (l)
-	     (cond ((null l) 0)
-		   ((not (listp l)) l)
-		   ((and (listp l) (null (cdr l))) (frob (car l)))
-		   ((listp l) `(funcall cuCaddf ,(frob (car l)) ,(frob (cdr l))))
-		   (t (break "error ~a" l)))))
-    (frob (pairup rest))))
-(pairup '(1 2 3 4))
-(c+ 1 2 3 4)
 
 
 (progn
   (progn
     #.(in-package #:cl-cpp-generator)
+    (progn
+ (defun pairup (l)
+   (cond ((null l) nil)
+         ((null (cdr l)) (list l))   
+         (t (let ((p (pairup (cddr l))))
+	      (if p
+		  (list (list (car l) (cadr l))
+			p)
+		  (list (car l) (cadr l)))))))
+ #+nil
+ (pairup '(1 2 3 4))
+
+ (defun c+ (rest ;&rest rest
+		    )
+   (labels ((frob (l)
+	      (cond ((null l) 0)
+		    ((not (listp l)) l)
+		    ((and (listp l) (null (cdr l))) (frob (car l)))
+		    ((listp l) `(funcall cuCaddf ,(frob (car l)) ,(frob (cdr l))))
+		    (t (break "error ~a" l)))))
+     (frob (pairup rest))))
+ #+nil
+ (c+ 1 2 3 4))
     (defun flush (a)
   (if (< (abs a) 1e-15)
       0s0
@@ -139,8 +142,8 @@
 			       ,@(loop for k2 below n2 appending 
 				      (loop for n1_ below n1 collect
 					   `(setf ,(row-major 'x1 n1_ k2)
-						  (+ 
-						   ,@(loop for n2_ below n2 collect
+						  ,(c+ 
+						   (loop for n2_ below n2 collect
 							  (twiddle-mul (row-major 'x n1_ n2_)
 								       n2_ k2 n2))))))
 			       (raw "// multiply with twiddle factors and transpose")

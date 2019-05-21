@@ -28,63 +28,477 @@ __global__ void fft_21_3_7(complex *dst, complex *src) {
         CMPLXF((-2.2252093395631461e-1), (9.749279121818235e-1));
     const complex w7p1_7 =
         CMPLXF((6.234898018587334e-1), (7.818314824680298e-1));
-    x1[0] = (x[0] + x[3] + x[6] + x[9] + x[12] + x[15] + x[18]);
-    x1[1] = (x[1] + x[4] + x[7] + x[10] + x[13] + x[16] + x[19]);
-    x1[2] = (x[2] + x[5] + x[8] + x[11] + x[14] + x[17] + x[20]);
-    x1[3] = (x[0] + cuCmulf(x[3], w7m1_7) + cuCmulf(x[6], w7p5_7) +
-             cuCmulf(x[9], w7p4_7) + cuCmulf(x[12], w7p3_7) +
-             cuCmulf(x[15], w7p2_7) + cuCmulf(x[18], w7p1_7));
-    x1[4] = (x[1] + cuCmulf(x[4], w7m1_7) + cuCmulf(x[7], w7p5_7) +
-             cuCmulf(x[10], w7p4_7) + cuCmulf(x[13], w7p3_7) +
-             cuCmulf(x[16], w7p2_7) + cuCmulf(x[19], w7p1_7));
-    x1[5] = (x[2] + cuCmulf(x[5], w7m1_7) + cuCmulf(x[8], w7p5_7) +
-             cuCmulf(x[11], w7p4_7) + cuCmulf(x[14], w7p3_7) +
-             cuCmulf(x[17], w7p2_7) + cuCmulf(x[20], w7p1_7));
-    x1[6] = (x[0] + cuCmulf(x[3], w7p5_7) + cuCmulf(x[6], w7p3_7) +
-             cuCmulf(x[9], w7p1_7) + cuCmulf(x[12], w7m1_7) +
-             cuCmulf(x[15], w7p4_7) + cuCmulf(x[18], w7p2_7));
-    x1[7] = (x[1] + cuCmulf(x[4], w7p5_7) + cuCmulf(x[7], w7p3_7) +
-             cuCmulf(x[10], w7p1_7) + cuCmulf(x[13], w7m1_7) +
-             cuCmulf(x[16], w7p4_7) + cuCmulf(x[19], w7p2_7));
-    x1[8] = (x[2] + cuCmulf(x[5], w7p5_7) + cuCmulf(x[8], w7p3_7) +
-             cuCmulf(x[11], w7p1_7) + cuCmulf(x[14], w7m1_7) +
-             cuCmulf(x[17], w7p4_7) + cuCmulf(x[20], w7p2_7));
-    x1[9] = (x[0] + cuCmulf(x[3], w7p4_7) + cuCmulf(x[6], w7p1_7) +
-             cuCmulf(x[9], w7p5_7) + cuCmulf(x[12], w7p2_7) +
-             cuCmulf(x[15], w7m1_7) + cuCmulf(x[18], w7p3_7));
-    x1[10] = (x[1] + cuCmulf(x[4], w7p4_7) + cuCmulf(x[7], w7p1_7) +
-              cuCmulf(x[10], w7p5_7) + cuCmulf(x[13], w7p2_7) +
-              cuCmulf(x[16], w7m1_7) + cuCmulf(x[19], w7p3_7));
-    x1[11] = (x[2] + cuCmulf(x[5], w7p4_7) + cuCmulf(x[8], w7p1_7) +
-              cuCmulf(x[11], w7p5_7) + cuCmulf(x[14], w7p2_7) +
-              cuCmulf(x[17], w7m1_7) + cuCmulf(x[20], w7p3_7));
-    x1[12] = (x[0] + cuCmulf(x[3], w7p3_7) + cuCmulf(x[6], w7m1_7) +
-              cuCmulf(x[9], w7p2_7) + cuCmulf(x[12], w7p5_7) +
-              cuCmulf(x[15], w7p1_7) + cuCmulf(x[18], w7p4_7));
-    x1[13] = (x[1] + cuCmulf(x[4], w7p3_7) + cuCmulf(x[7], w7m1_7) +
-              cuCmulf(x[10], w7p2_7) + cuCmulf(x[13], w7p5_7) +
-              cuCmulf(x[16], w7p1_7) + cuCmulf(x[19], w7p4_7));
-    x1[14] = (x[2] + cuCmulf(x[5], w7p3_7) + cuCmulf(x[8], w7m1_7) +
-              cuCmulf(x[11], w7p2_7) + cuCmulf(x[14], w7p5_7) +
-              cuCmulf(x[17], w7p1_7) + cuCmulf(x[20], w7p4_7));
-    x1[15] = (x[0] + cuCmulf(x[3], w7p2_7) + cuCmulf(x[6], w7p4_7) +
-              cuCmulf(x[9], w7m1_7) + cuCmulf(x[12], w7p1_7) +
-              cuCmulf(x[15], w7p3_7) + cuCmulf(x[18], w7p5_7));
-    x1[16] = (x[1] + cuCmulf(x[4], w7p2_7) + cuCmulf(x[7], w7p4_7) +
-              cuCmulf(x[10], w7m1_7) + cuCmulf(x[13], w7p1_7) +
-              cuCmulf(x[16], w7p3_7) + cuCmulf(x[19], w7p5_7));
-    x1[17] = (x[2] + cuCmulf(x[5], w7p2_7) + cuCmulf(x[8], w7p4_7) +
-              cuCmulf(x[11], w7m1_7) + cuCmulf(x[14], w7p1_7) +
-              cuCmulf(x[17], w7p3_7) + cuCmulf(x[20], w7p5_7));
-    x1[18] = (x[0] + cuCmulf(x[3], w7p1_7) + cuCmulf(x[6], w7p2_7) +
-              cuCmulf(x[9], w7p3_7) + cuCmulf(x[12], w7p4_7) +
-              cuCmulf(x[15], w7p5_7) + cuCmulf(x[18], w7m1_7));
-    x1[19] = (x[1] + cuCmulf(x[4], w7p1_7) + cuCmulf(x[7], w7p2_7) +
-              cuCmulf(x[10], w7p3_7) + cuCmulf(x[13], w7p4_7) +
-              cuCmulf(x[16], w7p5_7) + cuCmulf(x[19], w7m1_7));
-    x1[20] = (x[2] + cuCmulf(x[5], w7p1_7) + cuCmulf(x[8], w7p2_7) +
-              cuCmulf(x[11], w7p3_7) + cuCmulf(x[14], w7p4_7) +
-              cuCmulf(x[17], w7p5_7) + cuCmulf(x[20], w7m1_7));
+    x1[0] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 0)), cuCaddf(aref, cuCaddf(x, 3))),
+        cuCaddf(
+            cuCaddf(cuCaddf(aref, cuCaddf(x, 6)), cuCaddf(aref, cuCaddf(x, 9))),
+            cuCaddf(cuCaddf(cuCaddf(aref, cuCaddf(x, 12)),
+                            cuCaddf(aref, cuCaddf(x, 15))),
+                    cuCaddf(aref, cuCaddf(x, 18)))));
+    x1[1] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 1)), cuCaddf(aref, cuCaddf(x, 4))),
+        cuCaddf(cuCaddf(cuCaddf(aref, cuCaddf(x, 7)),
+                        cuCaddf(aref, cuCaddf(x, 10))),
+                cuCaddf(cuCaddf(cuCaddf(aref, cuCaddf(x, 13)),
+                                cuCaddf(aref, cuCaddf(x, 16))),
+                        cuCaddf(aref, cuCaddf(x, 19)))));
+    x1[2] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 2)), cuCaddf(aref, cuCaddf(x, 5))),
+        cuCaddf(cuCaddf(cuCaddf(aref, cuCaddf(x, 8)),
+                        cuCaddf(aref, cuCaddf(x, 11))),
+                cuCaddf(cuCaddf(cuCaddf(aref, cuCaddf(x, 14)),
+                                cuCaddf(aref, cuCaddf(x, 17))),
+                        cuCaddf(aref, cuCaddf(x, 20)))));
+    x1[3] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 0)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 3)),
+                                                 w7m1_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 6)), w7p5_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 9)),
+                                                 w7p4_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 12)),
+                                                w7p3_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 15)),
+                                                w7p2_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 18)),
+                                                 w7p1_7))))));
+    x1[4] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 1)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 4)),
+                                                 w7m1_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 7)), w7p5_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 10)),
+                                                 w7p4_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 13)),
+                                                w7p3_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 16)),
+                                                w7p2_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 19)),
+                                                 w7p1_7))))));
+    x1[5] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 2)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 5)),
+                                                 w7m1_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 8)), w7p5_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 11)),
+                                                 w7p4_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 14)),
+                                                w7p3_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 17)),
+                                                w7p2_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 20)),
+                                                 w7p1_7))))));
+    x1[6] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 0)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 3)),
+                                                 w7p5_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 6)), w7p3_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 9)),
+                                                 w7p1_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 12)),
+                                                w7m1_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 15)),
+                                                w7p4_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 18)),
+                                                 w7p2_7))))));
+    x1[7] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 1)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 4)),
+                                                 w7p5_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 7)), w7p3_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 10)),
+                                                 w7p1_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 13)),
+                                                w7m1_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 16)),
+                                                w7p4_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 19)),
+                                                 w7p2_7))))));
+    x1[8] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 2)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 5)),
+                                                 w7p5_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 8)), w7p3_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 11)),
+                                                 w7p1_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 14)),
+                                                w7m1_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 17)),
+                                                w7p4_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 20)),
+                                                 w7p2_7))))));
+    x1[9] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 0)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 3)),
+                                                 w7p4_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 6)), w7p1_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 9)),
+                                                 w7p5_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 12)),
+                                                w7p2_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 15)),
+                                                w7m1_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 18)),
+                                                 w7p3_7))))));
+    x1[10] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 1)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 4)),
+                                                 w7p4_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 7)), w7p1_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 10)),
+                                                 w7p5_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 13)),
+                                                w7p2_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 16)),
+                                                w7m1_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 19)),
+                                                 w7p3_7))))));
+    x1[11] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 2)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 5)),
+                                                 w7p4_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 8)), w7p1_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 11)),
+                                                 w7p5_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 14)),
+                                                w7p2_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 17)),
+                                                w7m1_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 20)),
+                                                 w7p3_7))))));
+    x1[12] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 0)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 3)),
+                                                 w7p3_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 6)), w7m1_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 9)),
+                                                 w7p2_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 12)),
+                                                w7p5_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 15)),
+                                                w7p1_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 18)),
+                                                 w7p4_7))))));
+    x1[13] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 1)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 4)),
+                                                 w7p3_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 7)), w7m1_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 10)),
+                                                 w7p2_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 13)),
+                                                w7p5_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 16)),
+                                                w7p1_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 19)),
+                                                 w7p4_7))))));
+    x1[14] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 2)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 5)),
+                                                 w7p3_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 8)), w7m1_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 11)),
+                                                 w7p2_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 14)),
+                                                w7p5_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 17)),
+                                                w7p1_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 20)),
+                                                 w7p4_7))))));
+    x1[15] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 0)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 3)),
+                                                 w7p2_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 6)), w7p4_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 9)),
+                                                 w7m1_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 12)),
+                                                w7p1_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 15)),
+                                                w7p3_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 18)),
+                                                 w7p5_7))))));
+    x1[16] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 1)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 4)),
+                                                 w7p2_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 7)), w7p4_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 10)),
+                                                 w7m1_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 13)),
+                                                w7p1_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 16)),
+                                                w7p3_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 19)),
+                                                 w7p5_7))))));
+    x1[17] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 2)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 5)),
+                                                 w7p2_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 8)), w7p4_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 11)),
+                                                 w7m1_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 14)),
+                                                w7p1_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 17)),
+                                                w7p3_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 20)),
+                                                 w7p5_7))))));
+    x1[18] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 0)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 3)),
+                                                 w7p1_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 6)), w7p2_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 9)),
+                                                 w7p3_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 12)),
+                                                w7p4_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 15)),
+                                                w7p5_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 18)),
+                                                 w7m1_7))))));
+    x1[19] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 1)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 4)),
+                                                 w7p1_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 7)), w7p2_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 10)),
+                                                 w7p3_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 13)),
+                                                w7p4_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 16)),
+                                                w7p5_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 19)),
+                                                 w7m1_7))))));
+    x1[20] = cuCaddf(
+        cuCaddf(cuCaddf(aref, cuCaddf(x, 2)),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 5)),
+                                                 w7p1_7)))),
+        cuCaddf(
+            cuCaddf(
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf,
+                                cuCaddf(cuCaddf(aref, cuCaddf(x, 8)), w7p2_7))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 11)),
+                                                 w7p3_7)))),
+            cuCaddf(
+                cuCaddf(cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 14)),
+                                                w7p4_7))),
+                        cuCaddf(funcall,
+                                cuCaddf(cuCmulf,
+                                        cuCaddf(cuCaddf(aref, cuCaddf(x, 17)),
+                                                w7p5_7)))),
+                cuCaddf(funcall,
+                        cuCaddf(cuCmulf, cuCaddf(cuCaddf(aref, cuCaddf(x, 20)),
+                                                 w7m1_7))))));
     // multiply with twiddle factors and transpose;
     {
       complex x2[21];
