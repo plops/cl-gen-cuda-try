@@ -10,17 +10,24 @@
 (defun pairup (l)
   (cond ((null l) nil)
         ((null (cdr l)) (list l))   
-        (t (cons (list (car l) (cadr l))
-                 (pairup (cddr l))))))
+        (t (let ((p (pairup (cddr l))))
+	     (if p
+	      (list (list (car l) (cadr l))
+		    p)
+	      (list (car l) (cadr l)))))))
 
-(pairup '(1 2 3 4 4 5))
+(pairup '(1 2 3 4))
 
 (defun c+ (&rest rest)
   (labels ((frob (l)
-	     (loop for (a b) in (pairup l) collect
-		  `(funcall cuCaddf a b))))
-    (frob rest)))
+	     (cond ((null l) 0)
+		   ((not (listp l)) l)
+		   ((and (listp l) (null (cdr l))) (car l))
+		   ((listp l) `(funcall cuCaddf ,(frob (car l)) ,(frob (cdr l))))
+		   (t (break "error ~a" l)))))
+    (frob (pairup rest))))
 (c+ 1 2 3 4)
+
 
 (progn
   (progn
