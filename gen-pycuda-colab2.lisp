@@ -7,9 +7,6 @@
 #+nil(setf *features* (union *features* '())) 
 #+nil(setf *features* (set-difference *features* '()))
 
-
-
-
 (progn
   (progn
     #.(in-package #:cl-cpp-generator)
@@ -24,18 +21,23 @@
 		  (list (car l) (cadr l)))))))
  #+nil
  (pairup '(1 2 3 4))
-
  (defun c+ (rest ;&rest rest
 		    )
+   "convert a list of values into binary reduction tree using the
+cuCaddf function. c+ copes with sexpr elements like (aref x 3) in the
+input list by packaging them into a new sexpr like (val (aref x 3))
+which is treated specially."
    (labels ((frob (l)
 	      (cond ((null l) 0)
-		    ((not (listp l)) l)
+		    ((numberp l) l)
+		    ((and (listp l) (member (car l) '(val))) (cadr l))
 		    ((and (listp l) (null (cdr l))) (frob (car l)))
 		    ((listp l) `(funcall cuCaddf ,(frob (car l)) ,(frob (cdr l))))
 		    (t (break "error ~a" l)))))
-     (frob (pairup rest))))
+     (frob (pairup (loop for e in rest
+			collect `(val ,e))))))
  #+nil
- (c+ 1 2 3 4))
+ (c+ '(1 (aref x 3) 3 4)))
     (defun flush (a)
   (if (< (abs a) 1e-15)
       0s0
