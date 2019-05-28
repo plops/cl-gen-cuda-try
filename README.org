@@ -36,10 +36,20 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 | gen-pycuda-colab2.lisp | pycuda_colab2.py | 2 stage fft that runs on google colab. looks quite messy becaus cuda has no complex numbers                                             |   |   |
 
 
+# What to work on
+
+| task                                                 | priority (1 .. high) | reason                               | comment                                                 |
+|------------------------------------------------------+----------------------+--------------------------------------+---------------------------------------------------------|
+| measure performance with nvidia nsight compute       |                    1 | learn which counters are interesting | tried on vast.ai and google colab. can't get it to work |
+| read performance metrics from inside cuda            |                    2 | guide optimization of tile size      | is that even possible?                                  |
+| port https://github.com/plops/satellite-plot to cuda |                    3 | decompress raw satellite payload     |                                                         |
+| learn SAR focussing                                  |                    1 |                                      |                                                         |
+| learn satellite orbit                                |                    4 |                                      |                                                         |
+| SAR focussing with terrain                           |                    4 |                                      |                                                         |
+| measure surface movement with SAR sequences          |                    5 |                                      |                                                         |
+| store global surface timeline with 10km resolution   |                    6 |                                      |                                                         |
+
 # Caches
-
-
-
 
 
 ## Intel Core i5 CPU       M 520  @ 2.40GHz
