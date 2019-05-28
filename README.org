@@ -26,14 +26,14 @@ This works on CPU.
 
 Then I use this function to implement a 256 element FFT. Currently, this function isn't working.
 
-| file                   | generated code   | description                                                                                                                         |   |   |
-|------------------------+------------------+-------------------------------------------------------------------------------------------------------------------------------------+---+---|
-| gen.lisp               | cuda_try.cu      | read out some details about the cuda device, also tried and aborted porting fft code                                                |   |   |
-| gen-cpu.lisp           | cpu_try.c        | implement dft, fft. here i first understood how cooley-tukey split a 1d fft into ffts of 2d matrices and transpositions             |   |   |
-| gen-simd.lisp          | simd_try.c       | i tried to express the code from gen-cpu for vectorization. i gave up because it looks like a mess and will be much slower than gpu |   |   |
-| hex.lisp               | -none-           | hex representation for floating point constants. i use this in computer generated constants like twiddle factors for fft            |   |   |
-| gen-pycuda-colab.lisp  | pycuda_colab.py  | simple example that generates python containing a string with cuda code that can be run on google colab                             |   |   |
-| gen-pycuda-colab2.lisp | pycuda_colab2.py | 2 stage fft that runs on google colab. looks quite messy becaus cuda has no complex numbers                                         |   |   |
+| file                   | generated code   | description                                                                                                                             |   |   |
+|------------------------+------------------+-----------------------------------------------------------------------------------------------------------------------------------------+---+---|
+| gen.lisp               | cuda_try.cu      | read out some details about the cuda device, also tried and aborted porting fft code                                                    |   |   |
+| gen-cpu.lisp           | cpu_try.c        | implement dft, fft. here i first understood how cooley-tukey split a 1d fft into ffts of 2d matrices and transpositions                 |   |   |
+| gen-simd.lisp          | simd_try.c       | i tried to express the code from gen-cpu for vectorization. i gave up because it looks like a mess and will be much slower than gpu     |   |   |
+| hex.lisp               | -none-           | hex representation for floating point constants. i added this to cl-cpp-generator and use it for constants like twiddle factors for fft |   |   |
+| gen-pycuda-colab.lisp  | pycuda_colab.py  | simple example that generates python containing a string with cuda code that can be run on google colab                                 |   |   |
+| gen-pycuda-colab2.lisp | pycuda_colab2.py | 2 stage fft that runs on google colab. looks quite messy becaus cuda has no complex numbers                                             |   |   |
 
 
 # Caches
