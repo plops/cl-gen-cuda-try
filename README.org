@@ -37,11 +37,11 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - https://en.wikichip.org/wiki/intel/core_i5/i5-520m
 
 
-|-----+-------------------------+---------------------------+---------------------------------------+--------------------|
-| L1I | 	64 KiB          | 	2x32 KiB          | 	4-way set associative	 | write-back         |
-| L1D | 	64 KiB          | 	 2x32 KiB         | 	8-way set associative         | 	write-back |
-| L2  | 	512 KiB	  | 2x256 KiB                 | 	8-way set associative         | 	write-back |
-| L3  | 	3 MiB           | 		2x1.5 MiB | 	12-way set associative        | 	write-back |
+|-----+---------+-----------+------------------------+------------|
+| L1I | 64 KiB  | 2x32 KiB  | 4-way set associative  | write-back |
+| L1D | 64 KiB  | 2x32 KiB  | 8-way set associative  | write-back |
+| L2  | 512 KiB | 2x256 KiB | 8-way set associative  | write-back |
+| L3  | 3 MiB   | 2x1.5 MiB | 12-way set associative | write-back |
 
 ## Intel x7-x8750
 
