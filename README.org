@@ -5,14 +5,14 @@ code.  The code generator (https://github.com/plops/cl-cpp-generator)
 is very simple. A single function consumes a lisp like language and
 emits a string with C code.
 
-Although this approach is very simple, it gives access to the expressiveness 
-of Commmon Lisp macros. I can easily play around with different code
-structures, try ideas fast, test the performance and throw non-working
-attempts away without regret.
+Although this approach is very simple, it gives access to the
+expressiveness of Commmon Lisp macros. I can easily play around with
+different code structures, try ideas fast, test the performance and
+throw non-working attempts away without regret.
 
 
-Currently, I want to understand 2D Fast Fourier Transform. First on the
-CPU and eventually on the GPU.
+Currently, I want to understand 2D Fast Fourier Transform. First on
+the CPU and eventually on the GPU.
 
 How should memory accesses be ordered?
 
@@ -21,16 +21,14 @@ mixed approach faster?
 
 # Stages
 
-First I made a 16 element FFT with radix 4 work. It computes row-wise DFTs of a 4x4 matrix, transposes and does it again.
-This works on CPU.
+First I made a 16 element FFT with radix 4 work. It computes row-wise
+DFTs of a 4x4 matrix, transposes and does it again.  This works on
+CPU.
 
-Then I use this function to implement a 256 element FFT. Currently, this function isn't working.
+Then I use this function to implement a 256 element FFT. Currently,
+this function isn't working.
 
 # Caches
-
-
-
-
 
 ## Intel Core i5 CPU       M 520  @ 2.40GHz
 
@@ -84,24 +82,33 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 
 # Read performance counters
 
-- rdpmc instruction https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/595214
-  - PAPI overheads are typically in excess of 2000 cycles to read a single counter.  
-  -  "perf stat" command (or similar) will sometimes use these fixed function counters and will disable them on exit
+- rdpmc instruction
+  https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/595214
+  - PAPI overheads are typically in excess of 2000 cycles to read a
+    single counter.
+  -  "perf stat" command (or similar) will sometimes use these fixed
+    function counters and will disable them on exit
 
-- use kernel parameters isolcpus=0 to free one of the cpus for benchmarking
+- use kernel parameters isolcpus=0 to free one of the cpus for
+  benchmarking
 - https://easyperf.net/blog/2019/04/03/Precise-timing-of-machine-code-with-Linux-perf
 # References
 
-- cuda complex library https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp
+- cuda complex library
+  https://github.com/jtravs/cuda_complex/blob/master/cuda_complex.hpp
 
-- Vasily Volkov FFT on GPU (2008) https://people.eecs.berkeley.edu/~kubitron/courses/cs258-S08/projects/reports/project6_report.pdf
+- Vasily Volkov FFT on GPU (2008)
+  https://people.eecs.berkeley.edu/~kubitron/courses/cs258-S08/projects/reports/project6_report.pdf
 - https://github.com/vetter/shoc/blob/master/src/cuda/level1/fft/fftlib.cu
 - http://www.bealto.com/gpu-fft_intro.html
 - https://mc.stanford.edu/cgi-bin/images/7/75/SC08_FFT_on_GPUs.pdf
-- eliminate power-of-two memory stride for better caching https://www.davidhbailey.com/dhbpapers/fftzp.pdf
-- how to split dft into 2d https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
+- eliminate power-of-two memory stride for better caching
+  https://www.davidhbailey.com/dhbpapers/fftzp.pdf
+- how to split dft into 2d
+  https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
 
-- gcc vectorization https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
+- gcc vectorization
+  https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
 - profile mem access (2007) https://lwn.net/Articles/257209/
   - opannotate .. lists the source or assembler code of the program
     and shows the instructions where the event was recognized
@@ -110,40 +117,54 @@ Then I use this function to implement a 256 element FFT. Currently, this functio
 - http://www.brendangregg.com/blog/2017-05-09/cpu-utilization-is-wrong.html
 
 
-- good explanation how to measure and interprete timing http://sites.utexas.edu/jdm4372/2018/07/23/comments-on-timing-short-code-sections-on-intel-processors/
+- good explanation how to measure and interprete timing
+  http://sites.utexas.edu/jdm4372/2018/07/23/comments-on-timing-short-code-sections-on-intel-processors/
 - https://github.com/jdmccalpin/low-overhead-timers
 - https://github.com/jdmccalpin/periodic-performance-counters
 - offloading https://www.youtube.com/watch?v=kIA_UtdVabQ
-  - #pragma omp target teams distribute parallel for collapse(2) map(to:zr,zi,xscale,yscale) map(from:results[0:npixels])
+  - #pragma omp target teams distribute parallel for collapse(2)
+    map(to:zr,zi,xscale,yscale) map(from:results[0:npixels])
 - https://software.intel.com/en-us/forums/intel-isa-extensions/topic/289038
-  - working prefetch increases the cache misses (but speeds up execution)
+  - working prefetch increases the cache misses (but speeds up
+    execution)
   - resource stall ratio: RS_FULL ratio and ROB_FULL ratio
-  - Frequent resource stalls indicate the presence of tuning opportunities like frequent cache misses, long execution paths, and memory order buffer (MOB) stalls
+  - Frequent resource stalls indicate the presence of tuning
+    opportunities like frequent cache misses, long execution paths,
+    and memory order buffer (MOB) stalls
 - https://www.blackhat.com/docs/us-15/materials/us-15-Herath-These-Are-Not-Your-Grand-Daddys-CPU-Performance-Counters-CPU-Hardware-Performance-Counters-For-Security.pdf
-  - Performance Application Programming Interface http://icl.cs.utk.edu/papi/Perfmon2 http://perfmon2.sourceforge.net/
+  - Performance Application Programming Interface
+    http://icl.cs.utk.edu/papi/Perfmon2
+    http://perfmon2.sourceforge.net/
   - Andi Kleen's pmu-tools https://github.com/andikleen/pmu-tools
-    - toplev .. Estimate on which part of the CPU pipeline a workload bottlenecks using the TopDown mode 
-    -  sudo ./toplev.py --all --core C0 taskset -c 0 ~/stage/cl-gen-cuda-try/source/cpu_try_gcc
+    - toplev .. Estimate on which part of the CPU pipeline a workload
+      bottlenecks using the TopDown mode
+    -  sudo ./toplev.py --all --core C0 taskset -c 0
+      ~/stage/cl-gen-cuda-try/source/cpu_try_gcc
     - http://www.cs.technion.ac.il/~erangi/TMA_using_Linux_perf__Ahmad_Yasin.pdf
-      - turning hyperthreading off gives 8 (instead of 4 general purpose counters) since sandy bridge
-      - for profiling disable virtualization, turbo and smt 
-      - affinity: taskset0x<mask> in Linux or start /affinity 0x<mask> in Windows
-    - Performance Analysis in Modern Multicores (cpu architect intel)  http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf
-    - Butterfly FFT   http://cs.haifa.ac.il/courses/verilog/p2011.html
+      - turning hyperthreading off gives 8 (instead of 4 general
+        purpose counters) since sandy bridge
+      - for profiling disable virtualization, turbo and smt
+      - affinity: taskset0x<mask> in Linux or start /affinity 0x<mask>
+        in Windows
+    - Performance Analysis in Modern Multicores (cpu architect intel)
+      http://cs.haifa.ac.il/~yosi/PARC/yasin.pdf
+    - Butterfly FFT http://cs.haifa.ac.il/courses/verilog/p2011.html
   - LikwidPerfCtr https://github.com/rrze-likwid/likwid
 
 # References SIMD
 - gcc simd https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html
   - https://news.ycombinator.com/item?id=16050812
   - some simd helpers https://godbolt.org/g/N9VvXZ
-  - how to load https://stackoverflow.com/questions/9318115/loading-data-for-gccs-vector-extensions
-  - complex number https://stackoverflow.com/questions/41417061/how-to-enable-sse3-autovectorization-in-gcc
+  - how to load
+    https://stackoverflow.com/questions/9318115/loading-data-for-gccs-vector-extensions
+  - complex number
+    https://stackoverflow.com/questions/41417061/how-to-enable-sse3-autovectorization-in-gcc
   - complex https://github.com/Roger-luo/CSIMD
   - complex https://nullprogram.com/blog/2015/07/10/
-  - complex with eigen https://stackoverflow.com/questions/45298855/how-to-write-portable-simd-code-for-complex-multiplicative-reduction
-    - store real and imaginary parts in a way that they
-      can be directly loaded one packet at once, interleaved is not
-      good
+  - complex with eigen
+    https://stackoverflow.com/questions/45298855/how-to-write-portable-simd-code-for-complex-multiplicative-reduction
+    - store real and imaginary parts in a way that they can be
+      directly loaded one packet at once, interleaved is not good
     - -mfma -mavx512f
 - https://github.com/p12tic/libsimdpp
   - http://p12tic.github.io/libsimdpp/v2.2-dev/libsimdpp/w/
