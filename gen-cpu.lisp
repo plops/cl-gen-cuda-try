@@ -207,7 +207,7 @@
 
 	     ;; https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
 	     ;; ka and na run from 0..Na-1 for a of 1 or 2
-	     #+nil
+	     #-nil
 	     ,(let* ((n1 3)
 		    (n2 7)
 		     (n (* n1 n2))
@@ -217,7 +217,8 @@
 			 `(aref ,a ,(+ (* 1 x) (* n1 y))))
 		       (col-major (a x y)
 			 `(aref ,a ,(+ (* n2 x) (* 1 y)))))
-		 `(statements
+		  `(statements
+		    (raw "// https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm")
 		   (function (,dft ((a :type "float complex* __restrict__"))
 				   "float complex*")
 			     (setf a (funcall __builtin_assume_aligned a 64)) ;; tell compiler that argument ins 64byte aligned

@@ -21,7 +21,7 @@
 	  (raw " ")))))
   #.(in-package :cl-py-generator)
   (defparameter *path* "/home/martin/stage/cl-gen-cuda-try/")
-  (defparameter *code-file* "pycuda_colab2")
+  (defparameter *code-file* "pycuda_colab")
   (defparameter *source* (format nil "~a/source/~a" *path* *code-file*))
   (defparameter *code-facts*
     `((10 "")
